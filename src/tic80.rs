@@ -337,12 +337,14 @@ pub fn trib(x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32, color: u8) {
     unsafe { sys::trib(x1, y1, x2, y2, x3, y3, color) }
 }
 
+#[derive(Clone, Copy)]
 pub enum TextureSource {
     Tiles,
     Map,
     VBank1,
 }
 
+#[derive(Clone, Copy)]
 pub struct TTriOptions<'a> {
     pub texture_src: TextureSource,
     pub transparent: &'a [u8],

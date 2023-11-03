@@ -1,9 +1,6 @@
-#![cfg(feature = "buddy-alloc")]
-
+use buddy_alloc::{BuddyAllocParam, FastAllocParam, NonThreadsafeAlloc};
 use std::alloc::{GlobalAlloc, Layout};
 use std::cell::RefCell;
-
-use buddy_alloc::{BuddyAllocParam, FastAllocParam, NonThreadsafeAlloc};
 
 extern "C" {
     static __heap_base: u8;
@@ -12,8 +9,6 @@ extern "C" {
 const FAST_HEAP_SIZE: usize = 24 * 1024;
 const LEAF_SIZE: usize = 16;
 
-// This allocator implementation will, on first use, prepare a NonThreadsafeAlloc using all the remaining memory.
-// This is done at runtime as a workaround for the fact that __heap_base can't be accessed at compile time.
 struct TicAlloc(RefCell<Option<NonThreadsafeAlloc>>);
 
 unsafe impl GlobalAlloc for TicAlloc {

@@ -7,14 +7,11 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-buddy-alloc = { version = "0.4.1", optional = true }
+buddy-alloc = "0.4.1"
+glam = "0.24.2"
 lazy_static = "1.4.0"
 rand = { version = "0.8.5", default-features = false, features = ["small_rng"] }
 
 [profile.release]
 lto = true
 strip = true
-
-[features]
-# use `--no-default-features` or comment out next line to disable allocator
-default = ["buddy-alloc"]

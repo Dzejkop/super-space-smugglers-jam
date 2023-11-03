@@ -2,11 +2,6 @@ mod alloc;
 mod tic80;
 mod utils;
 
-use tic80::*;
-use utils::*;
-
-mod sprites {}
-
 mod btns {
     pub const UP: i32 = 0;
     pub const DOWN: i32 = 1;
@@ -14,7 +9,15 @@ mod btns {
     pub const RIGHT: i32 = 3;
 }
 
+use glam::*;
+use tic80::*;
+use utils::*;
+
 #[export_name = "TIC"]
 pub fn tic() {
     cls(0);
+
+    Sprite::slice(uvec2(1, 0), uvec2(2, 1))
+        .at(vec2(32.0, 32.0))
+        .render();
 }
