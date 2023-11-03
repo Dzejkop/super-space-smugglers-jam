@@ -62,10 +62,10 @@ pub struct Ship {
 }
 
 static mut SHIP: Ship = Ship {
-    x: 0.0,
+    x: 175.0,
     y: 0.0,
     vx: 0.0,
-    vy: 0.0,
+    vy: -1.0,
 };
 
 #[derive(Clone)]
@@ -161,52 +161,41 @@ fn draw_space_and_stuff() {
     }
 
     // Update the camera
-    unsafe {
-        let camera = camera_mut();
+    let camera = camera_mut();
 
-        const CAMERA_SPEED: f32 = 2.0;
+    const CAMERA_SPEED: f32 = 2.0;
 
-        if key(keys::A) {
-            camera.x += CAMERA_SPEED / camera.remap_zoom();
-        }
-
-        if key(keys::D) {
-            camera.x -= CAMERA_SPEED / camera.remap_zoom();
-        }
-
-        if key(keys::W) {
-            camera.y += CAMERA_SPEED / camera.remap_zoom();
-        }
-
-        if key(keys::S) {
-            camera.y -= CAMERA_SPEED / camera.remap_zoom();
-        }
-
-        let (world_x, world_y) = camera.screen_to_world(m.x as i32, m.y as i32);
-
-        // let zoom_factor = m.scroll_y as f32 * 0.001;
-
-        let target_zoom = if m.scroll_y > 0 {
-            1.0
-        } else if m.scroll_y < 0 {
-            0.0
-        } else {
-            camera.zoom
-        };
-
-        let zoom_change = (target_zoom - camera.zoom) * ZOOM_LERP;
-
-        // if zoom_change != 0.0 {
-        //     camera.x += (world_x - camera.x) * zoom_change;
-        //     camera.y += (world_y - camera.y) * zoom_change;
-        // }
-
-        camera.zoom += zoom_change;
+    if key(keys::A) {
+        camera.x += CAMERA_SPEED / camera.remap_zoom();
     }
+
+    if key(keys::D) {
+        camera.x -= CAMERA_SPEED / camera.remap_zoom();
+    }
+
+    if key(keys::W) {
+        camera.y += CAMERA_SPEED / camera.remap_zoom();
+    }
+
+    if key(keys::S) {
+        camera.y -= CAMERA_SPEED / camera.remap_zoom();
+    }
+
+    let target_zoom = if m.scroll_y > 0 {
+        1.0
+    } else if m.scroll_y < 0 {
+        0.0
+    } else {
+        camera.zoom
+    };
+
+    let zoom_change = (target_zoom - camera.zoom) * ZOOM_LERP;
+
+    camera.zoom += zoom_change;
 
     // Draw the planets
     unsafe {
-        let (ox, oy) = camera().world_to_screen(0.0, 0.0);
+        let (ox, oy) = camera.world_to_screen_integer(0.0, 0.0);
 
         for planet in &mut PLANETS.iter_mut() {
             planet.x = f32::sin(time() * planet.orbit_speed) * planet.orbit_radius;
@@ -216,16 +205,16 @@ fn draw_space_and_stuff() {
             circb(
                 ox,
                 oy,
-                (planet.orbit_radius * camera().remap_zoom()) as i32,
+                (planet.orbit_radius * camera.remap_zoom()) as i32,
                 planet.color,
             );
 
             // Draw planet
-            let (x, y) = camera().world_to_screen(planet.x, planet.y);
+            let (x, y) = camera.world_to_screen_integer(planet.x, planet.y);
             circ(
                 x,
                 y,
-                (camera().remap_zoom() * planet.radius) as i32,
+                (camera.remap_zoom() * planet.radius) as i32,
                 planet.color,
             );
         }
@@ -247,8 +236,12 @@ fn draw_space_and_stuff() {
         SHIP.x += SHIP.vx;
         SHIP.y += SHIP.vy;
 
-        let (x, y) = camera().world_to_screen(SHIP.x, SHIP.y);
-        circ(x, y, 2, 4);
+        let (x, y) = camera.world_to_screen_integer(SHIP.x, SHIP.y);
+
+        Img::sprite_idx_with_size(258, uvec2(2, 2))
+            .scale(camera.remap_zoom())
+            .at(vec2(x as f32, y as f32))
+            .draw();
 
         let mut prev_step = [SHIP.x, SHIP.y];
         for (idx, step) in simulate_trajectory(time(), &SHIP, &PLANETS)
@@ -256,8 +249,8 @@ fn draw_space_and_stuff() {
             .enumerate()
         {
             if idx % 100 == 0 {
-                let (x1, y1) = camera().world_to_screen(prev_step[0], prev_step[1]);
-                let (x2, y2) = camera().world_to_screen(step.x, step.y);
+                let (x1, y1) = camera.world_to_screen_integer(prev_step[0], prev_step[1]);
+                let (x2, y2) = camera.world_to_screen_integer(step.x, step.y);
 
                 line(x1 as f32, y1 as f32, x2 as f32, y2 as f32, 12);
 

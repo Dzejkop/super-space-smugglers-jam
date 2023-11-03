@@ -30,16 +30,22 @@ impl Camera {
         self.zoom * (MAX_ZOOM - MIN_ZOOM) + MIN_ZOOM
     }
 
-    pub fn world_to_screen(&self, x: f32, y: f32) -> (i32, i32) {
+    pub fn world_to_screen(&self, x: f32, y: f32) -> (f32, f32) {
         let cx = WIDTH / 2;
         let cy = HEIGHT / 2;
 
         let zoom = self.remap_zoom();
 
         (
-            ((self.x + x) * zoom + cx as f32) as i32,
-            ((self.y + y) * zoom + cy as f32) as i32,
+            (self.x + x) * zoom + cx as f32,
+            (self.y + y) * zoom + cy as f32,
         )
+    }
+
+    pub fn world_to_screen_integer(&self, x: f32, y: f32) -> (i32, i32) {
+        let (x, y) = self.world_to_screen(x, y);
+
+        (x as i32, y as i32)
     }
 
     pub fn screen_to_world(&self, x: i32, y: i32) -> (f32, f32) {

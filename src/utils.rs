@@ -32,6 +32,10 @@ impl Img {
         Self::sprite(uvec2(idx % 16, idx / 16), uvec2(1, 1))
     }
 
+    pub fn sprite_idx_with_size(idx: u32, size: UVec2) -> Self {
+        Self::sprite(uvec2(idx % 16, idx / 16), size)
+    }
+
     pub fn at(mut self, at: Vec2) -> Self {
         self.at = at;
         self
