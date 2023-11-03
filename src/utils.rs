@@ -38,6 +38,19 @@ pub mod keys {
     pub const X: i32 = 24;
     pub const Y: i32 = 25;
     pub const Z: i32 = 26;
+
+    pub const DIGIT_0: i32 = 27;
+    pub const DIGIT_1: i32 = 28;
+    pub const DIGIT_2: i32 = 29;
+    pub const DIGIT_3: i32 = 30;
+    pub const DIGIT_4: i32 = 31;
+    pub const DIGIT_5: i32 = 32;
+    pub const DIGIT_6: i32 = 33;
+    pub const DIGIT_7: i32 = 34;
+    pub const DIGIT_8: i32 = 35;
+    pub const SPACE: i32 = 48;
+
+    pub const DIGIT_9: i32 = 36;
 }
 
 pub struct Img {

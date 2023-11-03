@@ -329,4 +329,17 @@ fn draw_ui(game: &mut Game) {
             game.game_speed = GameSpeed::Fast;
         }
     }
+
+    if key(keys::DIGIT_1) {
+        game.game_speed = GameSpeed::Stop;
+    } else if key(keys::DIGIT_2) {
+        game.game_speed = GameSpeed::Normal;
+    } else if key(keys::DIGIT_3) {
+        game.game_speed = GameSpeed::Fast;
+    } else if keyp(keys::SPACE, 16, 16) {
+        game.game_speed = match game.game_speed {
+            GameSpeed::Stop => GameSpeed::Normal,
+            _ => GameSpeed::Stop,
+        };
+    }
 }
