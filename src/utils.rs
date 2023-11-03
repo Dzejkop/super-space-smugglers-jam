@@ -18,11 +18,7 @@ pub struct Img {
 }
 
 impl Img {
-    pub fn sprite(id: u32) -> Self {
-        Self::sprite_xy(uvec2(id % 16, id / 16), uvec2(1, 1))
-    }
-
-    pub fn sprite_xy(id: UVec2, size: UVec2) -> Self {
+    pub fn sprite(id: UVec2, size: UVec2) -> Self {
         Self {
             uv_min: id.as_vec2() * 8.0,
             uv_max: (id + size).as_vec2() * 8.0,
@@ -30,6 +26,10 @@ impl Img {
             rot: 0.0,
             scale: 1.0,
         }
+    }
+
+    pub fn sprite_idx(idx: u32) -> Self {
+        Self::sprite(uvec2(idx % 16, idx / 16), uvec2(1, 1))
     }
 
     pub fn at(mut self, at: Vec2) -> Self {

@@ -13,12 +13,12 @@ pub fn tic(rng: &mut dyn RngCore) {
         particle.life -= 1;
 
         let sprite = lerp(
-            particle.max_sprite as f32,
-            particle.min_sprite as f32,
+            particle.max_sprite_idx as f32,
+            particle.min_sprite_idx as f32,
             particle.life as f32 / particle.max_life as f32,
         ) as u32;
 
-        Img::sprite(sprite).at(particle.pos).draw();
+        Img::sprite_idx(sprite).at(particle.pos).draw();
 
         particle.pos += particle.vel;
         particle.vel *= vec2(rng.gen_range(0.5..1.0), rng.gen_range(0.5..1.0));
@@ -26,7 +26,7 @@ pub fn tic(rng: &mut dyn RngCore) {
     }
 }
 
-pub fn spawn(pos: Vec2, vel: Vec2, min_sprite: u32, max_sprite: u32, life: u32) {
+pub fn spawn(pos: Vec2, vel: Vec2, min_sprite_idx: u32, max_sprite_idx: u32, life: u32) {
     let particles = unsafe { &mut PARTICLES };
 
     for particle in particles {
@@ -34,8 +34,8 @@ pub fn spawn(pos: Vec2, vel: Vec2, min_sprite: u32, max_sprite: u32, life: u32) 
             *particle = Particle {
                 pos,
                 vel,
-                max_sprite,
-                min_sprite,
+                max_sprite_idx,
+                min_sprite_idx,
                 life,
                 max_life: life,
             };
@@ -51,8 +51,8 @@ static mut PARTICLES: [Particle; 128] = [Particle::null(); 128];
 struct Particle {
     pos: Vec2,
     vel: Vec2,
-    min_sprite: u32,
-    max_sprite: u32,
+    min_sprite_idx: u32,
+    max_sprite_idx: u32,
     life: u32,
     max_life: u32,
 }
@@ -62,8 +62,8 @@ impl Particle {
         Self {
             pos: vec2(0.0, 0.0),
             vel: vec2(0.0, 0.0),
-            min_sprite: 0,
-            max_sprite: 0,
+            min_sprite_idx: 0,
+            max_sprite_idx: 0,
             life: 0,
             max_life: 0,
         }

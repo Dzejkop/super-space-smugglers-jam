@@ -127,19 +127,22 @@ pub fn tic() {
 
     cls(0);
 
-    draw_ship(vec2(32.0, 32.0), time() * 0.001);
+    draw_police_ship(vec2(32.0, 64.0), time() * 0.001);
     draw_space_and_stuff();
 
     particles::tic(rng);
 }
 
-fn draw_ship(at: Vec2, rot: f32) {
-    Img::sprite_xy(uvec2(17, 18), uvec2(2, 2))
-        .at(at)
-        .rot(rot)
-        .draw();
+fn draw_police_ship(at: Vec2, rot: f32) {
+    let sprite = if time() % 600.0 < 300.0 {
+        uvec2(18, 16)
+    } else {
+        uvec2(20, 16)
+    };
 
-    Img::sprite_xy(uvec2(17, 20), uvec2(2, 2))
+    Img::sprite(sprite, uvec2(2, 2)).at(at).rot(rot).draw();
+
+    Img::sprite(uvec2(16, 18), uvec2(2, 2))
         .at(rotate(at + vec2(0.0, 16.0), at, rot))
         .rot(rot)
         .draw();
