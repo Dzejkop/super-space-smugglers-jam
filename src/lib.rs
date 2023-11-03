@@ -19,5 +19,7 @@ pub fn tic() {
 
     Sprite::slice(uvec2(1, 0), uvec2(2, 1))
         .at(vec2(32.0, 32.0))
+        .rot(time() * 0.01)
+        .scale(2.0)
         .render();
 }

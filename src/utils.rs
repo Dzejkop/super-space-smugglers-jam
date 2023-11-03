@@ -5,7 +5,8 @@ pub struct Sprite {
     uv_min: Vec2,
     uv_max: Vec2,
     at: Vec2,
-    size: Vec2,
+    rot: f32,
+    scale: f32,
 }
 
 impl Sprite {
@@ -14,7 +15,8 @@ impl Sprite {
             uv_min: id_min.as_vec2() * 8.0,
             uv_max: (id_max.as_vec2() + 1.0) * 8.0,
             at: vec2(0.0, 0.0),
-            size: ((id_max - id_min).as_vec2() + 1.0) * 8.0,
+            rot: 0.0,
+            scale: 1.0,
         }
     }
 
@@ -23,12 +25,51 @@ impl Sprite {
         self
     }
 
-    pub fn size(mut self, size: Vec2) -> Self {
-        self.size = size;
+    pub fn rot(mut self, rot: f32) -> Self {
+        self.rot = rot;
+        self
+    }
+
+    pub fn scale(mut self, scale: f32) -> Self {
+        self.scale = scale;
         self
     }
 
     pub fn render(self) {
+        let Self {
+            uv_min,
+            uv_max,
+            at,
+            rot,
+            scale,
+        } = self;
+
+        let size = (uv_max - uv_min) * scale;
+
+        let transform = |v: Vec2| -> Vec2 {
+            let offset = at + size * 0.5;
+            let v = v - offset;
+
+            offset
+                + vec2(
+                    v.x * rot.cos() - v.y * rot.sin(),
+                    v.x * rot.sin() + v.y * rot.cos(),
+                )
+        };
+
+        let v0 = at;
+        let v1 = vec2(at.x + size.x, at.y);
+        let v2 = vec2(at.x, at.y + size.y);
+        let v3 = at + size;
+
+        let uv0 = uv_min;
+        let uv1 = vec2(uv_max.x, uv_min.y);
+        let uv2 = vec2(uv_min.x, uv_max.y);
+        let uv3 = uv_max;
+
+        let vertices = [transform(v0), transform(v1), transform(v2), transform(v3)];
+        let uvs = [uv0, uv1, uv2, uv3];
+
         let opts = TTriOptions {
             texture_src: TextureSource::Tiles,
             transparent: &[],
@@ -38,36 +79,24 @@ impl Sprite {
             depth: false,
         };
 
-        ttri(
-            self.at.x + 0.0,
-            self.at.y + 0.0,
-            self.at.x + self.size.x,
-            self.at.y + 0.0,
-            self.at.x + 0.0,
-            self.at.y + self.size.y,
-            self.uv_min.x,
-            self.uv_min.y,
-            self.uv_max.x,
-            self.uv_min.y,
-            self.uv_min.x,
-            self.uv_max.y,
-            opts,
-        );
+        let tris = [[0, 1, 2], [2, 1, 3]];
 
-        ttri(
-            self.at.x + 0.0,
-            self.at.y + self.size.y,
-            self.at.x + self.size.x,
-            self.at.y + 0.0,
-            self.at.x + self.size.x,
-            self.at.y + self.size.y,
-            self.uv_min.x,
-            self.uv_max.y,
-            self.uv_max.x,
-            self.uv_min.y,
-            self.uv_max.x,
-            self.uv_max.y,
-            opts,
-        );
+        for [id0, id1, id2] in tris {
+            ttri(
+                vertices[id0].x,
+                vertices[id0].y,
+                vertices[id1].x,
+                vertices[id1].y,
+                vertices[id2].x,
+                vertices[id2].y,
+                uvs[id0].x,
+                uvs[id0].y,
+                uvs[id1].x,
+                uvs[id1].y,
+                uvs[id2].x,
+                uvs[id2].y,
+                opts,
+            );
+        }
     }
 }
