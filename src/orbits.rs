@@ -1,26 +1,28 @@
 use crate::{Planet, Ship};
 
+// Average time step at 60 FPS
 const TIME_STEP: f32 = 1000.0 / 60.0;
-const NUM_STEPS: usize = 10_000;
 
 #[derive(Clone, Copy)]
 pub struct TrajectoryStep {
+    pub n: usize,
     pub t: f32,
     pub x: f32,
     pub y: f32,
 }
 
-static mut TRAJECTORY: [TrajectoryStep; NUM_STEPS] = [TrajectoryStep {
-    t: 0.0,
-    x: 0.0,
-    y: 0.0,
-}; NUM_STEPS];
-
-pub fn simulate_trajectory(t: f32, ship: &Ship, planets: &[Planet]) -> &'static [TrajectoryStep] {
-    let mut planets = planets.to_vec();
+pub fn simulate_trajectory<const N: usize>(
+    t: f32,
+    ship: &Ship,
+    planets: &[Planet; N],
+) -> impl Iterator<Item = TrajectoryStep> {
+    let mut planets: [Planet; N] = planets.clone();
     let mut ship = ship.clone();
+    let mut n = 0;
 
-    for n in 0..NUM_STEPS {
+    std::iter::from_fn(move || {
+        n += 1;
+
         let time = t + TIME_STEP * n as f32;
 
         for planet in &mut planets {
@@ -43,12 +45,11 @@ pub fn simulate_trajectory(t: f32, ship: &Ship, planets: &[Planet]) -> &'static 
         ship.x += ship.vx;
         ship.y += ship.vy;
 
-        unsafe {
-            TRAJECTORY[n].t = time;
-            TRAJECTORY[n].x = ship.x;
-            TRAJECTORY[n].y = ship.y;
-        }
-    }
-
-    unsafe { &TRAJECTORY }
+        Some(TrajectoryStep {
+            n,
+            t: time,
+            x: ship.x,
+            y: ship.y,
+        })
+    })
 }

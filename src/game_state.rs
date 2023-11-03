@@ -10,6 +10,9 @@ pub struct Game {
     prev_time: f32,
 
     pub game_speed: GameSpeed,
+
+    // State
+    pub manouver_mode: bool,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -43,6 +46,7 @@ impl Game {
             time: 0.0,
             prev_time: 0.0,
             game_speed: GameSpeed::Stop,
+            manouver_mode: false,
         }
     }
 
@@ -62,5 +66,9 @@ impl Game {
 
     pub fn dt(&self) -> f32 {
         self.game_time - self.prev_game_time
+    }
+
+    pub fn is_paused(&self) -> bool {
+        self.game_speed == GameSpeed::Stop
     }
 }

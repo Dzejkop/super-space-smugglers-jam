@@ -211,23 +211,51 @@ fn draw_space_and_stuff() {
             .rot(game.time() * 0.001)
             .at(vec2(x as f32, y as f32))
             .draw();
+    }
 
-        circ(x, y, 5, 12);
+    unsafe {
+        let (mx, my) = camera.screen_to_world(m.x as i32, m.y as i32);
 
-        // let mut prev_step = [SHIP.x, SHIP.y];
-        // for (idx, step) in simulate_trajectory(time(), &SHIP, &PLANETS)
-        //     .iter()
-        //     .enumerate()
-        // {
-        //     if idx % 100 == 0 {
-        //         let (x1, y1) = camera.world_to_screen_integer(prev_step[0], prev_step[1]);
-        //         let (x2, y2) = camera.world_to_screen_integer(step.x, step.y);
+        let dx = SHIP.x - mx;
+        let dy = SHIP.y - my;
 
-        //         line(x1 as f32, y1 as f32, x2 as f32, y2 as f32, 12);
+        let d = dx * dx + dy * dy;
 
-        //         prev_step = [step.x, step.y];
-        //     }
-        // }
+        let (sx, sy) = camera.world_to_screen(SHIP.x, SHIP.y);
+        let (mx, my) = camera.world_to_screen(mx, my);
+
+        let dvx = (sx - mx) * 0.01;
+        let dvy = (sy - my) * 0.01;
+
+        if m.left && game.is_paused() && d < (10.0 / camera.remap_zoom()) && !game.manouver_mode {
+            game.manouver_mode = true;
+        }
+
+        if game.manouver_mode && !m.left {
+            game.manouver_mode = false;
+
+            // TODO: Maybe execute manouver
+            SHIP.vx += dvx;
+            SHIP.vy += dvy;
+        }
+
+        if game.manouver_mode {
+            let mut t_ship = SHIP.clone();
+            t_ship.vx += dvx;
+            t_ship.vy += dvy;
+
+            line(sx, sy, mx, my, 12);
+
+            let mut prev_step = [t_ship.x, t_ship.y];
+            for step in simulate_trajectory(time(), &t_ship, &PLANETS).take(1000) {
+                let (x1, y1) = camera.world_to_screen_integer(prev_step[0], prev_step[1]);
+                let (x2, y2) = camera.world_to_screen_integer(step.x, step.y);
+
+                line(x1 as f32, y1 as f32, x2 as f32, y2 as f32, 12);
+
+                prev_step = [step.x, step.y];
+            }
+        }
     }
 
     unsafe {
