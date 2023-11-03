@@ -169,12 +169,12 @@ fn draw_space_and_stuff() {
 
         circ(SHIP.x as i32, SHIP.y as i32, 2, 4);
 
-        for (idx, [px, py]) in simulate_trajectory(time(), &SHIP, &PLANETS)
+        for (idx, step) in simulate_trajectory(time(), &SHIP, &PLANETS)
             .iter()
             .enumerate()
         {
             if idx % 25 == 0 {
-                circ(*px as i32, *py as i32, 1, 7);
+                circ(step.x as i32, step.y as i32, 1, 7);
             }
         }
     }
@@ -191,6 +191,4 @@ fn draw_space_and_stuff() {
 
         TIME_PREV = time();
     }
-
-    // m.x
 }
