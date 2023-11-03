@@ -1,10 +1,12 @@
 mod alloc;
 mod camera;
 mod intro;
+mod game_state;
 mod orbits;
 mod particles;
 mod ship;
 mod text;
+mod sprites;
 mod tic80;
 mod utils;
 
@@ -12,10 +14,12 @@ use self::camera::*;
 use self::tic80::sys::print;
 use self::tic80::*;
 use self::utils::*;
+use crate::game_state::game_mut;
 use crate::orbits::simulate_trajectory;
 use crate::ship::*;
 use crate::text::*;
 
+use game_state::{Game, GameSpeed};
 use glam::*;
 use rand::rngs::SmallRng;
 use rand::SeedableRng;
@@ -120,18 +124,12 @@ pub fn tic() {
 fn draw_space_and_stuff() {
     let m = mouse();
 
-    if m.left && !unsafe { MOUSE_LEFT_PREV } {
-        unsafe {
-            SHIP.x = m.x as f32;
-            SHIP.y = m.y as f32;
-
-            SHIP.vx = 0.0;
-            SHIP.vy = 1.0;
-        }
-    }
-
     // Update the camera
     let camera = camera_mut();
+    let game = game_mut();
+
+    game.update();
+    let dt = game.dt();
 
     const CAMERA_SPEED: f32 = 2.0;
 
@@ -168,8 +166,8 @@ fn draw_space_and_stuff() {
         let (ox, oy) = camera.world_to_screen_integer(0.0, 0.0);
 
         for planet in &mut PLANETS.iter_mut() {
-            planet.x = f32::sin(time() * planet.orbit_speed) * planet.orbit_radius;
-            planet.y = f32::cos(time() * planet.orbit_speed) * planet.orbit_radius;
+            planet.x = f32::sin(game.time() * planet.orbit_speed) * planet.orbit_radius;
+            planet.y = f32::cos(game.time() * planet.orbit_speed) * planet.orbit_radius;
 
             // Draw orbit
             circb(
@@ -199,12 +197,12 @@ fn draw_space_and_stuff() {
 
             let f = planet.mass / d2;
 
-            SHIP.vx += f * dx;
-            SHIP.vy += f * dy;
+            SHIP.vx += f * dx * dt;
+            SHIP.vy += f * dy * dt;
         }
 
-        SHIP.x += SHIP.vx;
-        SHIP.y += SHIP.vy;
+        SHIP.x += SHIP.vx * dt;
+        SHIP.y += SHIP.vy * dt;
 
         let (x, y) = camera.world_to_screen_integer(SHIP.x, SHIP.y);
 
@@ -213,24 +211,20 @@ fn draw_space_and_stuff() {
             .at(vec2(x as f32, y as f32))
             .draw();
 
-        let mut prev_step = [SHIP.x, SHIP.y];
-        for (idx, step) in simulate_trajectory(time(), &SHIP, &PLANETS)
-            .iter()
-            .enumerate()
-        {
-            if idx % 100 == 0 {
-                let (x1, y1) = camera.world_to_screen_integer(prev_step[0], prev_step[1]);
-                let (x2, y2) = camera.world_to_screen_integer(step.x, step.y);
+        // let mut prev_step = [SHIP.x, SHIP.y];
+        // for (idx, step) in simulate_trajectory(time(), &SHIP, &PLANETS)
+        //     .iter()
+        //     .enumerate()
+        // {
+        //     if idx % 100 == 0 {
+        //         let (x1, y1) = camera.world_to_screen_integer(prev_step[0], prev_step[1]);
+        //         let (x2, y2) = camera.world_to_screen_integer(step.x, step.y);
 
-                line(x1 as f32, y1 as f32, x2 as f32, y2 as f32, 12);
+        //         line(x1 as f32, y1 as f32, x2 as f32, y2 as f32, 12);
 
-                prev_step = [step.x, step.y];
-            }
-        }
-    }
-
-    unsafe {
-        MOUSE_LEFT_PREV = m.left;
+        //         prev_step = [step.x, step.y];
+        //     }
+        // }
     }
 
     unsafe {
@@ -240,5 +234,96 @@ fn draw_space_and_stuff() {
         print(time_as_text.as_bytes().as_ptr(), 0, 0, 7, true, 1, false);
 
         TIME_PREV = time();
+    }
+
+    draw_ui(game);
+
+    unsafe {
+        MOUSE_LEFT_PREV = m.left;
+    }
+}
+
+fn draw_ui(game: &mut Game) {
+    let m = mouse();
+    let mx = m.x as i32;
+    let my = m.y as i32;
+
+    let mouse_over_stop_button = mx >= WIDTH - (16 * 3) - 4
+        && mx < WIDTH - (16 * 4) - 4 + 16 * 2
+        && my >= HEIGHT - 16 - 4
+        && my < HEIGHT - 16 - 4 + 16 * 2;
+
+    let mouse_over_play_button = mx >= WIDTH - (16 * 2) - 4
+        && mx < WIDTH - (16 * 3) - 4 + 16 * 2
+        && my >= HEIGHT - 16 - 4
+        && my < HEIGHT - 16 - 4 + 16 * 2;
+
+    let mouse_over_fast_button = mx >= WIDTH - (16 * 1) - 4
+        && mx < WIDTH - (16 * 2) - 4 + 16 * 2
+        && my >= HEIGHT - 16 - 4
+        && my < HEIGHT - 16 - 4 + 16 * 2;
+
+    spr(
+        if matches!(game.game_speed, GameSpeed::Stop) {
+            sprites::ui::buttons::active::STOP
+        } else if mouse_over_stop_button {
+            sprites::ui::buttons::highlighted::STOP
+        } else {
+            sprites::ui::buttons::inactive::STOP
+        },
+        WIDTH - (16 * 3) - 4,
+        HEIGHT - 16 - 4,
+        SpriteOptions {
+            w: 2,
+            h: 2,
+            transparent: &[0],
+            ..Default::default()
+        },
+    );
+
+    spr(
+        if matches!(game.game_speed, GameSpeed::Normal) {
+            sprites::ui::buttons::active::NORMAL
+        } else if mouse_over_play_button {
+            sprites::ui::buttons::highlighted::NORMAL
+        } else {
+            sprites::ui::buttons::inactive::NORMAL
+        },
+        WIDTH - (16 * 2) - 4,
+        HEIGHT - 16 - 4,
+        SpriteOptions {
+            w: 2,
+            h: 2,
+            transparent: &[0],
+            ..Default::default()
+        },
+    );
+
+    spr(
+        if matches!(game.game_speed, GameSpeed::Fast) {
+            sprites::ui::buttons::active::FAST
+        } else if mouse_over_fast_button {
+            sprites::ui::buttons::highlighted::FAST
+        } else {
+            sprites::ui::buttons::inactive::FAST
+        },
+        WIDTH - (16 * 1) - 4,
+        HEIGHT - 16 - 4,
+        SpriteOptions {
+            w: 2,
+            h: 2,
+            transparent: &[0],
+            ..Default::default()
+        },
+    );
+
+    if m.left && !unsafe { MOUSE_LEFT_PREV } {
+        if mouse_over_stop_button {
+            game.game_speed = GameSpeed::Stop;
+        } else if mouse_over_play_button {
+            game.game_speed = GameSpeed::Normal;
+        } else if mouse_over_fast_button {
+            game.game_speed = GameSpeed::Fast;
+        }
     }
 }
