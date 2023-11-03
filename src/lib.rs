@@ -1,26 +1,16 @@
 mod alloc;
 mod orbits;
+mod particles;
 mod tic80;
 mod utils;
 
-use tic80::sys::print;
-use tic80::*;
-use utils::*;
-
+use self::tic80::sys::print;
+use self::tic80::*;
+use self::utils::*;
 use crate::orbits::simulate_trajectory;
-
-mod sprites {}
-
-mod btns {
-    pub const UP: i32 = 0;
-    pub const DOWN: i32 = 1;
-    pub const LEFT: i32 = 2;
-    pub const RIGHT: i32 = 3;
-}
-
 use glam::*;
-use tic80::*;
-use utils::*;
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 
 const SHIP_MASS: f32 = 0.0001;
 
@@ -88,20 +78,29 @@ static mut MOUSE_LEFT_PREV: bool = false;
 
 static mut TIME_PREV: f32 = 0.0;
 
+static mut RNG: Option<SmallRng> = None;
+
 #[export_name = "TIC"]
 pub fn tic() {
+    let rng = unsafe { RNG.get_or_insert_with(|| SmallRng::seed_from_u64(64)) };
+
+    // ---
+
     cls(0);
 
     draw_ship(vec2(32.0, 32.0), time() * 0.001);
     draw_space_and_stuff();
+
+    particles::tic(rng);
 }
 
 fn draw_ship(at: Vec2, rot: f32) {
-    // Main ship
-    Img::sprite(uvec2(1, 2), uvec2(2, 2)).at(at).rot(rot).draw();
+    Img::sprite_xy(uvec2(17, 18), uvec2(2, 2))
+        .at(at)
+        .rot(rot)
+        .draw();
 
-    // Bottom thruster
-    Img::sprite(uvec2(1, 4), uvec2(2, 2))
+    Img::sprite_xy(uvec2(17, 20), uvec2(2, 2))
         .at(rotate(at + vec2(0.0, 16.0), at, rot))
         .rot(rot)
         .draw();

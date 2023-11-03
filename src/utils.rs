@@ -1,5 +1,13 @@
 use crate::tic80::*;
 use glam::*;
+use std::ops;
+
+pub mod btns {
+    pub const UP: i32 = 0;
+    pub const DOWN: i32 = 1;
+    pub const LEFT: i32 = 2;
+    pub const RIGHT: i32 = 3;
+}
 
 pub struct Img {
     uv_min: Vec2,
@@ -10,14 +18,14 @@ pub struct Img {
 }
 
 impl Img {
-    pub fn sprite(id: UVec2, size: UVec2) -> Self {
-        let id = 16 + id;
-        let id_min = id;
-        let id_max = id + size;
+    pub fn sprite(id: u32) -> Self {
+        Self::sprite_xy(uvec2(id % 16, id / 16), uvec2(1, 1))
+    }
 
+    pub fn sprite_xy(id: UVec2, size: UVec2) -> Self {
         Self {
-            uv_min: id_min.as_vec2() * 8.0,
-            uv_max: id_max.as_vec2() * 8.0,
+            uv_min: id.as_vec2() * 8.0,
+            uv_max: (id + size).as_vec2() * 8.0,
             at: vec2(0.0, 0.0),
             rot: 0.0,
             scale: 1.0,
@@ -66,7 +74,7 @@ impl Img {
 
         let opts = TTriOptions {
             texture_src: TextureSource::Tiles,
-            transparent: &[],
+            transparent: &[0],
             z1: 0.0,
             z2: 0.0,
             z3: 0.0,
@@ -97,4 +105,14 @@ impl Img {
 
 pub fn rotate(point: Vec2, around: Vec2, angle: f32) -> Vec2 {
     (point - around).rotate(vec2(angle.cos(), angle.sin())) + around
+}
+
+pub fn lerp<T>(a: T, b: T, t: f32) -> T
+where
+    T: ops::Add<Output = T>,
+    T: ops::Sub<Output = T>,
+    T: ops::Mul<f32, Output = T>,
+    T: Copy,
+{
+    a + (b - a) * t.clamp(0.0, 1.0)
 }
