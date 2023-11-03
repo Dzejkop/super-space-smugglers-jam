@@ -45,7 +45,7 @@ pub fn spawn(pos: Vec2, vel: Vec2, min_sprite: u32, max_sprite: u32, life: u32) 
     }
 }
 
-static mut PARTICLES: [Particle; 256] = [Particle::null(); 256];
+static mut PARTICLES: [Particle; 128] = [Particle::null(); 128];
 
 #[derive(Clone, Copy)]
 struct Particle {
