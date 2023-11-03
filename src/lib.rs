@@ -1,14 +1,19 @@
 mod alloc;
 mod camera;
-mod intro;
 mod game_state;
+mod intro;
 mod orbits;
 mod particles;
 mod ship;
-mod text;
 mod sprites;
+mod text;
 mod tic80;
 mod utils;
+
+use game_state::{Game, GameSpeed};
+use glam::*;
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 
 use self::camera::*;
 use self::tic80::sys::print;
@@ -18,11 +23,6 @@ use crate::game_state::game_mut;
 use crate::orbits::simulate_trajectory;
 use crate::ship::*;
 use crate::text::*;
-
-use game_state::{Game, GameSpeed};
-use glam::*;
-use rand::rngs::SmallRng;
-use rand::SeedableRng;
 
 #[derive(Clone)]
 pub struct Ship {
@@ -208,8 +208,11 @@ fn draw_space_and_stuff() {
 
         Img::sprite_idx_with_size(258, uvec2(2, 2))
             // .scale(camera.remap_zoom())
+            .rot(game.time() * 0.001)
             .at(vec2(x as f32, y as f32))
             .draw();
+
+        circ(x, y, 5, 12);
 
         // let mut prev_step = [SHIP.x, SHIP.y];
         // for (idx, step) in simulate_trajectory(time(), &SHIP, &PLANETS)

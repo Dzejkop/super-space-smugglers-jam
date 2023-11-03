@@ -94,12 +94,10 @@ impl Img {
         let size = (uv_max - uv_min) * scale;
         let transform = |vertex| rotate(vertex, at + size * 0.5, rot);
 
-        let half_size = size * 0.5;
-
-        let v0 = at - half_size;
-        let v1 = vec2(at.x + half_size.x, at.y - half_size.y);
-        let v2 = vec2(at.x - half_size.x, at.y + half_size.y);
-        let v3 = at + half_size;
+        let v0 = at;
+        let v1 = vec2(at.x + size.x, at.y);
+        let v2 = vec2(at.x, at.y + size.y);
+        let v3 = at + size;
 
         let uv0 = uv_min;
         let uv1 = vec2(uv_max.x, uv_min.y);
