@@ -6,7 +6,6 @@ mod tic80;
 mod utils;
 
 use self::camera::*;
-
 use self::tic80::sys::print;
 use self::tic80::*;
 use self::utils::*;
@@ -14,14 +13,14 @@ use crate::orbits::simulate_trajectory;
 
 mod sprites {}
 
-mod btns {
+pub mod btns {
     pub const UP: i32 = 0;
     pub const DOWN: i32 = 1;
     pub const LEFT: i32 = 2;
     pub const RIGHT: i32 = 3;
 }
 
-mod keys {
+pub mod keys {
     pub const A: i32 = 1;
     pub const B: i32 = 2;
     pub const C: i32 = 3;
@@ -163,23 +162,46 @@ fn draw_space_and_stuff() {
 
     // Update the camera
     unsafe {
+        let camera = camera_mut();
+
+        const CAMERA_SPEED: f32 = 2.0;
+
         if key(keys::A) {
-            camera_mut().x += 1.0;
+            camera.x += CAMERA_SPEED / camera.remap_zoom();
         }
 
         if key(keys::D) {
-            camera_mut().x -= 1.0;
+            camera.x -= CAMERA_SPEED / camera.remap_zoom();
         }
 
         if key(keys::W) {
-            camera_mut().y += 1.0;
+            camera.y += CAMERA_SPEED / camera.remap_zoom();
         }
 
         if key(keys::S) {
-            camera_mut().y -= 1.0;
+            camera.y -= CAMERA_SPEED / camera.remap_zoom();
         }
 
-        camera_mut().zoom += m.scroll_y as f32 * 0.001;
+        let (world_x, world_y) = camera.screen_to_world(m.x as i32, m.y as i32);
+
+        // let zoom_factor = m.scroll_y as f32 * 0.001;
+
+        let target_zoom = if m.scroll_y > 0 {
+            1.0
+        } else if m.scroll_y < 0 {
+            0.0
+        } else {
+            camera.zoom
+        };
+
+        let zoom_change = (target_zoom - camera.zoom) * ZOOM_LERP;
+
+        // if zoom_change != 0.0 {
+        //     camera.x += (world_x - camera.x) * zoom_change;
+        //     camera.y += (world_y - camera.y) * zoom_change;
+        // }
+
+        camera.zoom += zoom_change;
     }
 
     // Draw the planets
@@ -194,13 +216,18 @@ fn draw_space_and_stuff() {
             circb(
                 ox,
                 oy,
-                (planet.orbit_radius * camera().zoom) as i32,
+                (planet.orbit_radius * camera().remap_zoom()) as i32,
                 planet.color,
             );
 
             // Draw planet
             let (x, y) = camera().world_to_screen(planet.x, planet.y);
-            circ(x, y, (camera().zoom * planet.radius) as i32, planet.color);
+            circ(
+                x,
+                y,
+                (camera().remap_zoom() * planet.radius) as i32,
+                planet.color,
+            );
         }
     }
 
