@@ -1,6 +1,8 @@
-use crate::tic80::*;
-use glam::*;
 use std::ops;
+
+use glam::*;
+
+use crate::tic80::*;
 
 pub mod btns {
     pub const UP: i32 = 0;
@@ -92,10 +94,12 @@ impl Img {
         let size = (uv_max - uv_min) * scale;
         let transform = |vertex| rotate(vertex, at + size * 0.5, rot);
 
-        let v0 = at;
-        let v1 = vec2(at.x + size.x, at.y);
-        let v2 = vec2(at.x, at.y + size.y);
-        let v3 = at + size;
+        let half_size = size * 0.5;
+
+        let v0 = at - half_size;
+        let v1 = vec2(at.x + half_size.x, at.y - half_size.y);
+        let v2 = vec2(at.x - half_size.x, at.y + half_size.y);
+        let v3 = at + half_size;
 
         let uv0 = uv_min;
         let uv1 = vec2(uv_max.x, uv_min.y);

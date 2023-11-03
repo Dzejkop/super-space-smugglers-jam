@@ -67,19 +67,19 @@ static mut PLANETS: [Planet; 3] = [
     Planet {
         x: 0.0,
         y: 0.0,
-        orbit_radius: 250.0,
+        orbit_radius: 500.0,
         orbit_speed: 0.0002,
-        radius: 5.0,
-        mass: 0.1,
+        radius: 20.0,
+        mass: 0.02,
         color: 3,
     },
     Planet {
         x: 0.0,
         y: 0.0,
-        orbit_radius: 500.0,
+        orbit_radius: 1000.0,
         orbit_speed: 0.00001,
-        radius: 2.0,
-        mass: 0.01,
+        radius: 10.0,
+        mass: 0.001,
         color: 2,
     },
 ];
@@ -207,7 +207,7 @@ fn draw_space_and_stuff() {
         let (x, y) = camera.world_to_screen_integer(SHIP.x, SHIP.y);
 
         Img::sprite_idx_with_size(258, uvec2(2, 2))
-            .scale(camera.remap_zoom())
+            // .scale(camera.remap_zoom())
             .at(vec2(x as f32, y as f32))
             .draw();
 
