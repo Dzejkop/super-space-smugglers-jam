@@ -1,7 +1,10 @@
 mod alloc;
 mod camera;
+mod intro;
 mod orbits;
 mod particles;
+mod ship;
+mod text;
 mod tic80;
 mod utils;
 
@@ -10,44 +13,8 @@ use self::tic80::sys::print;
 use self::tic80::*;
 use self::utils::*;
 use crate::orbits::simulate_trajectory;
-
-mod sprites {}
-
-pub mod btns {
-    pub const UP: i32 = 0;
-    pub const DOWN: i32 = 1;
-    pub const LEFT: i32 = 2;
-    pub const RIGHT: i32 = 3;
-}
-
-pub mod keys {
-    pub const A: i32 = 1;
-    pub const B: i32 = 2;
-    pub const C: i32 = 3;
-    pub const D: i32 = 4;
-    pub const E: i32 = 5;
-    pub const F: i32 = 6;
-    pub const G: i32 = 7;
-    pub const H: i32 = 8;
-    pub const I: i32 = 9;
-    pub const J: i32 = 10;
-    pub const K: i32 = 11;
-    pub const L: i32 = 12;
-    pub const M: i32 = 13;
-    pub const N: i32 = 14;
-    pub const O: i32 = 15;
-    pub const P: i32 = 16;
-    pub const Q: i32 = 17;
-    pub const R: i32 = 18;
-    pub const S: i32 = 19;
-    pub const T: i32 = 20;
-    pub const U: i32 = 21;
-    pub const V: i32 = 22;
-    pub const W: i32 = 23;
-    pub const X: i32 = 24;
-    pub const Y: i32 = 25;
-    pub const Z: i32 = 26;
-}
+use crate::ship::*;
+use crate::text::*;
 
 use glam::*;
 use rand::rngs::SmallRng;
@@ -118,33 +85,36 @@ static mut TIME_PREV: f32 = 0.0;
 
 static mut RNG: Option<SmallRng> = None;
 
+enum State {
+    Intro,
+    Playing,
+}
+
+// TODO change before release
+static mut STATE: State = State::Playing;
+
 #[export_name = "TIC"]
 pub fn tic() {
     let rng = unsafe { RNG.get_or_insert_with(|| SmallRng::seed_from_u64(64)) };
+    let state = unsafe { &mut STATE };
 
     // ---
 
     cls(0);
 
-    draw_police_ship(vec2(32.0, 64.0), time() * 0.001);
-    draw_space_and_stuff();
+    match state {
+        State::Intro => {
+            if intro::tic() {
+                *state = State::Playing;
+            }
 
-    particles::tic(rng);
-}
+            particles::tic(rng);
+        }
 
-fn draw_police_ship(at: Vec2, rot: f32) {
-    let sprite = if time() % 600.0 < 300.0 {
-        uvec2(18, 16)
-    } else {
-        uvec2(20, 16)
-    };
-
-    Img::sprite(sprite, uvec2(2, 2)).at(at).rot(rot).draw();
-
-    Img::sprite(uvec2(16, 18), uvec2(2, 2))
-        .at(rotate(at + vec2(0.0, 16.0), at, rot))
-        .rot(rot)
-        .draw();
+        State::Playing => {
+            draw_space_and_stuff();
+        }
+    }
 }
 
 fn draw_space_and_stuff() {

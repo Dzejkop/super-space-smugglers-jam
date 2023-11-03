@@ -1,4 +1,4 @@
-use crate::utils::*;
+use crate::{tic80::*, utils::*};
 use glam::*;
 use rand::{Rng, RngCore};
 
@@ -43,6 +43,26 @@ pub fn spawn(pos: Vec2, vel: Vec2, min_sprite_idx: u32, max_sprite_idx: u32, lif
             break;
         }
     }
+}
+
+pub fn is_any_visible() -> bool {
+    let particles = unsafe { &PARTICLES };
+
+    for particle in particles {
+        if particle.life == 0 {
+            continue;
+        }
+
+        if particle.pos.x >= -4.0
+            && particle.pos.y >= -4.0
+            && particle.pos.x <= (WIDTH as f32) + 4.0
+            && particle.pos.y <= (HEIGHT as f32) + 4.0
+        {
+            return true;
+        }
+    }
+
+    false
 }
 
 static mut PARTICLES: [Particle; 128] = [Particle::null(); 128];

@@ -9,6 +9,35 @@ pub mod btns {
     pub const RIGHT: i32 = 3;
 }
 
+pub mod keys {
+    pub const A: i32 = 1;
+    pub const B: i32 = 2;
+    pub const C: i32 = 3;
+    pub const D: i32 = 4;
+    pub const E: i32 = 5;
+    pub const F: i32 = 6;
+    pub const G: i32 = 7;
+    pub const H: i32 = 8;
+    pub const I: i32 = 9;
+    pub const J: i32 = 10;
+    pub const K: i32 = 11;
+    pub const L: i32 = 12;
+    pub const M: i32 = 13;
+    pub const N: i32 = 14;
+    pub const O: i32 = 15;
+    pub const P: i32 = 16;
+    pub const Q: i32 = 17;
+    pub const R: i32 = 18;
+    pub const S: i32 = 19;
+    pub const T: i32 = 20;
+    pub const U: i32 = 21;
+    pub const V: i32 = 22;
+    pub const W: i32 = 23;
+    pub const X: i32 = 24;
+    pub const Y: i32 = 25;
+    pub const Z: i32 = 26;
+}
+
 pub struct Img {
     uv_min: Vec2,
     uv_max: Vec2,
