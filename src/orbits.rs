@@ -1,5 +1,4 @@
-use crate::tic80::{HEIGHT, WIDTH};
-use crate::{Planet, Ship, SHIP_MASS};
+use crate::{Planet, Ship};
 
 const TIME_STEP: f32 = 1000.0 / 60.0;
 const NUM_STEPS: usize = 10_000;
@@ -21,23 +20,21 @@ pub fn simulate_trajectory(t: f32, ship: &Ship, planets: &[Planet]) -> &'static 
     let mut planets = planets.to_vec();
     let mut ship = ship.clone();
 
-    let cx = WIDTH / 2;
-    let cy = HEIGHT / 2;
-
     for n in 0..NUM_STEPS {
         let time = t + TIME_STEP * n as f32;
 
         for planet in &mut planets {
-            planet.x = cx as f32 + f32::sin(time * planet.orbit_speed) * planet.orbit_radius;
-            planet.y = cy as f32 + f32::cos(time * planet.orbit_speed) * planet.orbit_radius;
+            planet.x = f32::sin(time * planet.orbit_speed) * planet.orbit_radius;
+            planet.y = f32::cos(time * planet.orbit_speed) * planet.orbit_radius;
         }
 
         for planet in &planets {
             let dx = planet.x - ship.x;
             let dy = planet.y - ship.y;
-            let d2 = dx * dx + dy * dy;
 
-            let f = planet.mass * SHIP_MASS / d2;
+            let d = dx * dx + dy * dy;
+
+            let f = planet.mass / d;
 
             ship.vx += f * dx;
             ship.vy += f * dy;
