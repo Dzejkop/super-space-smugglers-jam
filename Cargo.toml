@@ -1,0 +1,20 @@
+[package]
+name = "cart"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+buddy-alloc = { version = "0.4.1", optional = true }
+lazy_static = "1.4.0"
+rand = { version = "0.8.5", default-features = false, features = ["small_rng"] }
+
+[profile.release]
+lto = true
+strip = true
+
+[features]
+# use `--no-default-features` or comment out next line to disable allocator
+default = ["buddy-alloc"]
