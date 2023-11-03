@@ -17,9 +17,16 @@ use utils::*;
 pub fn tic() {
     cls(0);
 
-    Sprite::slice(uvec2(1, 0), uvec2(2, 1))
-        .at(vec2(32.0, 32.0))
-        .rot(time() * 0.01)
-        .scale(2.0)
-        .render();
+    draw_ship(vec2(32.0, 32.0), time() * 0.001);
+}
+
+fn draw_ship(at: Vec2, rot: f32) {
+    // Main ship
+    Img::sprite(uvec2(1, 2), uvec2(2, 2)).at(at).rot(rot).draw();
+
+    // Bottom thruster
+    Img::sprite(uvec2(1, 4), uvec2(2, 2))
+        .at(rotate(at + vec2(0.0, 16.0), at, rot))
+        .rot(rot)
+        .draw();
 }

@@ -1,7 +1,7 @@
 use crate::tic80::*;
 use glam::*;
 
-pub struct Sprite {
+pub struct Img {
     uv_min: Vec2,
     uv_max: Vec2,
     at: Vec2,
@@ -9,11 +9,15 @@ pub struct Sprite {
     scale: f32,
 }
 
-impl Sprite {
-    pub fn slice(id_min: UVec2, id_max: UVec2) -> Self {
+impl Img {
+    pub fn sprite(id: UVec2, size: UVec2) -> Self {
+        let id = 16 + id;
+        let id_min = id;
+        let id_max = id + size;
+
         Self {
             uv_min: id_min.as_vec2() * 8.0,
-            uv_max: (id_max.as_vec2() + 1.0) * 8.0,
+            uv_max: id_max.as_vec2() * 8.0,
             at: vec2(0.0, 0.0),
             rot: 0.0,
             scale: 1.0,
@@ -35,7 +39,7 @@ impl Sprite {
         self
     }
 
-    pub fn render(self) {
+    pub fn draw(self) {
         let Self {
             uv_min,
             uv_max,
@@ -45,17 +49,7 @@ impl Sprite {
         } = self;
 
         let size = (uv_max - uv_min) * scale;
-
-        let transform = |v: Vec2| -> Vec2 {
-            let offset = at + size * 0.5;
-            let v = v - offset;
-
-            offset
-                + vec2(
-                    v.x * rot.cos() - v.y * rot.sin(),
-                    v.x * rot.sin() + v.y * rot.cos(),
-                )
-        };
+        let transform = |vertex| rotate(vertex, at + size * 0.5, rot);
 
         let v0 = at;
         let v1 = vec2(at.x + size.x, at.y);
@@ -99,4 +93,8 @@ impl Sprite {
             );
         }
     }
+}
+
+pub fn rotate(point: Vec2, around: Vec2, angle: f32) -> Vec2 {
+    (point - around).rotate(vec2(angle.cos(), angle.sin())) + around
 }
