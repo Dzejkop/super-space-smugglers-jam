@@ -71,7 +71,7 @@ impl ShipSprite {
                 .draw();
         }
 
-        engine_at + vec2(4.0, 4.0)
+        engine_at
     }
 }
 

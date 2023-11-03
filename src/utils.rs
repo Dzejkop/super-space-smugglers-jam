@@ -105,7 +105,7 @@ impl Img {
         } = self;
 
         let size = (uv_max - uv_min) * scale;
-        let transform = |vertex| rotate(vertex, at + size * 0.5, rot);
+        let transform = |vertex| rotate(vertex, at + size * 0.5, rot) - size * 0.5;
 
         let v0 = at;
         let v1 = vec2(at.x + size.x, at.y);
