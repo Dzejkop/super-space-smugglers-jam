@@ -12,13 +12,15 @@ cargo build --release
 
 To start and load
 ```
-tic80 --fs . --cmd 'load game.tic & import binary target/wasm32-unknown-unknown/release/cart.wasm'
+tic80 --fs . --cmd 'load game.wasmp & import binary target/wasm32-unknown-unknown/release/cart.wasm'
 ```
 
-Make sure to save inside TIC-80 when making changes to assets or after importing the .wasm file.
+Once the TIC-80 is loaded you can just reimport the wasm file after it was compiled with
+```
+import binary target/wasm32-unknown-unknown/release/cart.wasm
+```
 
-Saving to `.wasmp` currently doesn't work because it doesn't save the imported binary data.
-So let's just stick to `game.tic` for now
+When saving, make sure to save to `game.wasmp`
 
 # Notes from the original template
 
