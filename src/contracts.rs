@@ -226,11 +226,9 @@ pub fn tic(
                 let planet_pos = camera.world_to_screen(planet.pos);
                 let idx = 2 - idx;
 
-                if time() % 1000.0 < 500.0 {
-                    Arrow::new(mpos, planet_pos, planet.color)
-                        .margin(5.0)
-                        .draw();
-                }
+                Arrow::new(mpos, planet_pos, planet.color)
+                    .margin(5.0)
+                    .draw();
             }
         }
     }
