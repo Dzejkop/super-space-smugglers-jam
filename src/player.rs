@@ -35,7 +35,7 @@ pub fn tic(camera: &Camera, game: &Game, planets: &[Planet]) {
 
     let at = camera.world_to_screen(ship.pos);
 
-    let engine_at = ShipSprite::player()
+    ShipSprite::player()
         .at(at)
         .rot(game.time() * 0.001)
         .scale((3.0 * camera.zoom).max(0.15))

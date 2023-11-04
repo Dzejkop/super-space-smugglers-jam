@@ -35,7 +35,7 @@ mod prelude {
     pub(crate) use crate::text::Text;
     pub(crate) use crate::tic80::*;
     pub(crate) use crate::utils::*;
-    pub(crate) use crate::{msgs, orbits, particles};
+    pub(crate) use crate::{msgs, orbits, particles, police};
 }
 
 use rand::rngs::SmallRng;
@@ -48,6 +48,7 @@ static mut RNG: Option<SmallRng> = None;
 enum State {
     Intro,
     Playing,
+    GameOver,
 }
 
 // TODO change before release
@@ -70,19 +71,21 @@ pub fn tic() {
             particles::tic(rng, None);
         }
 
-        State::Playing => unsafe {
+        State::Playing | State::GameOver => unsafe {
             game::tic();
             camera::tic();
             planets::tic(camera::get(), game::get());
             player::tic(camera::get(), game::get(), planets::get());
 
-            police::tic(
+            if police::tic(
                 rng,
                 camera::get(),
                 player::get(),
                 planets::get(),
-                game::get(),
-            );
+                game::get_mut(),
+            ) {
+                *state = State::GameOver;
+            }
 
             draw_space_and_stuff(
                 camera::get(),
@@ -93,7 +96,7 @@ pub fn tic() {
 
             particles::tic(rng, Some(camera::get()));
             msgs::tic();
-            ui::tic(game::get_mut());
+            ui::tic(game::get_mut(), police::get());
         },
     }
 }

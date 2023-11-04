@@ -25,24 +25,24 @@ pub fn tic() -> bool {
 
     Text::new("Space: Out of Control")
         .at(vec2(WIDTH as f32, 45.0 - text_offset))
-        .centered()
+        .align_center()
         .draw();
 
     Text::new("Game for TK Game Jam 2023")
         .at(vec2(WIDTH as f32, 60.0 - text_offset))
-        .centered()
+        .align_center()
         .draw();
 
     Text::new("by dzejkop & Patryk27")
         .at(vec2(WIDTH as f32, 68.0 - text_offset))
-        .centered()
+        .align_center()
         .draw();
 
     if time % 1.0 < 0.5 {
         Text::new("Press any key to start")
             .at(vec2(WIDTH as f32, 90.0 + text_offset))
             .color(5)
-            .centered()
+            .align_center()
             .draw();
     }
 

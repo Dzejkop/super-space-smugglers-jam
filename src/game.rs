@@ -24,7 +24,7 @@ pub struct Game {
     pub speed: GameSpeed,
     pub manouver_mode: bool,
     pub fuel: f32,
-    pub money: f32,
+    pub money: u32,
     pub tickets: u32,
 }
 
@@ -38,7 +38,7 @@ impl Game {
             speed: GameSpeed::Stop,
             manouver_mode: false,
             fuel: 1.0,
-            money: 10000.0,
+            money: 10,
             tickets: 0,
         }
     }
@@ -67,10 +67,6 @@ impl Game {
 
     pub fn ufuel(&self) -> u32 {
         (self.fuel * 100.0) as u32
-    }
-
-    pub fn money_str(&self) -> String {
-        format!("${}k", (self.money / 1000.0) as u32)
     }
 
     pub fn tickets(&self) -> u32 {

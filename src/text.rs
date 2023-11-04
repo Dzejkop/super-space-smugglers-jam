@@ -27,8 +27,13 @@ impl Text {
         self
     }
 
-    pub fn centered(mut self) -> Self {
+    pub fn align_center(mut self) -> Self {
         self.alignment = TextAlignment::Center;
+        self
+    }
+
+    pub fn align_right(mut self) -> Self {
+        self.alignment = TextAlignment::Right;
         self
     }
 
@@ -40,13 +45,15 @@ impl Text {
             alignment,
         } = self;
 
-        let at = match alignment {
-            TextAlignment::Left => at,
+        let at = {
+            let width = print_alloc(&text, 1024, 1024, Default::default());
 
-            TextAlignment::Center => {
-                let width = print_alloc(&text, 1024, 1024, Default::default());
-
-                vec2((at.x - width as f32) / 2.0, at.y)
+            match alignment {
+                TextAlignment::Left => at,
+                TextAlignment::Center => {
+                    vec2((at.x - width as f32) / 2.0, at.y)
+                }
+                TextAlignment::Right => vec2(at.x - width as f32, at.y),
             }
         };
 
@@ -62,6 +69,7 @@ impl Text {
 enum TextAlignment {
     Left,
     Center,
+    Right,
 }
 
 impl Default for TextAlignment {
