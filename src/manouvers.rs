@@ -64,6 +64,8 @@ pub fn tic(
                 if game.fuel < 0.01 {
                     game.fuel = 0.0;
                 }
+
+                game.speed = GameSpeed::Normal;
             }
         }
     }
@@ -74,25 +76,23 @@ pub fn tic(
         player.vel += game.manouver_dv;
 
         let mut prev_step = player.pos;
-        let steps = sim::trajectory(game, &player, planets).take(1000);
+        let steps = sim::trajectory(game, &player, planets).take(750);
 
         for step in steps {
             let p1 = camera.world_to_screen(prev_step);
-            let p2 = camera.world_to_screen(vec2(step.x, step.y));
+            let p2 = camera.world_to_screen(step.pos);
 
-            if step.n > 500 {
-                if step.n % 8 == 0 {
-                    pix(p1.x as i32, p1.y as i32, step.c);
-                }
-            } else if step.n > 250 {
-                if step.n % 4 == 0 {
-                    pix(p2.x as i32, p2.y as i32, step.c);
-                }
+            let display = if step.touches {
+                time() % 500.0 < 250.0
             } else {
-                line(p1.x, p1.y, p2.x, p2.y, step.c);
+                true
+            };
+
+            if display {
+                line(p1.x, p1.y, p2.x, p2.y, step.color);
             }
 
-            prev_step = vec2(step.x, step.y);
+            prev_step = step.pos;
         }
     }
 }

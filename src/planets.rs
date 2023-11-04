@@ -36,7 +36,7 @@ pub fn tic(camera: &Camera) {
             orbit.x,
             orbit.y,
             planet.orbit_radius * camera.zoom,
-            planet.orbit_offset,
+            planet.orbit_phase,
         );
 
         // ---
@@ -47,13 +47,13 @@ pub fn tic(camera: &Camera) {
         circ(
             center.x,
             center.y,
-            (camera.zoom * planet.radius * 2.5).max(min_radius) as i32,
+            (camera.zoom * planet.radius).max(min_radius) as i32,
             planet.color,
         );
     }
 }
 
-fn draw_orbit(x: f32, y: f32, r: f32, o: f32) {
+fn draw_orbit(x: f32, y: f32, r: f32, p: f32) {
     let offset = vec2(x, y);
     let steps = 64;
 
@@ -61,8 +61,8 @@ fn draw_orbit(x: f32, y: f32, r: f32, o: f32) {
         let a1 = (step as f32) / (steps as f32);
         let a2 = (step as f32 + 1.0) / (steps as f32);
 
-        let a1 = o + a1 * 2.0 * PI;
-        let a2 = o + a2 * 2.0 * PI;
+        let a1 = p + a1 * 2.0 * PI;
+        let a2 = p + a2 * 2.0 * PI;
 
         let p1 = offset + vec2(a1.cos(), a1.sin()) * r;
         let p2 = offset + vec2(a2.cos(), a2.sin()) * r;
@@ -185,37 +185,6 @@ pub mod galaxies {
         }
 
         planets
-
-        // Planet::new()
-        //     .with_radius(25.0)
-        //     .with_mass(5.0)
-        //     .with_orbit(12000.0, 0.5 * PI)
-        //     .with_color(11),
-        // Planet::new()
-        //     .with_radius(25.0)
-        //     .with_mass(5.0)
-        //     .with_orbit(12000.0, 0.75 * PI)
-        //     .with_color(11),
-        // Planet::new()
-        //     .with_radius(25.0)
-        //     .with_mass(5.0)
-        //     .with_orbit(12000.0, PI)
-        //     .with_color(11),
-        // Planet::new()
-        //     .with_radius(25.0)
-        //     .with_mass(5.0)
-        //     .with_orbit(12000.0, 1.25 * PI)
-        //     .with_color(11),
-        // Planet::new()
-        //     .with_radius(25.0)
-        //     .with_mass(5.0)
-        //     .with_orbit(12000.0, 1.5 * PI)
-        //     .with_color(11),
-        // Planet::new()
-        //     .with_radius(25.0)
-        //     .with_mass(5.0)
-        //     .with_orbit(12000.0, 1.75 * PI)
-        //     .with_color(11),
     }
 
     pub fn gamma() -> Vec<Planet> {
@@ -225,7 +194,7 @@ pub mod galaxies {
                 .with_radius(20.0)
                 .with_mass(1.0)
                 .with_orbit(1500.0, 0.0)
-                .with_color(13),
+                .with_color(3),
             Planet::new()
                 .with_radius(28.0)
                 .with_mass(1.0)

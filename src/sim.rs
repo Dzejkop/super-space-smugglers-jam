@@ -8,10 +8,10 @@ pub fn tic(game: &Game, player: &mut Ship, planets: &mut [Planet]) {
 
 #[derive(Clone, Copy)]
 pub struct TrajectoryStep {
-    pub n: usize,
-    pub x: f32,
-    pub y: f32,
-    pub c: u8,
+    pub step: usize,
+    pub pos: Vec2,
+    pub color: u8,
+    pub touches: bool,
 }
 
 pub fn trajectory(
@@ -32,13 +32,12 @@ pub fn trajectory(
 
         let mut closest_color = 12;
         let mut closest_dist = f32::MAX;
+        let mut touches = false;
 
         for planet in &planets {
             let dist = planet.pos.distance(player.pos);
 
-            if dist >= planet.radius * 2.0 + 1000.0 {
-                continue;
-            }
+            touches |= dist <= planet.radius * 3.0 + 128.0;
 
             if dist < closest_dist {
                 closest_color = planet.color;
@@ -47,10 +46,10 @@ pub fn trajectory(
         }
 
         Some(TrajectoryStep {
-            n: step,
-            x: player.pos.x,
-            y: player.pos.y,
-            c: closest_color,
+            step,
+            pos: player.pos,
+            color: closest_color,
+            touches,
         })
     })
 }
@@ -65,7 +64,7 @@ fn eval(time: f32, player: &mut Ship, planets: &mut [Planet]) {
         let planet = &mut planets[planet_id];
 
         let orbit =
-            0.05 * PI * 2.0 * time / planet.orbit_speed + planet.orbit_offset;
+            0.05 * PI * 2.0 * time / planet.orbit_speed + planet.orbit_phase;
 
         let orbit = vec2(orbit.cos(), orbit.sin());
 

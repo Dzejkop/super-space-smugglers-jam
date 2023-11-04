@@ -72,7 +72,7 @@ pub fn tic(
 
         let ship_to_planet_distance = (player.pos - planet.pos).length();
 
-        if camera.zoom < 0.15 && flash_indicator {
+        if camera.zoom < 0.15 && flash_indicator && !game.manouver_mode {
             circb(planet_pos.x as i32, planet_pos.y as i32, 8, 3);
         }
 

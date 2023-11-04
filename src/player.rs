@@ -27,7 +27,7 @@ pub fn tic(camera: &Camera, game: &Game) {
         .engine(true)
         .draw(Some(game));
 
-    if camera.zoom < 0.15 && time() % 1000.0 < 500.0 {
+    if camera.zoom < 0.15 && time() % 1000.0 < 500.0 && !game.manouver_mode {
         circb(at.x as i32, at.y as i32, 8, 5);
     }
 

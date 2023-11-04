@@ -6,7 +6,7 @@ pub struct Planet {
 
     // Oribital characteristics
     pub orbit_radius: f32,
-    pub orbit_offset: f32,
+    pub orbit_phase: f32,
     pub orbit_speed: f32,
 
     pub radius: f32,
@@ -22,7 +22,7 @@ impl Planet {
         Self {
             pos: vec2(0.0, 0.0),
             orbit_radius: 0.0,
-            orbit_offset: 0.0,
+            orbit_phase: 0.0,
             orbit_speed: 0.0,
             radius: 0.0,
             mass: 0.0,
@@ -38,9 +38,9 @@ impl Planet {
         }
     }
 
-    pub const fn with_orbit(mut self, radius: f32, offset: f32) -> Self {
+    pub const fn with_orbit(mut self, radius: f32, phase: f32) -> Self {
         self.orbit_radius = radius;
-        self.orbit_offset = offset;
+        self.orbit_phase = phase;
         self
     }
 
