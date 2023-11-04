@@ -69,7 +69,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    fn center() -> Vec2 {
+    pub fn center() -> Vec2 {
         vec2(WIDTH as f32 / 2.0, HEIGHT as f32 / 2.0)
     }
 

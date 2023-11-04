@@ -46,9 +46,9 @@ pub mod keys {
     pub const DIGIT_6: i32 = 33;
     pub const DIGIT_7: i32 = 34;
     pub const DIGIT_8: i32 = 35;
-    pub const SPACE: i32 = 48;
-
     pub const DIGIT_9: i32 = 36;
+
+    pub const SPACE: i32 = 48;
 }
 
 pub mod sprites {

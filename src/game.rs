@@ -1,11 +1,7 @@
 use crate::prelude::*;
 
-pub const MAX_DV_LENGTH: f32 = 1.0;
-
-// How does the DV world space vector translate to a DV manouver vector
-pub const DV_FACTOR: f32 = 0.001;
-
-// pub const
+pub const MAX_MANOUVER_LENGTH: f32 = 10.0;
+pub const MANOUVER_SENSITIVITY: f32 = 0.04;
 
 static mut GAME: Option<Game> = None;
 
