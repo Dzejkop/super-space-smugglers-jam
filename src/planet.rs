@@ -36,12 +36,6 @@ impl Planet {
         }
     }
 
-    pub const fn with_pos(mut self, x: f32, y: f32) -> Self {
-        self.pos.x = x;
-        self.pos.y = y;
-        self
-    }
-
     pub const fn with_orbit(mut self, radius: f32, speed: f32) -> Self {
         self.orbit_radius = radius;
         self.orbit_speed = speed;
@@ -61,10 +55,6 @@ impl Planet {
     pub const fn with_color(mut self, color: u8) -> Self {
         self.color = color;
         self
-    }
-
-    pub fn update(&mut self) {
-        //
     }
 
     pub fn collides_with(&self, obj: Vec2) -> bool {

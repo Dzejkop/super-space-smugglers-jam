@@ -53,41 +53,44 @@ pub unsafe fn get_mut() -> &'static mut [Planet] {
 pub fn tic(camera: &Camera) {
     let planets = unsafe { get() };
 
-    for (idx, planet) in planets.iter().enumerate() {
-        // Draw orbit
-        if let Some(parent) = planet.parent {
-            let o = camera.world_to_screen(planets[parent].pos).as_ivec2();
-
-            circb(
-                o.x,
-                o.y,
-                (planet.orbit_radius * camera.zoom) as i32,
-                planet.color,
-            );
+    for planet in planets {
+        let orbit = if let Some(parent) = planet.parent {
+            camera.world_to_screen(planets[parent].pos)
         } else {
-            let o = camera.world_to_screen(vec2(0.0, 0.0)).as_ivec2();
+            camera.world_to_screen(vec2(0.0, 0.0))
+        };
 
-            circb(
-                o.x,
-                o.y,
-                (planet.orbit_radius * camera.zoom) as i32,
-                planet.color,
-            );
-        }
+        draw_orbit(orbit.x, orbit.y, planet.orbit_radius * camera.zoom);
 
-        // Draw planet
-        let pos = camera.world_to_screen(planet.pos).as_ivec2();
+        // ---
 
-        if idx != 0 && camera.zoom < 0.15 {
-            circb(pos.x, pos.y, 8, planet.color);
-        }
+        let center = camera.world_to_screen(planet.pos).as_ivec2();
+        let max_radius = if planet.parent.is_some() { 1.0 } else { 3.0 };
 
         circ(
-            pos.x,
-            pos.y,
-            (camera.zoom * planet.radius) as i32,
+            center.x,
+            center.y,
+            (camera.zoom * planet.radius).max(max_radius) as i32,
             planet.color,
         );
+    }
+}
+
+fn draw_orbit(x: f32, y: f32, r: f32) {
+    let offset = vec2(x, y);
+    let steps = 64;
+
+    for step in (0..steps).step_by(2) {
+        let a1 = (step as f32) / (steps as f32);
+        let a2 = (step as f32 + 1.0) / (steps as f32);
+
+        let a1 = a1 * 2.0 * PI;
+        let a2 = a2 * 2.0 * PI;
+
+        let p1 = offset + vec2(a1.cos(), a1.sin()) * r;
+        let p2 = offset + vec2(a2.cos(), a2.sin()) * r;
+
+        line(p1.x, p1.y, p2.x, p2.y, 14);
     }
 }
 

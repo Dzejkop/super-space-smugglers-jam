@@ -16,9 +16,9 @@ pub fn orbital_period(central_mass: f32, radius: f32) -> f32 {
 #[derive(Clone, Copy)]
 pub struct TrajectoryStep {
     pub n: usize,
-    pub t: f32,
     pub x: f32,
     pub y: f32,
+    pub c: u8,
 }
 
 pub fn trajectory(
@@ -37,11 +37,27 @@ pub fn trajectory(
 
         sim::eval(time, &mut player, &mut planets);
 
+        let mut closest_color = 12;
+        let mut closest_dist = f32::MAX;
+
+        for planet in &planets {
+            let dist = planet.pos.distance(player.pos);
+
+            if dist >= planet.radius * 2.0 + 300.0 {
+                continue;
+            }
+
+            if dist < closest_dist {
+                closest_color = planet.color;
+                closest_dist = dist;
+            }
+        }
+
         Some(TrajectoryStep {
             n: step,
-            t: time,
             x: player.pos.x,
             y: player.pos.y,
+            c: closest_color,
         })
     })
 }

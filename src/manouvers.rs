@@ -82,14 +82,14 @@ pub fn tic(
 
             if step.n > 500 {
                 if step.n % 8 == 0 {
-                    pix(p1.x as i32, p1.y as i32, 14);
+                    pix(p1.x as i32, p1.y as i32, step.c);
                 }
             } else if step.n > 250 {
                 if step.n % 4 == 0 {
-                    pix(p2.x as i32, p2.y as i32, 12);
+                    pix(p2.x as i32, p2.y as i32, step.c);
                 }
             } else {
-                line(p1.x, p1.y, p2.x, p2.y, 12);
+                line(p1.x, p1.y, p2.x, p2.y, step.c);
             }
 
             prev_step = vec2(step.x, step.y);
