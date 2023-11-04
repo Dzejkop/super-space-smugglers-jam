@@ -79,8 +79,8 @@ pub fn tic(game: &mut Game, police: &police::State) {
             } else {
                 sprites::buttons::inactive::STOP
             },
-            WIDTH - (16 * 3) - 4,
-            HEIGHT - 16 - 4,
+            WIDTH - 16 * 3,
+            HEIGHT - 16,
             SpriteOptions {
                 w: 2,
                 h: 2,
@@ -97,8 +97,8 @@ pub fn tic(game: &mut Game, police: &police::State) {
             } else {
                 sprites::buttons::inactive::NORMAL
             },
-            WIDTH - (16 * 2) - 4,
-            HEIGHT - 16 - 4,
+            WIDTH - 16 * 2,
+            HEIGHT - 16,
             SpriteOptions {
                 w: 2,
                 h: 2,
@@ -115,8 +115,8 @@ pub fn tic(game: &mut Game, police: &police::State) {
             } else {
                 sprites::buttons::inactive::FAST
             },
-            WIDTH - (16 * 1) - 4,
-            HEIGHT - 16 - 4,
+            WIDTH - 16,
+            HEIGHT - 16,
             SpriteOptions {
                 w: 2,
                 h: 2,

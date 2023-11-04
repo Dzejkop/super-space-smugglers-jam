@@ -21,6 +21,12 @@ impl OverflowIndicator {
     }
 
     pub fn draw(self) {
+        unsafe {
+            INDICATORS.push(self);
+        }
+    }
+
+    fn draw_ex(self) {
         let Self { id, at } = self;
 
         let color = {
@@ -74,4 +80,14 @@ impl OverflowIndicator {
 enum OverflowIndicatorId {
     Player,
     Police,
+}
+
+static mut INDICATORS: Vec<OverflowIndicator> = Vec::new();
+
+pub fn tic() {
+    let indicators = unsafe { INDICATORS.drain(..) };
+
+    for indicator in indicators {
+        indicator.draw_ex();
+    }
 }
