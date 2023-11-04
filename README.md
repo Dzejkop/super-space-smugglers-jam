@@ -1,4 +1,4 @@
-# space-out-of-control
+# Space: Out of Control
 
 Game for [TK Game Jam 2023](https://itch.io/jam/tk-game-jam-2023).
 
