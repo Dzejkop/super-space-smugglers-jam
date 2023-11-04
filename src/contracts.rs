@@ -1,3 +1,4 @@
+use crate::police::PoliceState;
 use crate::prelude::sprites::buttons;
 use crate::prelude::*;
 
@@ -48,6 +49,7 @@ pub fn tic(
     game: &mut Game,
     player: &Player,
     planets: &[Planet],
+    police: &mut PoliceState,
 ) {
     let mo = mouse();
 
@@ -144,6 +146,7 @@ pub fn tic(
                     },
                 );
                 game.contracts.remove(selected_contract);
+                police.increment_wanted_level();
             }
         }
 

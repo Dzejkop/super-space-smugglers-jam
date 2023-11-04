@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub fn tic(game: &mut Game, police: &police::State) {
+pub fn tic(game: &mut Game, police: &police::PoliceState) {
     let m = mouse();
     let mx = m.x as i32;
     let my = m.y as i32;

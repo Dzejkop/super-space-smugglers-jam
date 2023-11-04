@@ -1,28 +1,36 @@
 use crate::prelude::*;
 use crate::ship::police_alternate_sprite;
 
-pub struct State {
+pub struct PoliceState {
     wanted: f32,
     dispatch_at: f32,
     deducation_at: f32,
     vehicles: Vec<PoliceVehicle>,
 }
 
-impl State {
+impl PoliceState {
     pub fn wanted(&self) -> f32 {
         self.wanted
     }
+
+    pub fn increment_wanted_level(&mut self) {
+        self.wanted = (self.wanted + 0.2).max(1.0);
+    }
 }
 
-static mut STATE: State = State {
+static mut STATE: PoliceState = PoliceState {
     wanted: 0.0,
     dispatch_at: 0.0,
     deducation_at: 0.0,
     vehicles: Vec::new(),
 };
 
-pub unsafe fn get() -> &'static State {
+pub unsafe fn get() -> &'static PoliceState {
     &STATE
+}
+
+pub unsafe fn get_mut() -> &'static mut PoliceState {
+    &mut STATE
 }
 
 pub fn tic(

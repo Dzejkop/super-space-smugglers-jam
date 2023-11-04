@@ -122,6 +122,7 @@ pub fn tic() {
                     game::get_mut(),
                     player::get_mut(),
                     planets::get(),
+                    police::get_mut(),
                 );
             }
 
