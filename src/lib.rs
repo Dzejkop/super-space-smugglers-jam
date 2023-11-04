@@ -1,4 +1,5 @@
 #![feature(const_fn_floating_point_arithmetic)]
+#![feature(extract_if)]
 
 #[macro_use]
 mod tic80;
@@ -7,6 +8,7 @@ mod alloc;
 mod camera;
 mod game;
 mod intro;
+mod msgs;
 mod orbits;
 mod overflow_indicator;
 mod particles;
@@ -33,7 +35,7 @@ mod prelude {
     pub(crate) use crate::text::Text;
     pub(crate) use crate::tic80::*;
     pub(crate) use crate::utils::*;
-    pub(crate) use crate::{orbits, particles};
+    pub(crate) use crate::{msgs, orbits, particles};
 }
 
 use rand::rngs::SmallRng;
@@ -65,7 +67,7 @@ pub fn tic() {
                 *state = State::Playing;
             }
 
-            particles::tic(rng);
+            particles::tic(rng, None);
         }
 
         State::Playing => unsafe {
@@ -73,15 +75,24 @@ pub fn tic() {
             camera::tic();
             planets::tic(camera::get(), game::get());
             player::tic(camera::get(), game::get(), planets::get());
-            police::tic(rng, camera::get(), player::get(), game::get());
+
+            police::tic(
+                rng,
+                camera::get(),
+                player::get(),
+                planets::get(),
+                game::get(),
+            );
 
             draw_space_and_stuff(
                 camera::get(),
                 game::get_mut(),
-                player::get(),
+                player::get_mut(),
                 planets::get(),
             );
 
+            particles::tic(rng, Some(camera::get()));
+            msgs::tic();
             ui::tic(game::get_mut());
         },
     }
@@ -90,62 +101,51 @@ pub fn tic() {
 fn draw_space_and_stuff(
     camera: &Camera,
     game: &mut Game,
-    player: &Ship,
+    player: &mut Ship,
     planets: &[Planet],
 ) {
-    let m = mouse();
+    let mo = mouse();
 
-    unsafe {
-        let (mx, my) = camera.screen_to_world(m.x as i32, m.y as i32);
+    let m = camera.screen_to_world(vec2(mo.x as f32, mo.y as f32));
+    let d = (player.pos - m).length_squared();
 
-        let dx = player.pos.x - mx;
-        let dy = player.pos.y - my;
+    let s = camera.world_to_screen(player.pos);
+    let m = camera.world_to_screen(m);
 
-        let d = dx * dx + dy * dy;
+    let dv = (s - m) * 0.01;
 
-        let (sx, sy) = camera.world_to_screen(player.pos.x, player.pos.y);
-        let (mx, my) = camera.world_to_screen(mx, my);
+    if mo.left
+        && game.is_paused()
+        && d < (30.0 / camera.zoom)
+        && !game.manouver_mode
+    {
+        game.manouver_mode = true;
+    }
 
-        let dvx = (sx - mx) * 0.01;
-        let dvy = (sy - my) * 0.01;
+    if game.manouver_mode && !mo.left {
+        game.manouver_mode = false;
 
-        if m.left
-            && game.is_paused()
-            && d < (30.0 / camera.zoom)
-            && !game.manouver_mode
+        player.vel += dv;
+    }
+
+    if game.manouver_mode {
+        let mut t_ship = *player;
+
+        t_ship.vel += dv;
+
+        line(s.x, s.y, m.x, m.y, 12);
+
+        let mut prev_step = t_ship.pos;
+
+        for step in orbits::trajectory(game.time(), &t_ship, planets).take(1000)
         {
-            game.manouver_mode = true;
-        }
+            let step = vec2(step.x, step.y);
+            let p1 = camera.world_to_screen(prev_step);
+            let p2 = camera.world_to_screen(step);
 
-        if game.manouver_mode && !m.left {
-            game.manouver_mode = false;
+            line(p1.x, p1.y, p2.x, p2.y, 12);
 
-            player::get_mut().vel.x += dvx;
-            player::get_mut().vel.y += dvy;
-        }
-
-        if game.manouver_mode {
-            let mut t_ship = *player::get();
-
-            t_ship.vel.x += dvx;
-            t_ship.vel.y += dvy;
-
-            line(sx, sy, mx, my, 12);
-
-            let mut prev_step = [t_ship.pos.x, t_ship.pos.y];
-
-            for step in
-                orbits::trajectory(game.time(), &t_ship, planets).take(1000)
-            {
-                let (x1, y1) =
-                    camera.world_to_screen_integer(prev_step[0], prev_step[1]);
-
-                let (x2, y2) = camera.world_to_screen_integer(step.x, step.y);
-
-                line(x1 as f32, y1 as f32, x2 as f32, y2 as f32, 12);
-
-                prev_step = [step.x, step.y];
-            }
+            prev_step = step;
         }
     }
 }

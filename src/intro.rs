@@ -56,8 +56,10 @@ pub fn tic() -> bool {
             // ---
 
             let player_at = get_player_pos(time);
+
             let player_vel =
                 get_velocity(player_at, get_player_pos(time + 0.01));
+
             let player_rot = get_rotation(player_vel);
 
             let player_engine_at = ShipSprite::player()
@@ -81,8 +83,10 @@ pub fn tic() -> bool {
 
             for idx in 0..3 {
                 let police_at = get_police_pos(idx, time);
+
                 let police_vel =
                     get_velocity(police_at, get_police_pos(idx, time + 0.01));
+
                 let police_rot = get_rotation(police_vel);
 
                 let police_engine_at = ShipSprite::police()

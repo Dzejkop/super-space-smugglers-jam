@@ -51,20 +51,14 @@ pub fn tic() {
     let zoom_diff = camera.target_zoom - camera.zoom;
 
     if zoom_diff.abs() > 0.001 {
-        let world_pos = camera.screen_to_world(m.x as i32, m.y as i32);
-
-        let screen_pos_before =
-            camera.world_to_screen(world_pos.0, world_pos.1);
+        let world_pos = camera.screen_to_world(vec2(m.x as f32, m.y as f32));
+        let screen_pos_before = camera.world_to_screen(world_pos);
 
         camera.zoom += zoom_diff * 0.25;
 
-        let screen_pos_after = camera.world_to_screen(world_pos.0, world_pos.1);
+        let screen_pos_after = camera.world_to_screen(world_pos);
 
-        camera.pos.x -=
-            (screen_pos_after.0 - screen_pos_before.0) / camera.zoom;
-
-        camera.pos.y -=
-            (screen_pos_after.1 - screen_pos_before.1) / camera.zoom;
+        camera.pos -= (screen_pos_after - screen_pos_before) / camera.zoom;
     }
 }
 
@@ -75,29 +69,15 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn world_to_screen(&self, x: f32, y: f32) -> (f32, f32) {
-        let cx = WIDTH / 2;
-        let cy = HEIGHT / 2;
-
-        (
-            (self.pos.x + x) * self.zoom + cx as f32,
-            (self.pos.y + y) * self.zoom + cy as f32,
-        )
+    fn center() -> Vec2 {
+        vec2(WIDTH as f32 / 2.0, HEIGHT as f32 / 2.0)
     }
 
-    pub fn world_to_screen_integer(&self, x: f32, y: f32) -> (i32, i32) {
-        let (x, y) = self.world_to_screen(x, y);
-
-        (x as i32, y as i32)
+    pub fn world_to_screen(&self, pos: Vec2) -> Vec2 {
+        Self::center() + (self.pos + pos) * self.zoom
     }
 
-    pub fn screen_to_world(&self, x: i32, y: i32) -> (f32, f32) {
-        let cx = WIDTH / 2;
-        let cy = HEIGHT / 2;
-
-        (
-            (x as f32 - cx as f32) / self.zoom - self.pos.x,
-            (y as f32 - cy as f32) / self.zoom - self.pos.y,
-        )
+    pub fn screen_to_world(&self, pos: Vec2) -> Vec2 {
+        (pos - Self::center()) / self.zoom - self.pos
     }
 }

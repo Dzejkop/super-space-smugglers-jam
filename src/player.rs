@@ -33,10 +33,9 @@ pub fn tic(camera: &Camera, game: &Game, planets: &[Planet]) {
 
     // ---
 
-    let (x, y) = camera.world_to_screen(ship.pos.x, ship.pos.y);
-    let at = vec2(x, y);
+    let at = camera.world_to_screen(ship.pos);
 
-    ShipSprite::player()
+    let engine_at = ShipSprite::player()
         .at(at)
         .rot(game.time() * 0.001)
         .scale((3.0 * camera.zoom).max(0.15))
@@ -44,7 +43,7 @@ pub fn tic(camera: &Camera, game: &Game, planets: &[Planet]) {
         .draw();
 
     if camera.zoom < 0.15 && time() % 1000.0 < 500.0 {
-        circb(x as i32, y as i32, 8, 5);
+        circb(at.x as i32, at.y as i32, 8, 5);
     }
 
     OverflowIndicator::player(at).draw();

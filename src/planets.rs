@@ -53,7 +53,7 @@ pub fn tic(camera: &Camera, game: &Game) {
     // ---
 
     let planets = unsafe { get_mut() };
-    let (ox, oy) = camera.world_to_screen_integer(0.0, 0.0);
+    let o = camera.world_to_screen(vec2(0.0, 0.0)).as_ivec2();
 
     for planet in planets {
         if let Some(parent) = planet.parent {
@@ -68,13 +68,12 @@ pub fn tic(camera: &Camera, game: &Game) {
                 + f32::sin(PI * 2.0 * game.time() / planet.orbit_speed)
                     * planet.orbit_radius;
 
-            let (ox, oy) =
-                camera.world_to_screen_integer(parent.pos.x, parent.pos.y);
+            let o = camera.world_to_screen(parent.pos).as_ivec2();
 
             // Draw orbit
             circb(
-                ox,
-                oy,
+                o.x,
+                o.y,
                 (planet.orbit_radius * camera.zoom) as i32,
                 planet.color,
             );
@@ -89,17 +88,22 @@ pub fn tic(camera: &Camera, game: &Game) {
 
             // Draw orbit
             circb(
-                ox,
-                oy,
+                o.x,
+                o.y,
                 (planet.orbit_radius * camera.zoom) as i32,
                 planet.color,
             );
         }
 
         // Draw planet
-        let (x, y) = camera.world_to_screen_integer(planet.pos.x, planet.pos.y);
+        let pos = camera.world_to_screen(planet.pos).as_ivec2();
 
-        circ(x, y, (camera.zoom * planet.radius) as i32, planet.color);
+        circ(
+            pos.x,
+            pos.y,
+            (camera.zoom * planet.radius) as i32,
+            planet.color,
+        );
     }
 }
 

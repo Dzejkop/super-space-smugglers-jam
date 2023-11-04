@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub fn tic(rng: &mut dyn RngCore) {
+pub fn tic(rng: &mut dyn RngCore, camera: Option<&Camera>) {
     let particles = unsafe { &mut PARTICLES };
 
     for particle in particles {
@@ -16,10 +16,15 @@ pub fn tic(rng: &mut dyn RngCore) {
             particle.life as f32 / particle.max_life as f32,
         ) as u32;
 
-        Img::sprite_idx(sprite).at(particle.pos).draw();
+        let at = camera
+            .map(|camera| camera.world_to_screen(particle.pos))
+            .unwrap_or(particle.pos);
+
+        Img::sprite_idx(sprite).at(at).draw();
 
         particle.pos += particle.vel;
         particle.vel *= vec2(rng.gen_range(0.5..1.0), rng.gen_range(0.5..1.0));
+
         particle.vel +=
             vec2(rng.gen_range(-0.1..0.1), rng.gen_range(-0.1..0.1));
     }

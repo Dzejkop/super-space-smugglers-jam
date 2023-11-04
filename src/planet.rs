@@ -80,4 +80,8 @@ impl Planet {
         self.color = color;
         self
     }
+
+    pub fn collides_with(&self, obj: Vec2) -> bool {
+        self.pos.distance(obj) <= self.radius
+    }
 }
