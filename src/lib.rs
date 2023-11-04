@@ -149,7 +149,8 @@ fn draw_space_and_stuff() {
     }
 
     if m.scroll_y != 0 {
-        // let prev_zoom = camera.zoom;
+        let world_pos = camera.screen_to_world(mouse().x as i32, mouse().y as i32);
+        let screen_pos_before = camera.world_to_screen(world_pos.0, world_pos.1);
 
         if m.scroll_y > 0 {
             camera.zoom *= 1.2;
@@ -159,10 +160,10 @@ fn draw_space_and_stuff() {
 
         camera.zoom = camera.zoom.clamp(MIN_ZOOM, MAX_ZOOM);
 
-        // let curr_zoom = camera.zoom;
+        let screen_pos_after = camera.world_to_screen(world_pos.0, world_pos.1);
 
-        // TODO
-        // camera.pos -= vec2(mouse().x as f32, mouse().y as f32) * (curr_zoom - prev_zoom);
+        camera.pos.x -= (screen_pos_after.0 - screen_pos_before.0) / camera.zoom;
+        camera.pos.y -= (screen_pos_after.1 - screen_pos_before.1) / camera.zoom;
     }
 
     // Draw the planets
