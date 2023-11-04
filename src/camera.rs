@@ -1,18 +1,16 @@
 use crate::tic80::{HEIGHT, WIDTH};
+use glam::*;
 
 pub const MAX_ZOOM: f32 = 1.5;
-pub const MIN_ZOOM: f32 = 1e-1;
-pub const ZOOM_LERP: f32 = 0.1;
+pub const MIN_ZOOM: f32 = 1e-2;
 
 pub struct Camera {
-    pub x: f32,
-    pub y: f32,
+    pub pos: Vec2,
     pub zoom: f32,
 }
 
 static mut CAMERA: Camera = Camera {
-    x: 0.0,
-    y: 0.0,
+    pos: vec2(0.0, 0.0),
     zoom: 1.0,
 };
 
@@ -25,20 +23,13 @@ pub fn camera_mut() -> &'static mut Camera {
 }
 
 impl Camera {
-    // Maps self.zoom which is between 0 and 1 to MIN_ZOOM and MAX_ZOOM
-    pub fn remap_zoom(&self) -> f32 {
-        self.zoom * (MAX_ZOOM - MIN_ZOOM) + MIN_ZOOM
-    }
-
     pub fn world_to_screen(&self, x: f32, y: f32) -> (f32, f32) {
         let cx = WIDTH / 2;
         let cy = HEIGHT / 2;
 
-        let zoom = self.remap_zoom();
-
         (
-            (self.x + x) * zoom + cx as f32,
-            (self.y + y) * zoom + cy as f32,
+            (self.pos.x + x) * self.zoom + cx as f32,
+            (self.pos.y + y) * self.zoom + cy as f32,
         )
     }
 
@@ -52,11 +43,9 @@ impl Camera {
         let cx = WIDTH / 2;
         let cy = HEIGHT / 2;
 
-        let zoom = self.remap_zoom();
-
         (
-            (x as f32 - cx as f32) / zoom - self.x,
-            (y as f32 - cy as f32) / zoom - self.y,
+            (x as f32 - cx as f32) / self.zoom - self.pos.x,
+            (y as f32 - cy as f32) / self.zoom - self.pos.y,
         )
     }
 }

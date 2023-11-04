@@ -22,7 +22,6 @@ use self::utils::*;
 use crate::game_state::game_mut;
 use crate::orbits::simulate_trajectory;
 use crate::ship::*;
-use crate::text::*;
 
 #[derive(Clone)]
 pub struct Ship {
@@ -134,32 +133,37 @@ fn draw_space_and_stuff() {
     const CAMERA_SPEED: f32 = 2.0;
 
     if key(keys::A) {
-        camera.x += CAMERA_SPEED / camera.remap_zoom();
+        camera.pos.x += CAMERA_SPEED / camera.zoom;
     }
 
     if key(keys::D) {
-        camera.x -= CAMERA_SPEED / camera.remap_zoom();
+        camera.pos.x -= CAMERA_SPEED / camera.zoom;
     }
 
     if key(keys::W) {
-        camera.y += CAMERA_SPEED / camera.remap_zoom();
+        camera.pos.y += CAMERA_SPEED / camera.zoom;
     }
 
     if key(keys::S) {
-        camera.y -= CAMERA_SPEED / camera.remap_zoom();
+        camera.pos.y -= CAMERA_SPEED / camera.zoom;
     }
 
-    let target_zoom = if m.scroll_y > 0 {
-        1.0
-    } else if m.scroll_y < 0 {
-        0.0
-    } else {
-        camera.zoom
-    };
+    if m.scroll_y != 0 {
+        // let prev_zoom = camera.zoom;
 
-    let zoom_change = (target_zoom - camera.zoom) * ZOOM_LERP;
+        if m.scroll_y > 0 {
+            camera.zoom *= 1.2;
+        } else {
+            camera.zoom /= 1.2;
+        }
 
-    camera.zoom += zoom_change;
+        camera.zoom = camera.zoom.clamp(MIN_ZOOM, MAX_ZOOM);
+
+        // let curr_zoom = camera.zoom;
+
+        // TODO
+        // camera.pos -= vec2(mouse().x as f32, mouse().y as f32) * (curr_zoom - prev_zoom);
+    }
 
     // Draw the planets
     unsafe {
@@ -173,18 +177,13 @@ fn draw_space_and_stuff() {
             circb(
                 ox,
                 oy,
-                (planet.orbit_radius * camera.remap_zoom()) as i32,
+                (planet.orbit_radius * camera.zoom) as i32,
                 planet.color,
             );
 
             // Draw planet
             let (x, y) = camera.world_to_screen_integer(planet.x, planet.y);
-            circ(
-                x,
-                y,
-                (camera.remap_zoom() * planet.radius) as i32,
-                planet.color,
-            );
+            circ(x, y, (camera.zoom * planet.radius) as i32, planet.color);
         }
     }
 
@@ -226,7 +225,7 @@ fn draw_space_and_stuff() {
         let dvx = (sx - mx) * 0.01;
         let dvy = (sy - my) * 0.01;
 
-        if m.left && game.is_paused() && d < (10.0 / camera.remap_zoom()) && !game.manouver_mode {
+        if m.left && game.is_paused() && d < (10.0 / camera.zoom) && !game.manouver_mode {
             game.manouver_mode = true;
         }
 
