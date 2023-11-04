@@ -44,69 +44,73 @@ pub fn tic(
 
     // ---
 
-    if game.time >= state.deducation_at {
-        let was_above_zero = state.wanted > 0.0;
+    if !player.is_caught {
+        if game.time >= state.deducation_at {
+            let was_above_zero = state.wanted > 0.0;
 
-        state.wanted = (state.wanted - 0.03).max(0.0);
-        state.deducation_at = game.time + rng.gen_range(1.0..4.0) * 1000.0;
+            state.wanted = (state.wanted - 0.03).max(0.0);
+            state.deducation_at = game.time + rng.gen_range(1.0..4.0) * 1000.0;
 
-        if state.wanted == 0.0 && was_above_zero {
-            msgs::add("Police seems to have lost interest in you.");
+            if state.wanted == 0.0 && was_above_zero {
+                msgs::add("Police seems to have lost interest in you.");
 
-            for vehicle in &mut state.vehicles {
-                vehicle.behavior = PoliceVehicleBehavior::escaping(rng);
+                for vehicle in &mut state.vehicles {
+                    vehicle.behavior = PoliceVehicleBehavior::escaping(rng);
+                }
             }
         }
-    }
 
-    if game.time >= state.dispatch_at {
-        let vehicles_in_pursuit = state
-            .vehicles
-            .iter()
-            .filter(|vehicle| {
-                matches!(vehicle.behavior, PoliceVehicleBehavior::InPursuit)
-            })
-            .count();
+        if game.time >= state.dispatch_at {
+            let vehicles_in_pursuit = state
+                .vehicles
+                .iter()
+                .filter(|vehicle| {
+                    matches!(vehicle.behavior, PoliceVehicleBehavior::InPursuit)
+                })
+                .count();
 
-        let max_vehicles_in_pursuit = (5.0 * state.wanted).ceil() as usize;
+            let max_vehicles_in_pursuit = (5.0 * state.wanted).ceil() as usize;
 
-        if state.wanted > 0.0 && vehicles_in_pursuit < max_vehicles_in_pursuit {
-            let vehicles = if rng.gen_bool(0.5) { 1 } else { 2 };
+            if state.wanted > 0.0
+                && vehicles_in_pursuit < max_vehicles_in_pursuit
+            {
+                let vehicles = if rng.gen_bool(0.5) { 1 } else { 2 };
 
-            for _ in 0..vehicles {
-                state.vehicles.push(PoliceVehicle::rand(rng));
+                for _ in 0..vehicles {
+                    state.vehicles.push(PoliceVehicle::rand(rng));
+                }
+
+                msgs::add({
+                    let msgs = [
+                        "Police vehicle detected!",
+                        "Oh no, it's the police!",
+                        "Oh noes, police comes!",
+                        "Schnapps, it's the cops!",
+                        "Dang it, it's the cops!",
+                        "Police, damn!",
+                        "Damn, space-police!",
+                        "Hide, it's the police!",
+                        "The arm of the law approaches!",
+                        "Has someone ordered a police patrol?",
+                    ];
+
+                    *msgs.choose(rng).unwrap()
+                });
+
+                sfx(
+                    1,
+                    SfxOptions {
+                        note: 1,
+                        octave: 1,
+                        duration: 5,
+                        channel: 0,
+                        ..Default::default()
+                    },
+                );
             }
 
-            msgs::add({
-                let msgs = [
-                    "Police vehicle detected!",
-                    "Oh no, it's the police!",
-                    "Oh noes, police comes!",
-                    "Schnapps, it's the cops!",
-                    "Dang it, it's the cops!",
-                    "Police, damn!",
-                    "Damn, space-police!",
-                    "Hide, it's the police!",
-                    "The arm of the law approaches!",
-                    "Has someone ordered a police patrol?",
-                ];
-
-                *msgs.choose(rng).unwrap()
-            });
-
-            sfx(
-                1,
-                SfxOptions {
-                    note: 1,
-                    octave: 1,
-                    duration: 5,
-                    channel: 0,
-                    ..Default::default()
-                },
-            );
+            state.dispatch_at = game.time + rng.gen_range(10.0..25.0) * 1000.0;
         }
-
-        state.dispatch_at = game.time + rng.gen_range(10.0..25.0) * 1000.0;
     }
 
     // ---
@@ -132,6 +136,10 @@ pub fn tic(
             .scale(3.0 * camera.zoom)
             .engine(true)
             .draw(Some(game));
+
+        if player.is_caught {
+            continue;
+        }
 
         if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
             if camera.zoom < 0.15
@@ -283,7 +291,7 @@ impl PoliceVehicle {
     }
 
     fn collides_with(&self, player: &Ship) -> bool {
-        self.pos.distance(player.pos) <= 64.0
+        self.pos.distance(player.pos) <= 90.0
     }
 }
 

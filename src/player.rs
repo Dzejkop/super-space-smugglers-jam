@@ -3,6 +3,7 @@ use crate::prelude::*;
 pub struct Player {
     pub ship: Ship,
     pub is_spawned: bool,
+    pub is_caught: bool,
 }
 
 static mut PLAYER: Player = Player {
@@ -12,6 +13,7 @@ static mut PLAYER: Player = Player {
         in_orbit: None,
     },
     is_spawned: false,
+    is_caught: false,
 };
 
 pub unsafe fn get() -> &'static Player {
@@ -62,7 +64,10 @@ pub fn tic(camera: &Camera, game: &Game) -> bool {
         .draw(Some(game));
 
     if player.is_spawned {
-        if camera.zoom < 0.15 && time() % 1000.0 < 500.0 && !game.manouver_mode
+        if !player.is_caught
+            && camera.zoom < 0.15
+            && time() % 1000.0 < 500.0
+            && !game.manouver_mode
         {
             circb(at.x as i32, at.y as i32, 8, 5);
         }
@@ -77,7 +82,9 @@ pub fn tic(camera: &Camera, game: &Game) -> bool {
 
     // ---
 
-    OverflowIndicator::player(at).draw();
+    if !player.is_caught {
+        OverflowIndicator::player(at).draw();
+    }
 
     if !player.is_spawned && mouse().left {
         let rot = rot - PI / 2.0;

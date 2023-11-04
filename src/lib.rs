@@ -1,6 +1,4 @@
-#![feature(const_fn_floating_point_arithmetic)]
 #![feature(extract_if)]
-#![feature(get_many_mut)]
 
 #[macro_use]
 mod tic80;
@@ -90,26 +88,30 @@ pub fn tic() {
                 planets::init(planets::galaxies::gamma());
             }
 
-            game::tic();
-            camera::tic();
-            particles::tic(rng, Some(game::get()), Some(camera::get()));
+            if let State::Spawning | State::Playing = state {
+                game::tic();
+                camera::tic();
+                particles::tic(rng, Some(game::get()), Some(camera::get()));
+            }
+
             planets::tic(camera::get());
 
             if player::tic(camera::get(), game::get()) {
                 *state = State::Playing;
             }
 
-            if let State::Playing = state {
-                if police::tic(
-                    rng,
-                    camera::get(),
-                    player::get(),
-                    planets::get(),
-                    game::get_mut(),
-                ) {
-                    *state = State::GameOver;
-                }
+            if police::tic(
+                rng,
+                camera::get(),
+                player::get(),
+                planets::get(),
+                game::get_mut(),
+            ) {
+                *state = State::GameOver;
+                player::get_mut().is_caught = true;
+            }
 
+            if let State::Playing = state {
                 manouvers::tic(
                     camera::get(),
                     game::get_mut(),
@@ -124,21 +126,50 @@ pub fn tic() {
                     planets::get(),
                     police::get_mut(),
                 );
-            }
 
-            fuel::tic(
-                camera::get(),
-                game::get_mut(),
-                player::get_mut(),
-                planets::get(),
-            );
+                fuel::tic(
+                    camera::get(),
+                    game::get_mut(),
+                    player::get_mut(),
+                    planets::get(),
+                );
 
-            msgs::tic(game::get());
-            overflow_indicator::tic();
-
-            if let State::Playing = state {
+                msgs::tic(game::get());
+                overflow_indicator::tic();
                 ui::tic(game::get_mut(), police::get());
                 sim::tic(game::get(), player::get_mut(), planets::get_mut());
+            }
+
+            if let State::GameOver = state {
+                let y = 22.0;
+
+                Text::new("Ouch, you've been caught!")
+                    .at(vec2(WIDTH as f32, y + 16.0))
+                    .align_center()
+                    .draw();
+
+                Text::new("Your criminal days are over.")
+                    .at(vec2(WIDTH as f32, y + 24.0))
+                    .align_center()
+                    .draw();
+
+                ShipSprite::police()
+                    .at(vec2(18.0, y + 22.0))
+                    .rot((time() / 333.0).sin())
+                    .draw(None);
+
+                ShipSprite::police()
+                    .at(vec2(WIDTH as f32 - 18.0, y + 22.0))
+                    .rot((time() / 333.0).cos())
+                    .draw(None);
+
+                Text::new("Use escape to restart the game")
+                    .at(vec2(WIDTH as f32, HEIGHT as f32 - 20.0))
+                    .color(5)
+                    .align_center()
+                    .draw();
+
+                camera::get_mut().zoom /= 1.0025;
             }
 
             mouse_utils::tic();
