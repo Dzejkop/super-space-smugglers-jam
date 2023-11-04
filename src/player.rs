@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 static mut SHIP: Ship = Ship {
-    pos: vec2(2000.0, 0.0),
+    pos: vec2(1800.0, 0.0),
     vel: vec2(-1.0, 1.0),
     in_orbit: None,
 };

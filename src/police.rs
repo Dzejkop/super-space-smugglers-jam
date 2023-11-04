@@ -15,7 +15,7 @@ impl State {
 }
 
 static mut STATE: State = State {
-    wanted: 1.0,
+    wanted: 0.0,
     dispatch_at: 0.0,
     deducation_at: 0.0,
     vehicles: Vec::new(),
