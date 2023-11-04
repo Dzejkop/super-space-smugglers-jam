@@ -1,9 +1,12 @@
+#![feature(const_fn_floating_point_arithmetic)]
+
 mod alloc;
 mod camera;
 mod game_state;
 mod intro;
 mod orbits;
 mod particles;
+mod planet;
 mod ship;
 mod sprites;
 mod text;
@@ -11,6 +14,12 @@ mod tic80;
 mod utils;
 
 use std::f32::consts::PI;
+
+use glam::*;
+use orbits::orbital_period;
+use planet::Planet;
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 
 use self::camera::*;
 use self::game_state::*;
@@ -21,9 +30,6 @@ use self::utils::*;
 use crate::game_state::game_mut;
 use crate::orbits::simulate_trajectory;
 use crate::ship::*;
-use glam::*;
-use rand::rngs::SmallRng;
-use rand::SeedableRng;
 
 #[derive(Clone)]
 pub struct Ship {
@@ -31,58 +37,51 @@ pub struct Ship {
     y: f32,
     vx: f32,
     vy: f32,
+
+    // Index of planet
+    in_orbit: Option<usize>,
 }
 
 static mut SHIP: Ship = Ship {
     x: 175.0,
     y: 0.0,
     vx: 0.0,
-    vy: -1.0,
+    vy: 1.0,
+    in_orbit: None,
 };
 
-#[derive(Clone)]
-pub struct Planet {
-    x: f32,
-    y: f32,
-
-    // Oribital characteristics
-    orbit_radius: f32,
-    orbit_speed: f32,
-
-    radius: f32,
-    mass: f32,
-    color: u8,
-}
-
-static mut PLANETS: [Planet; 3] = [
-    // The Sun
-    Planet {
-        x: 0.0,
-        y: 0.0,
-        orbit_radius: 0.0,
-        orbit_speed: 0.0,
-        radius: 100.0,
-        mass: 1.0,
-        color: 4,
-    },
-    Planet {
-        x: 0.0,
-        y: 0.0,
-        orbit_radius: 500.0,
-        orbit_speed: 0.0002,
-        radius: 20.0,
-        mass: 0.02,
-        color: 3,
-    },
-    Planet {
-        x: 0.0,
-        y: 0.0,
-        orbit_radius: 1000.0,
-        orbit_speed: 0.00001,
-        radius: 10.0,
-        mass: 0.001,
-        color: 2,
-    },
+static mut PLANETS: [Planet; 4] = [
+    // 0: The Sun
+    Planet::base()
+        .with_radius(120.0)
+        .with_mass(0.5)
+        .with_color(4),
+    // 1: Mercury-ish
+    Planet::base()
+        .with_orbit(1000.0, 0.0002)
+        .with_radius(30.0)
+        .with_mass(0.1)
+        .with_color(3),
+    // 2: Venus-ish
+    Planet::base()
+        .with_orbit(2000.0, 0.00001)
+        .with_radius(30.0)
+        .with_mass(0.1)
+        .with_color(4),
+    // 3: Jupiter-ish
+    Planet::base()
+        .with_orbit(4000.0, 0.0002)
+        .with_radius(60.0)
+        .with_mass(0.22)
+        .with_color(6),
+    // 4: Europa
+    // Planet::planet(0.0, 0.0, 2000.0, 0.00001, 30.0, 0.1, 2),
+    // Planet::base()
+    //     .with_orbit(300.0, 0.002)
+    //     .with_radius(15.0)
+    //     .with_mass(0.01)
+    //     .with_color(9)
+    //     .moon_of(3),
 ];
 
 static mut MOUSE_LEFT_PREV: bool = false;
@@ -98,10 +97,20 @@ enum State {
 // TODO change before release
 static mut STATE: State = State::Playing;
 
+static mut INIT: bool = false;
+
 #[export_name = "TIC"]
 pub fn tic() {
     let rng = unsafe { RNG.get_or_insert_with(|| SmallRng::seed_from_u64(64)) };
     let state = unsafe { &mut STATE };
+
+    if !unsafe { INIT } {
+        init();
+
+        unsafe {
+            INIT = true;
+        }
+    }
 
     // ---
 
@@ -119,6 +128,14 @@ pub fn tic() {
         State::Playing => {
             draw_space_and_stuff();
         }
+    }
+}
+
+fn init() {
+    let central_mass = unsafe { PLANETS[0].mass };
+
+    for planet in unsafe { &mut PLANETS } {
+        planet.orbit_speed = orbital_period(central_mass, planet.radius);
     }
 }
 
@@ -173,16 +190,38 @@ fn draw_space_and_stuff() {
         let (ox, oy) = camera.world_to_screen_integer(0.0, 0.0);
 
         for planet in &mut PLANETS.iter_mut() {
-            planet.x = f32::sin(game.time() * planet.orbit_speed) * planet.orbit_radius;
-            planet.y = f32::cos(game.time() * planet.orbit_speed) * planet.orbit_radius;
+            if let Some(parent) = planet.parent {
+                let parent = &PLANETS[parent];
 
-            // Draw orbit
-            circb(
-                ox,
-                oy,
-                (planet.orbit_radius * camera.zoom) as i32,
-                planet.color,
-            );
+                planet.x = parent.x
+                    + f32::cos(std::f32::consts::PI * 2.0 * game.time() / planet.orbit_speed)
+                        * planet.orbit_radius;
+                planet.y = parent.y
+                    + f32::sin(std::f32::consts::PI * 2.0 * game.time() / planet.orbit_speed)
+                        * planet.orbit_radius;
+
+                let (ox, oy) = camera.world_to_screen_integer(parent.x, parent.y);
+                // Draw orbit
+                circb(
+                    ox,
+                    oy,
+                    (planet.orbit_radius * camera.zoom) as i32,
+                    planet.color,
+                );
+            } else {
+                planet.x = f32::cos(std::f32::consts::PI * 2.0 * game.time() / planet.orbit_speed)
+                    * planet.orbit_radius;
+                planet.y = f32::sin(std::f32::consts::PI * 2.0 * game.time() / planet.orbit_speed)
+                    * planet.orbit_radius;
+
+                // Draw orbit
+                circb(
+                    ox,
+                    oy,
+                    (planet.orbit_radius * camera.zoom) as i32,
+                    planet.color,
+                );
+            }
 
             // Draw planet
             let (x, y) = camera.world_to_screen_integer(planet.x, planet.y);
@@ -192,19 +231,22 @@ fn draw_space_and_stuff() {
 
     // Draw the ship
     unsafe {
-        for planet in &PLANETS {
-            let dx = planet.x - SHIP.x;
-            let dy = planet.y - SHIP.y;
-            let d2 = dx * dx + dy * dy;
+        if dt != 0.0 {
+            for planet in &PLANETS {
+                let dx = planet.x - SHIP.x;
+                let dy = planet.y - SHIP.y;
 
-            let f = planet.mass / d2;
+                let d2 = dx * dx + dy * dy;
 
-            SHIP.vx += f * dx * dt;
-            SHIP.vy += f * dy * dt;
+                let f = planet.mass / d2;
+
+                SHIP.vx += f * dx * dt;
+                SHIP.vy += f * dy * dt;
+            }
+
+            SHIP.x += SHIP.vx * dt;
+            SHIP.y += SHIP.vy * dt;
         }
-
-        SHIP.x += SHIP.vx * dt;
-        SHIP.y += SHIP.vy * dt;
 
         let (x, y) = camera.world_to_screen_integer(SHIP.x, SHIP.y);
 
@@ -263,27 +305,27 @@ fn draw_space_and_stuff() {
         let dvx = (sx - mx) * 0.01;
         let dvy = (sy - my) * 0.01;
 
-        if m.left && game.is_paused() && d < (10.0 / camera.zoom) && !game.manouver_mode {
+        if m.left && game.is_paused() && d < (30.0 / camera.zoom) && !game.manouver_mode {
             game.manouver_mode = true;
         }
 
         if game.manouver_mode && !m.left {
             game.manouver_mode = false;
 
-            // TODO: Maybe execute manouver
             SHIP.vx += dvx;
             SHIP.vy += dvy;
         }
 
         if game.manouver_mode {
             let mut t_ship = SHIP.clone();
+
             t_ship.vx += dvx;
             t_ship.vy += dvy;
 
             line(sx, sy, mx, my, 12);
 
             let mut prev_step = [t_ship.x, t_ship.y];
-            for step in simulate_trajectory(time(), &t_ship, &PLANETS).take(1000) {
+            for step in simulate_trajectory(game.time(), &t_ship, &PLANETS).take(1000) {
                 let (x1, y1) = camera.world_to_screen_integer(prev_step[0], prev_step[1]);
                 let (x2, y2) = camera.world_to_screen_integer(step.x, step.y);
 
