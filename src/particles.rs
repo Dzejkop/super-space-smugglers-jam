@@ -1,14 +1,21 @@
 use crate::prelude::*;
 
-pub fn tic(rng: &mut dyn RngCore, camera: Option<&Camera>) {
+pub fn tic(
+    rng: &mut dyn RngCore,
+    game: Option<&Game>,
+    camera: Option<&Camera>,
+) {
     let particles = unsafe { &mut PARTICLES };
+    let is_paused = game.map(|game| game.is_paused()).unwrap_or(false);
 
     for particle in particles {
         if particle.life == 0 {
             continue;
         }
 
-        particle.life -= 1;
+        if !is_paused {
+            particle.life -= 1;
+        }
 
         let sprite = lerp(
             particle.max_sprite_idx as f32,
@@ -20,13 +27,21 @@ pub fn tic(rng: &mut dyn RngCore, camera: Option<&Camera>) {
             .map(|camera| camera.world_to_screen(particle.pos))
             .unwrap_or(particle.pos);
 
-        Img::sprite_idx(sprite).at(at).draw();
+        let scale = camera
+            .map(|camera| (3.0 * camera.zoom).max(0.2))
+            .unwrap_or(1.0);
 
-        particle.pos += particle.vel;
-        particle.vel *= vec2(rng.gen_range(0.5..1.0), rng.gen_range(0.5..1.0));
+        Img::sprite_idx(sprite).at(at).scale(scale).draw();
 
-        particle.vel +=
-            vec2(rng.gen_range(-0.1..0.1), rng.gen_range(-0.1..0.1));
+        if !is_paused {
+            particle.pos += particle.vel;
+
+            particle.vel *=
+                vec2(rng.gen_range(0.5..1.0), rng.gen_range(0.5..1.0));
+
+            particle.vel +=
+                vec2(rng.gen_range(-0.1..0.1), rng.gen_range(-0.1..0.1));
+        }
     }
 }
 
@@ -53,6 +68,10 @@ pub fn spawn(
             break;
         }
     }
+}
+
+pub fn spawn_exhaust(pos: Vec2, vel: Vec2) {
+    spawn(pos, vel, 266, 271, 22);
 }
 
 pub fn is_any_visible() -> bool {

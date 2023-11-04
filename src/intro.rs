@@ -71,12 +71,9 @@ pub fn tic() -> bool {
             ship_positions.push(player_at);
             ship_velocities.push(player_vel);
 
-            particles::spawn(
+            particles::spawn_exhaust(
                 player_engine_at,
                 -player_vel.normalize() * 2.5,
-                266,
-                271,
-                22,
             );
 
             // ---
@@ -95,12 +92,9 @@ pub fn tic() -> bool {
                     .engine(true)
                     .draw(None);
 
-                particles::spawn(
+                particles::spawn_exhaust(
                     police_engine_at,
                     -police_vel.normalize() * 2.5,
-                    266,
-                    271,
-                    22,
                 );
 
                 ship_positions.push(police_at);
@@ -144,13 +138,7 @@ pub fn tic() -> bool {
                     .engine(true)
                     .draw(None);
 
-                particles::spawn(
-                    ship_engine_at,
-                    -*ship_vel * 2.5,
-                    266,
-                    271,
-                    22,
-                );
+                particles::spawn_exhaust(ship_engine_at, -*ship_vel * 2.5);
             }
 
             if *elapsed > 12.0 && !particles::is_any_visible() {

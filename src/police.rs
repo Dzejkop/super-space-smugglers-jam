@@ -107,7 +107,7 @@ pub fn tic(
 
         let vehicle_vel = vehicle_dir * 0.2;
 
-        ShipSprite::police()
+        let vehicle_engine_at = ShipSprite::police()
             .at(vehicle_pos)
             .rot(PI - vehicle_dir.angle_between(Vec2::Y))
             .scale(3.0 * camera.zoom)
@@ -126,6 +126,11 @@ pub fn tic(
 
         if !game.is_paused() {
             vehicle.pos += vehicle_vel * game.dt();
+
+            particles::spawn_exhaust(
+                camera.screen_to_world(vehicle_engine_at),
+                -vehicle_vel,
+            );
 
             if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
                 if vehicle.collides_with(player) {
@@ -192,7 +197,7 @@ pub fn tic(
                     vec2(rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0));
 
                 if let Some(dir) = dir.try_normalize() {
-                    particles::spawn(pos, dir, 266, 271, 22);
+                    particles::spawn_exhaust(pos, dir);
                 }
             }
         }

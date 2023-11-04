@@ -75,12 +75,13 @@ pub fn tic() {
                 *state = State::Playing;
             }
 
-            particles::tic(rng, None);
+            particles::tic(rng, None, None);
         }
 
         State::Playing | State::GameOver => unsafe {
             game::tic();
             camera::tic();
+            particles::tic(rng, Some(game::get()), Some(camera::get()));
             planets::tic(camera::get(), game::get());
             player::tic(camera::get(), game::get(), planets::get());
 
@@ -108,7 +109,6 @@ pub fn tic() {
                 planets::get(),
             );
 
-            particles::tic(rng, Some(camera::get()));
             msgs::tic(game::get());
             ui::tic(game::get_mut(), police::get());
             overflow_indicator::tic();
