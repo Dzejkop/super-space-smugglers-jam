@@ -88,24 +88,6 @@ pub fn tic(game: &mut Game) {
         }
     }
 
-    // -- Top left corner --
-
-    Text::new(format!("Day: {}", game.day()))
-        .at(vec2(0.0, 0.0))
-        .draw();
-
-    Text::new(format!("Fuel: {}%", game.ufuel()))
-        .at(vec2(0.0, 8.0))
-        .draw();
-
-    Text::new(format!("Money: {}", game.money_str()))
-        .at(vec2(0.0, 16.0))
-        .draw();
-
-    Text::new(format!("Tickets: {}", game.tickets()))
-        .at(vec2(0.0, 24.0))
-        .draw();
-
     // -- Fuel UI --
 
     let fuel_height = (game.fuel() * 16.0 * 3.0 - 4.0) as i32;
