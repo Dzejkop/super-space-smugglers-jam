@@ -32,6 +32,7 @@ pub struct Game {
     // Contracts stuff
     pub contracts: Vec<Contract>,
     pub selected_contract: Option<usize>,
+    pub cargo_hold: [Option<Contract>; 3],
 }
 
 impl Game {
@@ -48,10 +49,11 @@ impl Game {
             contracts: vec![Contract {
                 planet: 1,
                 destination: 2,
-                cargo: Cargo::Passengers,
+                cargo: Cargo::Crabs,
                 reward: 20,
             }],
             selected_contract: None,
+            cargo_hold: [None; 3],
         }
     }
 

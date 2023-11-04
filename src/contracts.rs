@@ -3,6 +3,9 @@ use crate::prelude::arrow::Arrow;
 use crate::prelude::sprites::buttons;
 use crate::prelude::*;
 
+pub const MIN_ACCEPT_DISTANCE: f32 = 100.0;
+
+#[derive(Clone, Copy)]
 pub struct Contract {
     pub planet: usize,
     pub destination: usize,
@@ -10,8 +13,35 @@ pub struct Contract {
     pub reward: u32,
 }
 
+#[derive(Clone, Copy)]
 pub enum Cargo {
     Passengers,
+    Crabs,
+    Bananas,
+}
+
+impl Cargo {
+    pub fn sprite(&self) -> u32 {
+        match self {
+            Cargo::Passengers => 352,
+            Cargo::Bananas => 354,
+            Cargo::Crabs => 356,
+        }
+    }
+}
+
+pub fn insert_into_empty_cargo<const N: usize>(
+    contract: Contract,
+    hold: &mut [Option<Contract>; N],
+) -> bool {
+    for n in 0..N {
+        if hold[n].is_none() {
+            hold[n] = Some(contract);
+            return true;
+        }
+    }
+
+    false
 }
 
 pub fn tic(
@@ -22,11 +52,14 @@ pub fn tic(
 ) {
     let mo = mouse();
 
+    // Draw available unselected contracts
     for (idx, contract) in game.contracts.iter().enumerate() {
         let planet = &planets[contract.planet];
         let planet_pos = camera.world_to_screen(planet.pos);
 
-        if (time() / 1000.0) as i32 % 2 == 0 {
+        let flash_indicator = (time() / 1000.0) as i32 % 2 == 0;
+
+        if flash_indicator {
             Img::sprite_idx_with_size(320, uvec2(2, 2))
                 .at(planet_pos + vec2(64.0, -64.0) * camera.zoom)
                 .scale(4.0 * camera.zoom)
@@ -36,7 +69,15 @@ pub fn tic(
         let mouse_pos = camera.screen_to_world(vec2(mo.x as f32, mo.y as f32));
         let cursor_to_planet_distance = (planet.pos - mouse_pos).length();
 
-        if cursor_to_planet_distance < planet.radius {
+        let ship_to_planet_distance = (player.pos - planet.pos).length();
+
+        if camera.zoom < 0.15 && flash_indicator {
+            circb(planet_pos.x as i32, planet_pos.y as i32, 12, 3);
+        }
+
+        if cursor_to_planet_distance < planet.radius
+            && ship_to_planet_distance < planet.radius + MIN_ACCEPT_DISTANCE
+        {
             SelectionIndicator::new(planet_pos)
                 .size(Vec2::ONE * planet.radius * 1.2)
                 .draw();
@@ -89,6 +130,16 @@ pub fn tic(
         } else {
             buttons::inactive::OK
         };
+
+        if mouse_over_accept_button && mouse_left_pressed() {
+            game.selected_contract = None;
+
+            if !insert_into_empty_cargo(*contract, &mut game.cargo_hold) {
+                msgs::add("Cargo hold is full!");
+            } else {
+                game.contracts.remove(selected_contract);
+            }
+        }
 
         Img::sprite_idx_with_size(sprite_idx as u32, uvec2(2, 2))
             .at(button_pos)

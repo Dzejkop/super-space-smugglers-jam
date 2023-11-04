@@ -168,6 +168,30 @@ pub fn tic(game: &mut Game, police: &police::State) {
         );
     }
 
+    // -- Cargo hold --
+    // 16.0 offset because of fuel gauge + 8 cause we render at center
+    let left_offset = 24.0;
+    let bottom_offset = 8.0;
+
+    for (idx, cargo) in game.cargo_hold.iter().enumerate() {
+        let hold_cell_offset = 16.0 * idx as f32;
+        Img::sprite_idx_with_size(sprites::CARGO_HOLD as u32, uvec2(2, 2))
+            .at(vec2(
+                left_offset,
+                HEIGHT as f32 - bottom_offset - hold_cell_offset,
+            ))
+            .draw();
+
+        if let Some(contract) = cargo {
+            Img::sprite_idx_with_size(contract.cargo.sprite(), uvec2(2, 2))
+                .at(vec2(
+                    left_offset,
+                    HEIGHT as f32 - bottom_offset - hold_cell_offset,
+                ))
+                .draw();
+        }
+    }
+
     // -- Keyboard controls --
     if !game.manouver_mode {
         if key(keys::DIGIT_1) {

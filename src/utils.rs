@@ -81,6 +81,8 @@ pub mod sprites {
             pub const OK: i32 = 6;
         }
     }
+
+    pub const CARGO_HOLD: i32 = 238;
 }
 
 pub struct Img {

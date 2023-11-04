@@ -11,7 +11,7 @@ static mut PLANETS: &mut [Planet] = &mut [
         .with_orbit(1000.0, 0.0002)
         .with_radius(30.0)
         .with_mass(0.1)
-        .with_color(3),
+        .with_color(13),
     // 2: Venus-ish
     Planet::new()
         .with_orbit(2000.0, 0.00001)
