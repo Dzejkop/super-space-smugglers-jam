@@ -1,18 +1,17 @@
 use crate::tic80::time;
 
 pub struct Game {
-    // Time in game world
-    game_time: f32,
-    prev_game_time: f32,
+    real_time: f32,
+    world_time: f32,
 
-    // Program time for tracking purposes
-    time: f32,
-    prev_time: f32,
+    prev_real_time: f32,
+    prev_world_time: f32,
 
-    pub game_speed: GameSpeed,
-
-    // State
+    pub speed: GameSpeed,
     pub manouver_mode: bool,
+    pub fuel: f32,
+    pub money: f32,
+    pub tickets: u32,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -41,38 +40,53 @@ pub fn game_mut() -> &'static mut Game {
 impl Game {
     pub fn init() -> Self {
         Self {
-            game_time: 0.0,
-            prev_game_time: 0.0,
-            time: 0.0,
-            prev_time: 0.0,
-            game_speed: GameSpeed::Stop,
+            real_time: 0.0,
+            world_time: 0.0,
+            prev_real_time: 0.0,
+            prev_world_time: 0.0,
+            speed: GameSpeed::Stop,
             manouver_mode: false,
+            fuel: 100.0,
+            money: 10000.0,
+            tickets: 0,
         }
     }
 
     pub fn update(&mut self) {
-        self.prev_time = self.time;
-        self.time = time();
+        self.prev_real_time = self.real_time;
+        self.real_time = time();
 
-        let dt = self.time - self.prev_time;
+        let dt = self.real_time - self.prev_real_time;
 
-        self.prev_game_time = self.game_time;
-        self.game_time += dt * self.game_speed.to_speed();
+        self.prev_world_time = self.world_time;
+        self.world_time += dt * self.speed.to_speed();
     }
 
     pub fn time(&self) -> f32 {
-        self.game_time
+        self.world_time
     }
 
     pub fn day(&self) -> u32 {
-        (self.game_time / 250.0) as u32
+        (self.world_time / 250.0) as u32
+    }
+
+    pub fn fuel(&self) -> u32 {
+        self.fuel as u32
+    }
+
+    pub fn money_str(&self) -> String {
+        format!("${}k", (self.money / 1000.0) as u32)
+    }
+
+    pub fn tickets(&self) -> u32 {
+        self.tickets
     }
 
     pub fn dt(&self) -> f32 {
-        self.game_time - self.prev_game_time
+        self.world_time - self.prev_world_time
     }
 
     pub fn is_paused(&self) -> bool {
-        self.game_speed == GameSpeed::Stop
+        self.speed == GameSpeed::Stop
     }
 }

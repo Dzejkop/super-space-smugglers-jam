@@ -322,7 +322,7 @@ fn draw_ui(game: &mut Game) {
         && my < HEIGHT - 16 - 4 + 16 * 2;
 
     spr(
-        if matches!(game.game_speed, GameSpeed::Stop) {
+        if matches!(game.speed, GameSpeed::Stop) {
             sprites::ui::buttons::active::STOP
         } else if mouse_over_stop_button {
             sprites::ui::buttons::highlighted::STOP
@@ -340,7 +340,7 @@ fn draw_ui(game: &mut Game) {
     );
 
     spr(
-        if matches!(game.game_speed, GameSpeed::Normal) {
+        if matches!(game.speed, GameSpeed::Normal) {
             sprites::ui::buttons::active::NORMAL
         } else if mouse_over_play_button {
             sprites::ui::buttons::highlighted::NORMAL
@@ -358,7 +358,7 @@ fn draw_ui(game: &mut Game) {
     );
 
     spr(
-        if matches!(game.game_speed, GameSpeed::Fast) {
+        if matches!(game.speed, GameSpeed::Fast) {
             sprites::ui::buttons::active::FAST
         } else if mouse_over_fast_button {
             sprites::ui::buttons::highlighted::FAST
@@ -379,29 +379,38 @@ fn draw_ui(game: &mut Game) {
         .at(vec2(0.0, 0.0))
         .draw();
 
-    Text::new("Money: $123k").at(vec2(0.0, 8.0)).draw();
-    Text::new("Fuel: 100%").at(vec2(0.0, 16.0)).draw();
+    Text::new(format!("Fuel: {}%", game.fuel()))
+        .at(vec2(0.0, 8.0))
+        .draw();
+
+    Text::new(format!("Money: {}", game.money_str()))
+        .at(vec2(0.0, 16.0))
+        .draw();
+
+    Text::new(format!("Tickets: {}", game.tickets()))
+        .at(vec2(0.0, 24.0))
+        .draw();
 
     // ---
 
     if m.left && !unsafe { MOUSE_LEFT_PREV } {
         if mouse_over_stop_button {
-            game.game_speed = GameSpeed::Stop;
+            game.speed = GameSpeed::Stop;
         } else if mouse_over_play_button {
-            game.game_speed = GameSpeed::Normal;
+            game.speed = GameSpeed::Normal;
         } else if mouse_over_fast_button {
-            game.game_speed = GameSpeed::Fast;
+            game.speed = GameSpeed::Fast;
         }
     }
 
     if key(keys::DIGIT_1) {
-        game.game_speed = GameSpeed::Stop;
+        game.speed = GameSpeed::Stop;
     } else if key(keys::DIGIT_2) {
-        game.game_speed = GameSpeed::Normal;
+        game.speed = GameSpeed::Normal;
     } else if key(keys::DIGIT_3) {
-        game.game_speed = GameSpeed::Fast;
+        game.speed = GameSpeed::Fast;
     } else if keyp(keys::SPACE, 16, 16) {
-        game.game_speed = match game.game_speed {
+        game.speed = match game.speed {
             GameSpeed::Stop => GameSpeed::Normal,
             _ => GameSpeed::Stop,
         };
