@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crate::ship::police_alternate_sprite;
 
 enum State {
     Cooldown {
@@ -61,6 +62,11 @@ pub fn tic(rng: &mut dyn RngCore, camera: &Camera, player: &Ship, game: &Game) {
                     .scale(3.0 * camera.zoom)
                     .engine(true)
                     .draw();
+
+                if camera.zoom < 0.15 && time() % 1000.0 < 500.0 {
+                    let color = if police_alternate_sprite() { 10 } else { 2 };
+                    circb(vehicle_x as i32, vehicle_y as i32, 8, color); // or 2
+                }
 
                 OverflowIndicator::police(vehicle_pos).draw();
 

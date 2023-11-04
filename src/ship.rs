@@ -68,7 +68,7 @@ impl ShipSprite {
         let sprite = match id {
             ShipSpriteId::Player => uvec2(16, 16),
             ShipSpriteId::Police => {
-                if time() % 600.0 < 300.0 {
+                if police_alternate_sprite() {
                     uvec2(18, 16)
                 } else {
                     uvec2(20, 16)
@@ -85,7 +85,11 @@ impl ShipSprite {
         let engine_at = rotate(at + vec2(0.0, 16.0) * scale, at, rot);
 
         if engine {
-            let sprite_idx = if (time() / 100.0) as i32 % 2 == 0 { 288 } else { 290 };
+            let sprite_idx = if (time() / 100.0) as i32 % 2 == 0 {
+                288
+            } else {
+                290
+            };
             Img::sprite_idx_with_size(sprite_idx, uvec2(2, 2))
                 .at(engine_at)
                 .rot(rot)
@@ -95,6 +99,10 @@ impl ShipSprite {
 
         engine_at
     }
+}
+
+pub fn police_alternate_sprite() -> bool {
+    time() % 600.0 < 300.0
 }
 
 enum ShipSpriteId {
