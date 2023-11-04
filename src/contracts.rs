@@ -1,9 +1,13 @@
 use crate::police::PoliceState;
+use crate::prelude::keys::P;
 use crate::prelude::sprites::buttons;
 use crate::prelude::*;
 
 pub const MIN_ACCEPT_DISTANCE: f32 = 250.0;
 pub const MIN_DELIVERY_DISTANCE: f32 = 250.0;
+
+pub const MIN_DELAY_BETWEEN_NEW_CONTRACTS: f32 = 5000.0;
+pub const MAX_CONTRACTS: usize = 3;
 
 #[derive(Clone, Copy)]
 pub struct Contract {
@@ -45,6 +49,7 @@ pub fn insert_into_empty_cargo<const N: usize>(
 }
 
 pub fn tic(
+    rng: &mut dyn RngCore,
     camera: &Camera,
     game: &mut Game,
     player: &Player,
@@ -52,6 +57,51 @@ pub fn tic(
     police: &mut PoliceState,
 ) {
     let mo = mouse();
+
+    // Spawn new contracts
+
+    if game.contracts.len() < MAX_CONTRACTS {
+        if game.time - game.time_of_last_contract_spawned
+            > MIN_DELAY_BETWEEN_NEW_CONTRACTS
+        {
+            if rng.gen::<f32>() > 0.5 {
+                // Spawn new contract
+
+                music(
+                    tracks::NEW_CONTRACT_SOUND,
+                    MusicOptions {
+                        repeat: false,
+                        ..Default::default()
+                    },
+                );
+
+                msgs::add("New contract available!");
+
+                game.time_of_last_contract_spawned = game.time;
+
+                let planet = rng.gen_range(1..planets.len());
+                let mut dest = rng.gen_range(1..planets.len());
+
+                while dest == planet {
+                    dest = rng.gen_range(1..planets.len());
+                }
+
+                let cargo = match rng.gen_range(0..3) {
+                    0 => Cargo::Passengers,
+                    1 => Cargo::Crabs,
+                    2 => Cargo::Bananas,
+                    _ => unreachable!(),
+                };
+
+                game.contracts.push(Contract {
+                    planet,
+                    destination: dest,
+                    cargo,
+                    reward: 20,
+                });
+            }
+        }
+    }
 
     // Draw available unselected contracts
     for (idx, contract) in game.contracts.iter().enumerate() {

@@ -33,6 +33,7 @@ pub struct Game {
     pub contracts: Vec<Contract>,
     pub selected_contract: Option<usize>,
     pub cargo_hold: [Option<Contract>; 3],
+    pub time_of_last_contract_spawned: f32,
 }
 
 impl Game {
@@ -46,23 +47,10 @@ impl Game {
             manouver_mode: false,
             manouver_dv: Vec2::ZERO,
             manouver_fuel: 0.0,
-            contracts: vec![Contract {
-                planet: 1,
-                destination: 2,
-                cargo: Cargo::Crabs,
-                reward: 20,
-            }],
+            contracts: vec![],
             selected_contract: None,
-            cargo_hold: [
-                Some(Contract {
-                    planet: 1,
-                    destination: 3,
-                    cargo: Cargo::Crabs,
-                    reward: 20,
-                }),
-                None,
-                None,
-            ],
+            cargo_hold: [None; 3],
+            time_of_last_contract_spawned: 0.0,
         }
     }
 

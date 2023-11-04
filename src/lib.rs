@@ -120,6 +120,7 @@ pub fn tic() {
                 );
 
                 contracts::tic(
+                    rng,
                     camera::get(),
                     game::get_mut(),
                     player::get_mut(),
