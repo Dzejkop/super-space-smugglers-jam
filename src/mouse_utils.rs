@@ -24,3 +24,9 @@ pub fn mouse_left_pressed() -> bool {
 
     unsafe { !STATE.left_prev && mouse.left }
 }
+
+pub fn mouse_right_pressed() -> bool {
+    let mouse = mouse();
+
+    unsafe { !STATE.right_prev && mouse.right }
+}

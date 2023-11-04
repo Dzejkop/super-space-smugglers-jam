@@ -65,12 +65,16 @@ pub mod sprites {
             pub const STOP: i32 = 32;
             pub const NORMAL: i32 = 34;
             pub const FAST: i32 = 36;
+
+            pub const OK: i32 = 38;
         }
 
         pub mod inactive {
             pub const STOP: i32 = 0;
             pub const NORMAL: i32 = 2;
             pub const FAST: i32 = 4;
+
+            pub const OK: i32 = 6;
         }
     }
 }

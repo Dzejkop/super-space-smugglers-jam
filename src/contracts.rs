@@ -1,4 +1,6 @@
+use crate::mouse_utils::mouse_right_pressed;
 use crate::prelude::arrow::Arrow;
+use crate::prelude::sprites::buttons;
 use crate::prelude::*;
 
 pub struct Contract {
@@ -20,7 +22,7 @@ pub fn tic(
 ) {
     let mo = mouse();
 
-    for contract in &game.contracts {
+    for (idx, contract) in game.contracts.iter().enumerate() {
         let planet = &planets[contract.planet];
         let planet_pos = camera.world_to_screen(planet.pos);
 
@@ -40,10 +42,21 @@ pub fn tic(
                 .draw();
 
             if mouse_left_pressed() {
+                game.selected_contract = Some(idx);
 
+                // Enforce pause game, and disable manouver mode
+                game.manouver_mode = false;
+                game.speed = GameSpeed::Stop;
             }
-
         }
+    }
+
+    if game.manouver_mode || !game.is_paused() {
+        game.selected_contract = None;
+    }
+
+    if game.selected_contract.is_some() && mouse_right_pressed() {
+        game.selected_contract = None;
     }
 
     if let Some(selected_contract) = game.selected_contract {
@@ -57,6 +70,28 @@ pub fn tic(
 
         Arrow::new(planet_pos, destination_pos, destination.color)
             .margin(5.0)
+            .draw();
+
+        let middle_point = (planet_pos + destination_pos) / 2.0;
+
+        Text::new("Accept?")
+            .at(middle_point + vec2(0.0, 8.0))
+            .draw();
+
+        let mpos = vec2(mo.x as f32, mo.y as f32);
+
+        let button_pos = middle_point + vec2(0.0, 32.0);
+
+        let mouse_over_accept_button = (mpos - button_pos).length() < 8.0;
+
+        let sprite_idx = if mouse_over_accept_button {
+            buttons::highlighted::OK
+        } else {
+            buttons::inactive::OK
+        };
+
+        Img::sprite_idx_with_size(sprite_idx as u32, uvec2(2, 2))
+            .at(button_pos)
             .draw();
     }
 }
