@@ -76,8 +76,7 @@ pub fn tic(
 
         let mut prev_step = t_ship.pos;
 
-        let steps =
-            orbits::trajectory(game.time(), &t_ship, planets).take(1000);
+        let steps = orbits::trajectory(game.time, &t_ship, planets).take(1000);
 
         for step in steps {
             let p1 = camera.world_to_screen(prev_step);

@@ -85,7 +85,7 @@ impl ShipSprite {
         let engine_at = rotate(at + vec2(0.0, 16.0) * scale, at, rot);
 
         if engine {
-            let time = game.map(|game| game.time()).unwrap_or_else(|| time());
+            let time = game.map(|game| game.time).unwrap_or_else(|| time());
 
             let sprite_idx = if (time / 100.0) as i32 % 2 == 0 {
                 288

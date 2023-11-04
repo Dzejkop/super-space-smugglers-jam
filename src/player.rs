@@ -14,24 +14,8 @@ pub unsafe fn get_mut() -> &'static mut Ship {
     unsafe { &mut SHIP }
 }
 
-pub fn tic(camera: &Camera, game: &Game, planets: &[Planet]) {
+pub fn tic(camera: &Camera, game: &Game) {
     let ship = unsafe { &mut SHIP };
-
-    // ---
-
-    if game.dt() != 0.0 {
-        for planet in planets {
-            let d = planet.pos - ship.pos;
-            let d2 = d.length_squared();
-            let f = planet.mass / d2;
-
-            ship.vel += f * d * game.dt();
-        }
-
-        ship.pos += ship.vel * game.dt();
-    }
-
-    // ---
 
     let at = camera.world_to_screen(ship.pos);
     let rot = PI - ship.vel.angle_between(Vec2::Y);

@@ -1,5 +1,6 @@
 #![feature(const_fn_floating_point_arithmetic)]
 #![feature(extract_if)]
+#![feature(get_many_mut)]
 
 #[macro_use]
 mod tic80;
@@ -21,6 +22,7 @@ mod player;
 mod police;
 mod selection_indicator;
 mod ship;
+mod sim;
 mod text;
 mod ui;
 mod utils;
@@ -82,8 +84,8 @@ pub fn tic() {
             game::tic();
             camera::tic();
             particles::tic(rng, Some(game::get()), Some(camera::get()));
-            planets::tic(camera::get(), game::get());
-            player::tic(camera::get(), game::get(), planets::get());
+            planets::tic(camera::get());
+            player::tic(camera::get(), game::get());
 
             if police::tic(
                 rng,
@@ -112,6 +114,7 @@ pub fn tic() {
             msgs::tic(game::get());
             ui::tic(game::get_mut(), police::get());
             overflow_indicator::tic();
+            sim::tic(game::get(), player::get_mut(), planets::get_mut());
 
             mouse_utils::tic();
         },

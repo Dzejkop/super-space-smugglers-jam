@@ -1,8 +1,12 @@
+#![allow(unused)]
+
 use std::ops;
 
 use crate::prelude::*;
 
 pub mod arrow;
+
+pub const DT: f32 = 1000.0 / 60.0;
 
 pub mod btns {
     pub const UP: i32 = 0;

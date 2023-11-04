@@ -32,7 +32,7 @@ pub fn tic(game: &mut Game, police: &police::State) {
 
             let sprite = if active {
                 if almost_inactive {
-                    if game.time() % 1000.0 < 500.0 {
+                    if game.time % 1000.0 < 500.0 {
                         263
                     } else {
                         262
@@ -144,7 +144,7 @@ pub fn tic(game: &mut Game, police: &police::State) {
     if show_fuel {
         let fuel_height = 3.0 * 16.0 - 6.0;
 
-        let fuel_h = (game.fuel() * fuel_height) as i32;
+        let fuel_h = (game.fuel * fuel_height) as i32;
         let fuel_y = HEIGHT - fuel_h - 2;
 
         rect(2, fuel_y, 12, fuel_h, 6);

@@ -6,16 +6,14 @@ pub fn tic(
     camera: Option<&Camera>,
 ) {
     let particles = unsafe { &mut PARTICLES };
-    let is_paused = game.map(|game| game.is_paused()).unwrap_or(false);
+    let steps = game.map(|game| game.steps()).unwrap_or(1);
 
     for particle in particles {
         if particle.life == 0 {
             continue;
         }
 
-        if !is_paused {
-            particle.life -= 1;
-        }
+        particle.life = particle.life.saturating_sub(steps);
 
         let sprite = lerp(
             particle.max_sprite_idx as f32,
@@ -33,7 +31,7 @@ pub fn tic(
 
         Img::sprite_idx(sprite).at(at).scale(scale).draw();
 
-        if !is_paused {
+        for _ in 0..steps {
             particle.pos += particle.vel;
 
             particle.vel *=

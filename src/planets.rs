@@ -38,39 +38,29 @@ static mut PLANETS: [Planet; 4] = [
 static mut INIT: bool = false;
 
 pub unsafe fn get() -> &'static [Planet] {
+    if !INIT {
+        init();
+    }
+
     &PLANETS
 }
 
 pub unsafe fn get_mut() -> &'static mut [Planet] {
-    &mut PLANETS
-}
-
-pub fn tic(camera: &Camera, game: &Game) {
-    if unsafe { !INIT } {
+    if !INIT {
         init();
     }
 
-    // ---
+    &mut PLANETS
+}
 
-    let planets = unsafe { get_mut() };
-    let o = camera.world_to_screen(vec2(0.0, 0.0)).as_ivec2();
+pub fn tic(camera: &Camera) {
+    let planets = unsafe { get() };
 
     for planet in planets {
+        // Draw orbit
         if let Some(parent) = planet.parent {
-            // TODO undefined behavior
-            let parent = unsafe { &PLANETS[parent] };
+            let o = camera.world_to_screen(planets[parent].pos).as_ivec2();
 
-            planet.pos.x = parent.pos.x
-                + f32::cos(PI * 2.0 * game.time() / planet.orbit_speed)
-                    * planet.orbit_radius;
-
-            planet.pos.y = parent.pos.y
-                + f32::sin(PI * 2.0 * game.time() / planet.orbit_speed)
-                    * planet.orbit_radius;
-
-            let o = camera.world_to_screen(parent.pos).as_ivec2();
-
-            // Draw orbit
             circb(
                 o.x,
                 o.y,
@@ -78,15 +68,8 @@ pub fn tic(camera: &Camera, game: &Game) {
                 planet.color,
             );
         } else {
-            planet.pos.x =
-                f32::cos(PI * 2.0 * game.time() / planet.orbit_speed)
-                    * planet.orbit_radius;
+            let o = camera.world_to_screen(vec2(0.0, 0.0)).as_ivec2();
 
-            planet.pos.y =
-                f32::sin(PI * 2.0 * game.time() / planet.orbit_speed)
-                    * planet.orbit_radius;
-
-            // Draw orbit
             circb(
                 o.x,
                 o.y,

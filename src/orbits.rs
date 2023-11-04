@@ -1,8 +1,5 @@
 use crate::prelude::*;
 
-// Average time step at 60 FPS
-const TIME_STEP: f32 = 1000.0 / 60.0;
-
 const G: f32 = 6.6743e-11;
 
 // Returns orbital period according to
@@ -36,7 +33,7 @@ pub fn trajectory(
     std::iter::from_fn(move || {
         n += 1;
 
-        let time = t + TIME_STEP * n as f32;
+        let time = t + DT * n as f32;
 
         for planet in &mut planets {
             planet.pos.x = f32::cos(PI * 2.0 * time / planet.orbit_speed)
@@ -51,10 +48,10 @@ pub fn trajectory(
             let d2 = d.length_squared();
             let f = planet.mass / d2;
 
-            ship.vel += f * d * TIME_STEP;
+            ship.vel += f * d * DT;
         }
 
-        ship.pos += ship.vel * TIME_STEP;
+        ship.pos += ship.vel * DT;
 
         Some(TrajectoryStep {
             n,
