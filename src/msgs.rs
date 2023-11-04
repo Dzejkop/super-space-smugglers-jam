@@ -20,19 +20,6 @@ pub fn tic(game: &Game) {
             offset: 0.0,
             anim: MessageAnimation::GoingDown,
         });
-
-        if msg.is_some() {
-            sfx(
-                1,
-                SfxOptions {
-                    note: 1,
-                    octave: 1,
-                    duration: 5,
-                    channel: 0,
-                    ..Default::default()
-                },
-            );
-        }
     }
 
     let completed = if let Some(msg) = msg {

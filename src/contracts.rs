@@ -4,6 +4,7 @@ use crate::prelude::sprites::buttons;
 use crate::prelude::*;
 
 pub const MIN_ACCEPT_DISTANCE: f32 = 100.0;
+pub const MIN_DELIVERY_DISTANCE: f32 = 100.0;
 
 #[derive(Clone, Copy)]
 pub struct Contract {
@@ -185,5 +186,35 @@ pub fn tic(
                     .draw();
             }
         }
+    }
+
+    // Deliveries
+    let mut deliveries_to_clear = vec![];
+    for (idx, contract) in game.cargo_hold.iter().enumerate() {
+        if let Some(contract) = contract {
+            let planet = &planets[contract.destination];
+
+            let ship_to_planet_distance = (player.pos - planet.pos).length();
+
+            if ship_to_planet_distance < planet.radius + MIN_DELIVERY_DISTANCE {
+                game.money += contract.reward;
+
+                music(
+                    tracks::COIN_SOUND,
+                    MusicOptions {
+                        repeat: false,
+                        ..Default::default()
+                    },
+                );
+
+                msgs::add("Delivery complete!");
+
+                deliveries_to_clear.push(idx);
+            }
+        }
+    }
+
+    for idx in deliveries_to_clear {
+        game.cargo_hold[idx] = None;
     }
 }

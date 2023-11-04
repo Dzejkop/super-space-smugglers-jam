@@ -85,6 +85,17 @@ pub fn tic(
 
                 *msgs.choose(rng).unwrap()
             });
+
+            sfx(
+                1,
+                SfxOptions {
+                    note: 1,
+                    octave: 1,
+                    duration: 5,
+                    channel: 0,
+                    ..Default::default()
+                },
+            );
         }
 
         state.dispatch_at = game.time + rng.gen_range(10.0..25.0) * 1000.0;
@@ -151,6 +162,17 @@ pub fn tic(
             msgs::add(format!("You bribed the patrol, $-{}k", bribe));
         }
 
+        sfx(
+            1,
+            SfxOptions {
+                note: 1,
+                octave: 1,
+                duration: 5,
+                channel: 0,
+                ..Default::default()
+            },
+        );
+
         for vehicle in &mut state.vehicles {
             if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
                 vehicle.behavior = PoliceVehicleBehavior::escaping(rng);
@@ -211,6 +233,17 @@ pub fn tic(
 
             *msgs.choose(rng).unwrap()
         });
+
+        sfx(
+            1,
+            SfxOptions {
+                note: 1,
+                octave: 1,
+                duration: 5,
+                channel: 0,
+                ..Default::default()
+            },
+        );
     }
 
     game_over
