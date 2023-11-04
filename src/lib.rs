@@ -18,6 +18,7 @@ mod planet;
 mod planets;
 mod player;
 mod police;
+mod screen_shake;
 mod selection_indicator;
 mod ship;
 mod sim;
@@ -191,6 +192,7 @@ pub fn tic() {
                 camera::get_mut().zoom /= 1.0025;
             }
 
+            screen_shake::tic(rng);
             mouse_utils::tic();
         },
     }

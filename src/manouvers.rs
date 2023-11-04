@@ -1,4 +1,6 @@
+use crate::prelude::keys::D;
 use crate::prelude::*;
+use crate::screen_shake::add_shake;
 
 const MAX_MANOUVER_LENGTH: f32 = 10.0;
 
@@ -63,6 +65,20 @@ pub fn tic(
                 if game.fuel < 0.01 {
                     game.fuel = 0.0;
                 }
+
+                add_shake();
+
+                sfx(
+                    4,
+                    SfxOptions {
+                        note: 0,
+                        octave: 3,
+                        duration: 20,
+                        volume_left: 8,
+                        volume_right: 8,
+                        ..Default::default()
+                    },
+                );
 
                 game.speed = GameSpeed::Normal;
             }
