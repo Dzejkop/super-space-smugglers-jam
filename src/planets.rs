@@ -25,6 +25,7 @@ static mut PLANETS: [Planet; 4] = [
         .with_mass(0.22)
         .with_color(6),
     // 4: Europa
+    // TODO: Implement moons in trajectory calculations
     // Planet::planet(0.0, 0.0, 2000.0, 0.00001, 30.0, 0.1, 2),
     // Planet::base()
     //     .with_orbit(300.0, 0.002)
