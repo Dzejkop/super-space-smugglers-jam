@@ -206,10 +206,9 @@ fn draw_space_and_stuff() {
 
         let (x, y) = camera.world_to_screen_integer(SHIP.x, SHIP.y);
 
-        Img::sprite_idx_with_size(258, uvec2(2, 2))
-            // .scale(camera.remap_zoom())
-            .rot(game.time() * 0.001)
+        ShipSprite::player()
             .at(vec2(x as f32, y as f32))
+            .rot(game.time() * 0.001)
             .draw();
     }
 
