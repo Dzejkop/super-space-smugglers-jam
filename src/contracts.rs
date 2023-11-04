@@ -137,6 +137,13 @@ pub fn tic(
             if !insert_into_empty_cargo(*contract, &mut game.cargo_hold) {
                 msgs::add("Cargo hold is full!");
             } else {
+                music(
+                    tracks::COIN_SOUND,
+                    MusicOptions {
+                        repeat: false,
+                        ..Default::default()
+                    },
+                );
                 game.contracts.remove(selected_contract);
             }
         }

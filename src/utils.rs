@@ -57,6 +57,10 @@ pub mod keys {
     pub const SPACE: i32 = 48;
 }
 
+pub mod tracks {
+    pub const COIN_SOUND: i32 = 0;
+}
+
 pub mod sprites {
     pub mod buttons {
         pub mod active {
