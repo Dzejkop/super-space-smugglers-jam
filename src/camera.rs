@@ -43,7 +43,7 @@ pub fn tic() {
             camera.target_zoom /= 1.2;
         }
 
-        camera.target_zoom = camera.target_zoom.clamp(0.01, 1.5);
+        camera.target_zoom = camera.target_zoom.clamp(0.01, 1.0);
     }
 
     // ---

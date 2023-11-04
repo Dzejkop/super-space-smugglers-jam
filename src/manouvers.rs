@@ -74,7 +74,7 @@ pub fn tic(
         player.vel += game.manouver_dv;
 
         let mut prev_step = player.pos;
-        let steps = orbits::trajectory(game, &player, planets).take(1000);
+        let steps = sim::trajectory(game, &player, planets).take(1000);
 
         for step in steps {
             let p1 = camera.world_to_screen(prev_step);
