@@ -118,6 +118,13 @@ pub fn tic() {
                 planets::get(),
             );
 
+            fuel::tic(
+                camera::get(),
+                game::get_mut(),
+                player::get_mut(),
+                planets::get(),
+            );
+
             msgs::tic(game::get());
             ui::tic(game::get_mut(), police::get());
             overflow_indicator::tic();

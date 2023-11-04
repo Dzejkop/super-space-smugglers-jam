@@ -59,6 +59,7 @@ pub mod keys {
 
 pub mod tracks {
     pub const COIN_SOUND: i32 = 0;
+    pub const REFUEL_SOUND: i32 = 1;
 }
 
 pub mod sprites {

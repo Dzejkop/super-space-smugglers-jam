@@ -1,8 +1,8 @@
 use crate::prelude::sprites::buttons;
 use crate::prelude::*;
 
-pub const MIN_ACCEPT_DISTANCE: f32 = 100.0;
-pub const MIN_DELIVERY_DISTANCE: f32 = 100.0;
+pub const MIN_ACCEPT_DISTANCE: f32 = 250.0;
+pub const MIN_DELIVERY_DISTANCE: f32 = 250.0;
 
 #[derive(Clone, Copy)]
 pub struct Contract {
