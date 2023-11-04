@@ -100,6 +100,7 @@ pub fn tic(
         game.selected_contract = None;
     }
 
+    // Draw selected contract ui
     if let Some(selected_contract) = game.selected_contract {
         let contract = &game.contracts[selected_contract];
 
@@ -151,5 +152,47 @@ pub fn tic(
         Img::sprite_idx_with_size(sprite_idx as u32, uvec2(2, 2))
             .at(button_pos)
             .draw();
+    }
+
+    // If mouse is over cargo hold, show arrows to destinations
+    let mpos = vec2(mo.x as f32, mo.y as f32);
+
+    let cargo_hold_height = 3.0 * 16.0;
+
+    let cargo_hold_bounds = (
+        vec2(16.0, HEIGHT as f32 - cargo_hold_height),
+        vec2(16.0, cargo_hold_height),
+    );
+
+    rect(
+        cargo_hold_bounds.0.x as i32,
+        cargo_hold_bounds.0.y as i32,
+        cargo_hold_bounds.1.x as i32,
+        cargo_hold_bounds.1.y as i32,
+        5,
+    );
+
+    if mpos.x > cargo_hold_bounds.0.x
+        && mpos.x < cargo_hold_bounds.0.x + cargo_hold_bounds.1.x
+        && mpos.y > cargo_hold_bounds.0.y
+        && mpos.y < cargo_hold_bounds.0.y + cargo_hold_bounds.1.y
+    {
+        for (idx, cargo) in game.cargo_hold.iter().enumerate() {
+            if let Some(contract) = cargo {
+                let planet = &planets[contract.destination];
+                let planet_pos = camera.world_to_screen(planet.pos);
+
+                Arrow::new(
+                    vec2(
+                        cargo_hold_bounds.0.x + cargo_hold_bounds.1.x + 8.0,
+                        cargo_hold_bounds.0.y + 8.0 + 16.0 * idx as f32,
+                    ),
+                    planet_pos,
+                    planet.color,
+                )
+                .margin(5.0)
+                .draw();
+            }
+        }
     }
 }

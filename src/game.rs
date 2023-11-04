@@ -53,7 +53,16 @@ impl Game {
                 reward: 20,
             }],
             selected_contract: None,
-            cargo_hold: [None; 3],
+            cargo_hold: [
+                Some(Contract {
+                    planet: 1,
+                    destination: 3,
+                    cargo: Cargo::Crabs,
+                    reward: 20,
+                }),
+                None,
+                None,
+            ],
         }
     }
 
