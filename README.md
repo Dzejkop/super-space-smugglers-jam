@@ -9,3 +9,8 @@ Assuming you've got `tic80` installed (and in `PATH`), just:
 ``` bash
 $ just
 ```
+
+## License
+
+Copyright (c) 2023, Jakub Trąd & Patryk Wychowaniec    
+Licensed under the MIT license.
