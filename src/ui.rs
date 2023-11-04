@@ -1,4 +1,3 @@
-use crate::game::MAX_MANOUVER_LENGTH;
 use crate::prelude::*;
 
 static mut MOUSE_LEFT_PREV: bool = false;
@@ -137,29 +136,39 @@ pub fn tic(game: &mut Game, police: &police::State) {
     }
 
     // -- Fuel UI --
-    let fuel_height = (game.fuel() * 16.0 * 3.0 - 4.0) as i32;
-    let fuel_offset = HEIGHT - fuel_height - 2;
+    let show_fuel =
+        if game.manouver_mode && (game.fuel - game.manouver_fuel) < 0.01 {
+            time() % 1000.0 < 500.0
+        } else {
+            true
+        };
 
-    rect(2, fuel_offset, 12, fuel_height, 6);
+    if show_fuel {
+        let fuel_height = 3.0 * 16.0 - 6.0;
 
-    if game.manouver_mode {
-        let dv_fuel = game.manouver_dv.length() / MAX_MANOUVER_LENGTH;
-        let dv_fuel_height = (dv_fuel * 16.0 * 3.0) as i32;
+        let fuel_h = (game.fuel() * fuel_height) as i32;
+        let fuel_y = HEIGHT - fuel_h - 2;
 
-        rect(2, fuel_offset, 12, dv_fuel_height, 2);
+        rect(2, fuel_y, 12, fuel_h, 6);
+
+        if game.manouver_mode {
+            let fuel_cost_h = (game.manouver_fuel * fuel_height) as i32;
+
+            rect(2, fuel_y, 12, fuel_cost_h, 2);
+        }
+
+        spr(
+            14,
+            0,
+            HEIGHT - 16 * 3,
+            SpriteOptions {
+                w: 2,
+                h: 6,
+                transparent: &[0],
+                ..Default::default()
+            },
+        );
     }
-
-    spr(
-        14,
-        0,
-        HEIGHT - 16 * 3,
-        SpriteOptions {
-            w: 2,
-            h: 6,
-            transparent: &[0],
-            ..Default::default()
-        },
-    );
 
     // -- Keyboard controls --
     if !game.manouver_mode {
@@ -176,6 +185,29 @@ pub fn tic(game: &mut Game, police: &police::State) {
             };
         }
     }
+
+    // ---
+
+    if game.manouver_mode {
+        if game.fuel == 0.0 {
+            Text::new("You don't have fuel.")
+                .at(vec2(0.0, 0.0))
+                .color(2)
+                .draw();
+        } else {
+            Text::new("Release left mouse button to confirm.")
+                .at(vec2(0.0, 0.0))
+                .color(14)
+                .draw();
+
+            Text::new("Press right mouse button or X to cancel.")
+                .at(vec2(0.0, 8.0))
+                .color(14)
+                .draw();
+        }
+    }
+
+    // ---
 
     unsafe {
         MOUSE_LEFT_PREV = m.left;

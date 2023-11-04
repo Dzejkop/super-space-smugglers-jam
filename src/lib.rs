@@ -98,7 +98,7 @@ pub fn tic() {
             );
 
             particles::tic(rng, Some(camera::get()));
-            msgs::tic();
+            msgs::tic(game::get());
             ui::tic(game::get_mut(), police::get());
             overflow_indicator::tic();
         },

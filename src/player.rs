@@ -40,7 +40,7 @@ pub fn tic(camera: &Camera, game: &Game, planets: &[Planet]) {
         .rot(game.time() * 0.001)
         .scale((3.0 * camera.zoom).max(0.15))
         .engine(true)
-        .draw();
+        .draw(Some(game));
 
     if camera.zoom < 0.15 && time() % 1000.0 < 500.0 {
         circb(at.x as i32, at.y as i32, 8, 5);

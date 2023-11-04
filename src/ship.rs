@@ -56,7 +56,7 @@ impl ShipSprite {
         self
     }
 
-    pub fn draw(self) -> Vec2 {
+    pub fn draw(self, game: Option<&Game>) -> Vec2 {
         let Self {
             id,
             at,
@@ -85,11 +85,14 @@ impl ShipSprite {
         let engine_at = rotate(at + vec2(0.0, 16.0) * scale, at, rot);
 
         if engine {
-            let sprite_idx = if (time() / 100.0) as i32 % 2 == 0 {
+            let time = game.map(|game| game.time()).unwrap_or_else(|| time());
+
+            let sprite_idx = if (time / 100.0) as i32 % 2 == 0 {
                 288
             } else {
                 290
             };
+
             Img::sprite_idx_with_size(sprite_idx, uvec2(2, 2))
                 .at(engine_at)
                 .rot(rot)

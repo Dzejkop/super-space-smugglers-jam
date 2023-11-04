@@ -1,5 +1,6 @@
-use crate::game::{MANOUVER_SENSITIVITY, MAX_MANOUVER_LENGTH};
 use crate::prelude::*;
+
+const MAX_MANOUVER_LENGTH: f32 = 10.0;
 
 pub fn tic(
     camera: &Camera,
@@ -18,17 +19,24 @@ pub fn tic(
     let dist = vec.length();
 
     game.manouver_dv = {
-        let manouver = vec * MANOUVER_SENSITIVITY;
-        let max_manouver_length = game.fuel * MAX_MANOUVER_LENGTH;
+        let manouver_dir = vec.normalize();
+        let manouver_len = vec.length();
+        let manouver_sensitivity = lerp(0.008, 0.03, manouver_len / 100.0);
 
-        if max_manouver_length == 0.0 {
+        let manouver = manouver_dir * manouver_len * manouver_sensitivity;
+        let max_manouver_len = game.fuel * MAX_MANOUVER_LENGTH;
+
+        if max_manouver_len == 0.0 {
             vec2(0.0, 0.0)
-        } else if manouver.length() <= max_manouver_length {
+        } else if manouver.length() <= max_manouver_len {
             manouver
         } else {
-            manouver.normalize() * max_manouver_length
+            manouver.normalize() * max_manouver_len
         }
     };
+
+    game.manouver_fuel =
+        (game.manouver_dv.length() / MAX_MANOUVER_LENGTH).max(0.04);
 
     if !game.manouver_mode && dist < 10.0 {
         SelectionIndicator::new(camera.world_to_screen(player.pos))
@@ -45,13 +53,18 @@ pub fn tic(
     if game.manouver_mode && !mouse.left {
         game.manouver_mode = false;
 
-        if game.fuel <= 0.00001 {
-            msgs::add("You don't have fuel.");
-        } else {
-            player.vel.x += game.manouver_dv.x;
-            player.vel.y += game.manouver_dv.y;
+        if game.manouver_dv.length() > 0.0 {
+            if game.fuel <= 0.00001 {
+                msgs::add("You don't have fuel.");
+            } else {
+                player.vel.x += game.manouver_dv.x;
+                player.vel.y += game.manouver_dv.y;
+                game.fuel -= game.manouver_fuel;
 
-            game.fuel -= game.manouver_dv.length() / MAX_MANOUVER_LENGTH;
+                if game.fuel < 0.01 {
+                    game.fuel = 0.0;
+                }
+            }
         }
     }
 

@@ -105,14 +105,14 @@ pub fn tic(
             PoliceVehicleBehavior::Escaping { dir } => dir,
         };
 
-        let vehicle_vel = vehicle_dir * 0.1;
+        let vehicle_vel = vehicle_dir * 0.2;
 
         ShipSprite::police()
             .at(vehicle_pos)
             .rot(PI - vehicle_dir.angle_between(Vec2::Y))
             .scale(3.0 * camera.zoom)
             .engine(true)
-            .draw();
+            .draw(Some(game));
 
         if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
             if camera.zoom < 0.15 && game.time() % 1000.0 < 500.0 {

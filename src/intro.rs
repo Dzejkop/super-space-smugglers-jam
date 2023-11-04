@@ -66,7 +66,7 @@ pub fn tic() -> bool {
                 .at(player_at)
                 .rot(player_rot)
                 .engine(true)
-                .draw();
+                .draw(None);
 
             ship_positions.push(player_at);
             ship_velocities.push(player_vel);
@@ -93,7 +93,7 @@ pub fn tic() -> bool {
                     .at(police_at)
                     .rot(police_rot)
                     .engine(true)
-                    .draw();
+                    .draw(None);
 
                 particles::spawn(
                     police_engine_at,
@@ -142,7 +142,7 @@ pub fn tic() -> bool {
                     .at(*ship_pos)
                     .rot(get_rotation(*ship_vel))
                     .engine(true)
-                    .draw();
+                    .draw(None);
 
                 particles::spawn(
                     ship_engine_at,

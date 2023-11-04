@@ -1,8 +1,5 @@
 use crate::prelude::*;
 
-pub const MAX_MANOUVER_LENGTH: f32 = 10.0;
-pub const MANOUVER_SENSITIVITY: f32 = 0.04;
-
 static mut GAME: Option<Game> = None;
 
 pub unsafe fn get() -> &'static Game {
@@ -32,6 +29,7 @@ pub struct Game {
     // Manouver mode stuff
     pub manouver_mode: bool,
     pub manouver_dv: Vec2,
+    pub manouver_fuel: f32,
 }
 
 impl Game {
@@ -47,6 +45,7 @@ impl Game {
             tickets: 0,
             manouver_mode: false,
             manouver_dv: Vec2::ZERO,
+            manouver_fuel: 0.0,
         }
     }
 

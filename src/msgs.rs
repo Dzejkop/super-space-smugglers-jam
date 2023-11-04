@@ -6,7 +6,11 @@ use crate::prelude::*;
 static mut MSGS: VecDeque<String> = VecDeque::new();
 static mut MSG: Option<Message> = None;
 
-pub fn tic() {
+pub fn tic(game: &Game) {
+    if game.manouver_mode {
+        return;
+    }
+
     let msgs = unsafe { &mut MSGS };
     let msg = unsafe { &mut MSG };
 
