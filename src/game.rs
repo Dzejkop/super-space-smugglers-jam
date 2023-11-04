@@ -37,7 +37,7 @@ impl Game {
             prev_world_time: 0.0,
             speed: GameSpeed::Stop,
             manouver_mode: false,
-            fuel: 100.0,
+            fuel: 1.0,
             money: 10000.0,
             tickets: 0,
         }
@@ -61,8 +61,12 @@ impl Game {
         (self.world_time / 250.0) as u32
     }
 
-    pub fn fuel(&self) -> u32 {
-        self.fuel as u32
+    pub fn fuel(&self) -> f32 {
+        self.fuel
+    }
+
+    pub fn ufuel(&self) -> u32 {
+        (self.fuel * 100.0) as u32
     }
 
     pub fn money_str(&self) -> String {

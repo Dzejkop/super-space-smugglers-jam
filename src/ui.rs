@@ -7,6 +7,8 @@ pub fn tic(game: &mut Game) {
     let mx = m.x as i32;
     let my = m.y as i32;
 
+    // -- Time controls --
+
     let mouse_over_stop_button = mx >= WIDTH - (16 * 3) - 4
         && mx < WIDTH - (16 * 4) - 4 + 16 * 2
         && my >= HEIGHT - 16 - 4
@@ -76,11 +78,23 @@ pub fn tic(game: &mut Game) {
         },
     );
 
+    if m.left && !unsafe { MOUSE_LEFT_PREV } {
+        if mouse_over_stop_button {
+            game.speed = GameSpeed::Stop;
+        } else if mouse_over_play_button {
+            game.speed = GameSpeed::Normal;
+        } else if mouse_over_fast_button {
+            game.speed = GameSpeed::Fast;
+        }
+    }
+
+    // -- Top left corner --
+
     Text::new(format!("Day: {}", game.day()))
         .at(vec2(0.0, 0.0))
         .draw();
 
-    Text::new(format!("Fuel: {}%", game.fuel()))
+    Text::new(format!("Fuel: {}%", game.ufuel()))
         .at(vec2(0.0, 8.0))
         .draw();
 
@@ -92,17 +106,26 @@ pub fn tic(game: &mut Game) {
         .at(vec2(0.0, 24.0))
         .draw();
 
-    // ---
+    // -- Fuel UI --
 
-    if m.left && !unsafe { MOUSE_LEFT_PREV } {
-        if mouse_over_stop_button {
-            game.speed = GameSpeed::Stop;
-        } else if mouse_over_play_button {
-            game.speed = GameSpeed::Normal;
-        } else if mouse_over_fast_button {
-            game.speed = GameSpeed::Fast;
-        }
-    }
+    let fuel_height = (game.fuel() * 16.0 * 3.0 - 4.0) as i32;
+    let offset_from_top = HEIGHT - fuel_height - 2;
+
+    rect(2, offset_from_top, 12, fuel_height, 6);
+
+    spr(
+        14,
+        0,
+        HEIGHT - 16 * 3,
+        SpriteOptions {
+            w: 2,
+            h: 6,
+            transparent: &[0],
+            ..Default::default()
+        },
+    );
+
+    // -- Keyboard controls --
 
     if key(keys::DIGIT_1) {
         game.speed = GameSpeed::Stop;
