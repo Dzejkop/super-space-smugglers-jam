@@ -5,6 +5,7 @@ pub struct ShipSprite {
     id: ShipSpriteId,
     at: Vec2,
     rot: f32,
+    scale: f32,
     engine: bool,
 }
 
@@ -14,6 +15,7 @@ impl ShipSprite {
             id,
             at: Default::default(),
             rot: Default::default(),
+            scale: 1.0,
             engine: Default::default(),
         }
     }
@@ -36,6 +38,11 @@ impl ShipSprite {
         self
     }
 
+    pub fn scale(mut self, scale: f32) -> Self {
+        self.scale = scale;
+        self
+    }
+
     pub fn engine(mut self, engine: bool) -> Self {
         self.engine = engine;
         self
@@ -46,6 +53,7 @@ impl ShipSprite {
             id,
             at,
             rot,
+            scale,
             engine,
         } = self;
 
@@ -60,14 +68,19 @@ impl ShipSprite {
             }
         };
 
-        Img::sprite(sprite, uvec2(2, 2)).at(at).rot(rot).draw();
+        Img::sprite(sprite, uvec2(2, 2))
+            .at(at)
+            .rot(rot)
+            .scale(scale)
+            .draw();
 
-        let engine_at = rotate(at + vec2(0.0, 16.0), at, rot);
+        let engine_at = rotate(at + vec2(0.0, 16.0) * scale, at, rot);
 
         if engine {
             Img::sprite(uvec2(16, 18), uvec2(2, 2))
                 .at(engine_at)
                 .rot(rot)
+                .scale(scale)
                 .draw();
         }
 

@@ -209,6 +209,8 @@ fn draw_space_and_stuff() {
         ShipSprite::player()
             .at(vec2(x as f32, y as f32))
             .rot(game.time() * 0.001)
+            .scale(3.0 * camera.zoom)
+            .engine(true)
             .draw();
     }
 
