@@ -1,6 +1,4 @@
-use crate::{particles, ship::*, text::*, tic80::*};
-use glam::*;
-use std::f32::consts::PI;
+use crate::prelude::*;
 
 static mut STATE: State = State::AwaitingAnyKey;
 
@@ -58,7 +56,8 @@ pub fn tic() -> bool {
             // ---
 
             let player_at = get_player_pos(time);
-            let player_vel = get_velocity(player_at, get_player_pos(time + 0.01));
+            let player_vel =
+                get_velocity(player_at, get_player_pos(time + 0.01));
             let player_rot = get_rotation(player_vel);
 
             let player_engine_at = ShipSprite::player()
@@ -82,7 +81,8 @@ pub fn tic() -> bool {
 
             for idx in 0..3 {
                 let police_at = get_police_pos(idx, time);
-                let police_vel = get_velocity(police_at, get_police_pos(idx, time + 0.01));
+                let police_vel =
+                    get_velocity(police_at, get_police_pos(idx, time + 0.01));
                 let police_rot = get_rotation(police_vel);
 
                 let police_engine_at = ShipSprite::police()
@@ -140,7 +140,13 @@ pub fn tic() -> bool {
                     .engine(true)
                     .draw();
 
-                particles::spawn(ship_engine_at, -*ship_vel * 2.5, 266, 271, 22);
+                particles::spawn(
+                    ship_engine_at,
+                    -*ship_vel * 2.5,
+                    266,
+                    271,
+                    22,
+                );
             }
 
             if *elapsed > 12.0 && !particles::is_any_visible() {

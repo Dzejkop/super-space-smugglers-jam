@@ -1,6 +1,4 @@
-use crate::{tic80::*, utils::*};
-use glam::*;
-use rand::{Rng, RngCore};
+use crate::prelude::*;
 
 pub fn tic(rng: &mut dyn RngCore) {
     let particles = unsafe { &mut PARTICLES };
@@ -22,11 +20,18 @@ pub fn tic(rng: &mut dyn RngCore) {
 
         particle.pos += particle.vel;
         particle.vel *= vec2(rng.gen_range(0.5..1.0), rng.gen_range(0.5..1.0));
-        particle.vel += vec2(rng.gen_range(-0.1..0.1), rng.gen_range(-0.1..0.1));
+        particle.vel +=
+            vec2(rng.gen_range(-0.1..0.1), rng.gen_range(-0.1..0.1));
     }
 }
 
-pub fn spawn(pos: Vec2, vel: Vec2, min_sprite_idx: u32, max_sprite_idx: u32, life: u32) {
+pub fn spawn(
+    pos: Vec2,
+    vel: Vec2,
+    min_sprite_idx: u32,
+    max_sprite_idx: u32,
+    life: u32,
+) {
     let particles = unsafe { &mut PARTICLES };
 
     for particle in particles {

@@ -1,5 +1,13 @@
-use crate::{tic80::*, utils::*};
-use glam::*;
+use crate::prelude::*;
+
+#[derive(Clone, Copy)]
+pub struct Ship {
+    pub pos: Vec2,
+    pub vel: Vec2,
+
+    // Index of planet
+    pub in_orbit: Option<usize>,
+}
 
 pub struct ShipSprite {
     id: ShipSpriteId,

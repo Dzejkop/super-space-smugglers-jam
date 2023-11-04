@@ -1,8 +1,6 @@
 use std::ops;
 
-use glam::*;
-
-use crate::tic80::*;
+use crate::prelude::*;
 
 pub mod btns {
     pub const UP: i32 = 0;
@@ -51,6 +49,28 @@ pub mod keys {
     pub const SPACE: i32 = 48;
 
     pub const DIGIT_9: i32 = 36;
+}
+
+pub mod sprites {
+    pub mod buttons {
+        pub mod active {
+            pub const STOP: i32 = 64;
+            pub const NORMAL: i32 = 66;
+            pub const FAST: i32 = 68;
+        }
+
+        pub mod highlighted {
+            pub const STOP: i32 = 32;
+            pub const NORMAL: i32 = 34;
+            pub const FAST: i32 = 36;
+        }
+
+        pub mod inactive {
+            pub const STOP: i32 = 0;
+            pub const NORMAL: i32 = 2;
+            pub const FAST: i32 = 4;
+        }
+    }
 }
 
 pub struct Img {
@@ -105,7 +125,8 @@ impl Img {
         } = self;
 
         let size = (uv_max - uv_min) * scale;
-        let transform = |vertex| rotate(vertex, at + size * 0.5, rot) - size * 0.5;
+        let transform =
+            |vertex| rotate(vertex, at + size * 0.5, rot) - size * 0.5;
 
         let v0 = at;
         let v1 = vec2(at.x + size.x, at.y);
@@ -117,7 +138,8 @@ impl Img {
         let uv2 = vec2(uv_min.x, uv_max.y);
         let uv3 = uv_max;
 
-        let vertices = [transform(v0), transform(v1), transform(v2), transform(v3)];
+        let vertices =
+            [transform(v0), transform(v1), transform(v2), transform(v3)];
         let uvs = [uv0, uv1, uv2, uv3];
 
         let opts = TTriOptions {

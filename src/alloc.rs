@@ -1,6 +1,7 @@
-use buddy_alloc::{BuddyAllocParam, FastAllocParam, NonThreadsafeAlloc};
 use std::alloc::{GlobalAlloc, Layout};
 use std::cell::RefCell;
+
+use buddy_alloc::{BuddyAllocParam, FastAllocParam, NonThreadsafeAlloc};
 
 extern "C" {
     static __heap_base: u8;
@@ -21,8 +22,10 @@ unsafe impl GlobalAlloc for TicAlloc {
                 let heap_ptr = fast_heap_ptr.add(FAST_HEAP_SIZE);
                 let heap_size = 0x40000 - (heap_ptr as usize);
 
-                let fast_param = FastAllocParam::new(fast_heap_ptr, FAST_HEAP_SIZE);
-                let buddy_param = BuddyAllocParam::new(heap_ptr, heap_size, LEAF_SIZE);
+                let fast_param =
+                    FastAllocParam::new(fast_heap_ptr, FAST_HEAP_SIZE);
+                let buddy_param =
+                    BuddyAllocParam::new(heap_ptr, heap_size, LEAF_SIZE);
                 Some(NonThreadsafeAlloc::new(fast_param, buddy_param))
             };
         }

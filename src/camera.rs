@@ -1,25 +1,71 @@
-use crate::tic80::{HEIGHT, WIDTH};
-use glam::*;
+use crate::prelude::*;
 
 pub const MAX_ZOOM: f32 = 1.5;
 pub const MIN_ZOOM: f32 = 1e-2;
-
-pub struct Camera {
-    pub pos: Vec2,
-    pub zoom: f32,
-}
 
 static mut CAMERA: Camera = Camera {
     pos: vec2(0.0, 0.0),
     zoom: 0.2,
 };
 
-pub fn camera() -> &'static Camera {
-    unsafe { &CAMERA }
+pub unsafe fn get() -> &'static Camera {
+    &CAMERA
 }
 
-pub fn camera_mut() -> &'static mut Camera {
-    unsafe { &mut CAMERA }
+pub unsafe fn get_mut() -> &'static mut Camera {
+    &mut CAMERA
+}
+
+pub fn tic() {
+    const SPEED: f32 = 2.0;
+
+    let camera = unsafe { get_mut() };
+
+    let m = mouse();
+
+    if key(keys::A) {
+        camera.pos.x += SPEED / camera.zoom;
+    }
+
+    if key(keys::D) {
+        camera.pos.x -= SPEED / camera.zoom;
+    }
+
+    if key(keys::W) {
+        camera.pos.y += SPEED / camera.zoom;
+    }
+
+    if key(keys::S) {
+        camera.pos.y -= SPEED / camera.zoom;
+    }
+
+    if m.scroll_y != 0 {
+        let world_pos = camera.screen_to_world(m.x as i32, m.y as i32);
+
+        let screen_pos_before =
+            camera.world_to_screen(world_pos.0, world_pos.1);
+
+        if m.scroll_y > 0 {
+            camera.zoom *= 1.2;
+        } else {
+            camera.zoom /= 1.2;
+        }
+
+        camera.zoom = camera.zoom.clamp(MIN_ZOOM, MAX_ZOOM);
+
+        let screen_pos_after = camera.world_to_screen(world_pos.0, world_pos.1);
+
+        camera.pos.x -=
+            (screen_pos_after.0 - screen_pos_before.0) / camera.zoom;
+
+        camera.pos.y -=
+            (screen_pos_after.1 - screen_pos_before.1) / camera.zoom;
+    }
+}
+
+pub struct Camera {
+    pub pos: Vec2,
+    pub zoom: f32,
 }
 
 impl Camera {

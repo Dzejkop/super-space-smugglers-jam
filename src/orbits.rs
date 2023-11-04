@@ -1,4 +1,4 @@
-use crate::{Planet, Ship};
+use crate::prelude::*;
 
 // Average time step at 60 FPS
 const TIME_STEP: f32 = 1000.0 / 60.0;
@@ -13,7 +13,7 @@ const G: f32 = 6.6743e-11;
 // G = gravitational constant
 // M = mass of central body
 pub fn orbital_period(central_mass: f32, radius: f32) -> f32 {
-    0.0001 * 2.0 * std::f32::consts::PI * (radius * radius * radius / (G * central_mass)).sqrt()
+    0.0001 * 2.0 * PI * (radius * radius * radius / (G * central_mass)).sqrt()
 }
 
 #[derive(Clone, Copy)]
@@ -24,12 +24,12 @@ pub struct TrajectoryStep {
     pub y: f32,
 }
 
-pub fn simulate_trajectory<const N: usize>(
+pub fn trajectory(
     t: f32,
     ship: &Ship,
-    planets: &[Planet; N],
+    planets: &[Planet],
 ) -> impl Iterator<Item = TrajectoryStep> {
-    let mut planets: [Planet; N] = planets.clone();
+    let mut planets = planets.to_vec();
     let mut ship = ship.clone();
     let mut n = 0;
 
@@ -39,32 +39,28 @@ pub fn simulate_trajectory<const N: usize>(
         let time = t + TIME_STEP * n as f32;
 
         for planet in &mut planets {
-            planet.x = f32::cos(std::f32::consts::PI * 2.0 * time / planet.orbit_speed)
+            planet.pos.x = f32::cos(PI * 2.0 * time / planet.orbit_speed)
                 * planet.orbit_radius;
-            planet.y = f32::sin(std::f32::consts::PI * 2.0 * time / planet.orbit_speed)
+
+            planet.pos.y = f32::sin(PI * 2.0 * time / planet.orbit_speed)
                 * planet.orbit_radius;
         }
 
         for planet in &planets {
-            let dx = planet.x - ship.x;
-            let dy = planet.y - ship.y;
-
-            let d2 = dx * dx + dy * dy;
-
+            let d = planet.pos - ship.pos;
+            let d2 = d.length_squared();
             let f = planet.mass / d2;
 
-            ship.vx += f * dx * TIME_STEP;
-            ship.vy += f * dy * TIME_STEP;
+            ship.vel += f * d * TIME_STEP;
         }
 
-        ship.x += ship.vx * TIME_STEP;
-        ship.y += ship.vy * TIME_STEP;
+        ship.pos += ship.vel * TIME_STEP;
 
         Some(TrajectoryStep {
             n,
             t: time,
-            x: ship.x,
-            y: ship.y,
+            x: ship.pos.x,
+            y: ship.pos.y,
         })
     })
 }

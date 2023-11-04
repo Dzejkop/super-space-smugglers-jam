@@ -147,8 +147,24 @@ pub mod sys {
         pub fn time() -> f32;
         pub fn tstamp() -> u32;
         pub fn trace(text: *const u8, color: u8);
-        pub fn tri(x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32, color: u8);
-        pub fn trib(x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32, color: u8);
+        pub fn tri(
+            x1: f32,
+            y1: f32,
+            x2: f32,
+            y2: f32,
+            x3: f32,
+            y3: f32,
+            color: u8,
+        );
+        pub fn trib(
+            x1: f32,
+            y1: f32,
+            x2: f32,
+            y2: f32,
+            x3: f32,
+            y3: f32,
+            color: u8,
+        );
         pub fn ttri(
             x1: f32,
             y1: f32,
@@ -557,7 +573,12 @@ pub fn print_raw(text: &str, x: i32, y: i32, opts: PrintOptions) -> i32 {
     }
 }
 
-pub fn print_alloc(text: impl AsRef<str>, x: i32, y: i32, opts: PrintOptions) -> i32 {
+pub fn print_alloc(
+    text: impl AsRef<str>,
+    x: i32,
+    y: i32,
+    opts: PrintOptions,
+) -> i32 {
     let text = CString::new(text.as_ref()).unwrap();
     unsafe {
         sys::print(
@@ -622,7 +643,12 @@ pub fn font_raw(text: &str, x: i32, y: i32, opts: FontOptions) -> i32 {
     }
 }
 
-pub fn font_alloc(text: impl AsRef<str>, x: i32, y: i32, opts: FontOptions) -> i32 {
+pub fn font_alloc(
+    text: impl AsRef<str>,
+    x: i32,
+    y: i32,
+    opts: FontOptions,
+) -> i32 {
     let text = CString::new(text.as_ref()).unwrap();
     unsafe {
         sys::font(
@@ -660,7 +686,9 @@ pub fn trace_alloc(text: impl AsRef<str>, color: u8) {
 #[macro_export]
 macro_rules! trace {
     ($text: literal, $color: expr) => {
-        unsafe { crate::tic80::sys::trace(concat!($text, "\0").as_ptr(), $color) }
+        unsafe {
+            crate::tic80::sys::trace(concat!($text, "\0").as_ptr(), $color)
+        }
     };
     ($text: expr, $color: expr) => {
         crate::tic80::trace_alloc($text, $color);

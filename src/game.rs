@@ -1,4 +1,18 @@
-use crate::tic80::time;
+use crate::prelude::*;
+
+static mut GAME: Option<Game> = None;
+
+pub unsafe fn get() -> &'static Game {
+    GAME.get_or_insert_with(Game::init)
+}
+
+pub unsafe fn get_mut() -> &'static mut Game {
+    GAME.get_or_insert_with(Game::init)
+}
+
+pub fn tic() {
+    unsafe { get_mut() }.update();
+}
 
 pub struct Game {
     real_time: f32,
@@ -12,29 +26,6 @@ pub struct Game {
     pub fuel: f32,
     pub money: f32,
     pub tickets: u32,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum GameSpeed {
-    Stop,
-    Normal,
-    Fast,
-}
-
-impl GameSpeed {
-    pub fn to_speed(&self) -> f32 {
-        match self {
-            GameSpeed::Stop => 0.0,
-            GameSpeed::Normal => 1.0,
-            GameSpeed::Fast => 2.0,
-        }
-    }
-}
-
-static mut GAME: Option<Game> = None;
-
-pub fn game_mut() -> &'static mut Game {
-    unsafe { GAME.get_or_insert_with(Game::init) }
 }
 
 impl Game {
@@ -88,5 +79,22 @@ impl Game {
 
     pub fn is_paused(&self) -> bool {
         self.speed == GameSpeed::Stop
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum GameSpeed {
+    Stop,
+    Normal,
+    Fast,
+}
+
+impl GameSpeed {
+    pub fn to_speed(&self) -> f32 {
+        match self {
+            GameSpeed::Stop => 0.0,
+            GameSpeed::Normal => 1.0,
+            GameSpeed::Fast => 2.0,
+        }
     }
 }

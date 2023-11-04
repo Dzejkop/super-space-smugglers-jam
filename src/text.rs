@@ -1,6 +1,4 @@
-use crate::print;
-use crate::tic80::*;
-use glam::*;
+use crate::prelude::*;
 
 pub struct Text {
     text: String,

@@ -1,7 +1,8 @@
+use crate::prelude::*;
+
 #[derive(Clone, Default)]
 pub struct Planet {
-    pub x: f32,
-    pub y: f32,
+    pub pos: Vec2,
 
     // Oribital characteristics
     pub orbit_radius: f32,
@@ -18,8 +19,7 @@ pub struct Planet {
 impl Planet {
     pub const fn base() -> Self {
         Self {
-            x: 0.0,
-            y: 0.0,
+            pos: vec2(0.0, 0.0),
             orbit_radius: 0.0,
             orbit_speed: 0.0,
             radius: 0.0,
@@ -39,8 +39,7 @@ impl Planet {
         color: u8,
     ) -> Self {
         Self {
-            x,
-            y,
+            pos: vec2(x, y),
             orbit_radius,
             orbit_speed,
             radius,
@@ -56,8 +55,8 @@ impl Planet {
     }
 
     pub const fn with_pos(mut self, x: f32, y: f32) -> Self {
-        self.x = x;
-        self.y = y;
+        self.pos.x = x;
+        self.pos.y = y;
         self
     }
 
