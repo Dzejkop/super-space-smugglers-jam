@@ -224,16 +224,13 @@ pub fn tic(
             if let Some(contract) = cargo {
                 let planet = &planets[contract.destination];
                 let planet_pos = camera.world_to_screen(planet.pos);
-
                 let idx = 2 - idx;
 
-                let cargo_hold_middle = cargo_hold_bounds.0
-                    + vec2(cargo_hold_bounds.1.x / 2.0, 0.0)
-                    + vec2(0.0, 8.0 + 16.0 * idx as f32);
-
-                Arrow::new(cargo_hold_middle, planet_pos, planet.color)
-                    .margin(5.0)
-                    .draw();
+                if time() % 1000.0 < 500.0 {
+                    Arrow::new(mpos, planet_pos, planet.color)
+                        .margin(5.0)
+                        .draw();
+                }
             }
         }
     }

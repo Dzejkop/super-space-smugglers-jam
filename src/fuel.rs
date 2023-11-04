@@ -10,16 +10,14 @@ pub fn tic(
     planets: &[Planet],
 ) {
     let mo = mouse();
-
     let mpos = vec2(mo.x as f32, mo.y as f32);
 
     let fuel_gauge_height = 48.0;
+
     let fuel_gauge_bounds = (
         vec2(0.0, HEIGHT as f32 - fuel_gauge_height),
         vec2(16.0, HEIGHT as f32),
     );
-
-    let fuel_gauge_middle = fuel_gauge_bounds.0 + fuel_gauge_bounds.1 / 2.0;
 
     if mpos.x > fuel_gauge_bounds.0.x
         && mpos.x < fuel_gauge_bounds.0.x + fuel_gauge_bounds.1.x
@@ -28,12 +26,13 @@ pub fn tic(
     {
         for planet in REFUELLING_PLANETS {
             let planet = &planets[*planet];
-
             let planet_pos = camera.world_to_screen(planet.pos);
 
-            Arrow::new(fuel_gauge_middle, planet_pos, planet.color)
-                .margin(5.0)
-                .draw();
+            if time() % 1000.0 < 500.0 {
+                Arrow::new(mpos, planet_pos, planet.color)
+                    .margin(5.0)
+                    .draw();
+            }
         }
     }
 
