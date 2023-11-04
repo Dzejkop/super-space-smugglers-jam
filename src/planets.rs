@@ -56,7 +56,7 @@ pub unsafe fn get_mut() -> &'static mut [Planet] {
 pub fn tic(camera: &Camera) {
     let planets = unsafe { get() };
 
-    for planet in planets {
+    for (idx, planet) in planets.iter().enumerate() {
         // Draw orbit
         if let Some(parent) = planet.parent {
             let o = camera.world_to_screen(planets[parent].pos).as_ivec2();
@@ -80,6 +80,10 @@ pub fn tic(camera: &Camera) {
 
         // Draw planet
         let pos = camera.world_to_screen(planet.pos).as_ivec2();
+
+        if idx != 0 && camera.zoom < 0.15 {
+            circb(pos.x, pos.y, 8, planet.color);
+        }
 
         circ(
             pos.x,
