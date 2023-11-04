@@ -249,7 +249,8 @@ pub fn tic(
                 (player.ship.pos - planet.pos).length();
 
             if ship_to_planet_distance < planet.radius + MIN_DELIVERY_DISTANCE {
-                game.money += contract.reward;
+                game.credits += contract.reward;
+                game.total_credits += contract.reward;
 
                 music(
                     tracks::COIN_SOUND,

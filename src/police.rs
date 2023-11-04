@@ -164,10 +164,10 @@ pub fn tic(
 
             if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
                 if bribe.is_none() && vehicle.collides_with(&player.ship) {
-                    if game.money == 0 {
+                    if game.credits == 0 {
                         game_over = true;
                     } else {
-                        bribe = Some(rng.gen_range(1..10).min(game.money));
+                        bribe = Some(rng.gen_range(1..10).min(game.credits));
                     }
                 }
             }
@@ -175,7 +175,7 @@ pub fn tic(
     }
 
     if let Some(bribe) = bribe {
-        if bribe == game.money {
+        if bribe == game.credits {
             msgs::add("You *barely* bribed the patrol.");
         } else {
             msgs::add(format!("You bribed the patrol, $-{}k", bribe));
@@ -198,7 +198,7 @@ pub fn tic(
             }
         }
 
-        game.money -= bribe;
+        game.credits -= bribe;
         state.dispatch_at = game.time + rng.gen_range(30.0..60.0) * 1000.0;
     }
 

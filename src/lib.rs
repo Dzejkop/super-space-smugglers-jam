@@ -154,6 +154,24 @@ pub fn tic() {
                     .align_center()
                     .draw();
 
+                Text::new(format!(
+                    "You've tasted freedom for {} days.",
+                    game::get().day()
+                ))
+                .at(vec2(WIDTH as f32, y + 50.0))
+                .align_center()
+                .color(4)
+                .draw();
+
+                Text::new(format!(
+                    "You've collected ${}k credits.",
+                    game::get().day()
+                ))
+                .at(vec2(WIDTH as f32, y + 58.0))
+                .align_center()
+                .color(4)
+                .draw();
+
                 ShipSprite::police()
                     .at(vec2(18.0, y + 22.0))
                     .rot((time() / 333.0).sin())

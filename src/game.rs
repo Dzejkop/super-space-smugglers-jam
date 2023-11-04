@@ -21,7 +21,8 @@ pub struct Game {
     pub time: f32,
     pub speed: GameSpeed,
     pub fuel: f32,
-    pub money: u32,
+    pub credits: u32,
+    pub total_credits: u32,
     pub tickets: u32,
 
     // Manouver mode stuff
@@ -42,7 +43,8 @@ impl Game {
             time: 0.0,
             speed: GameSpeed::Stop,
             fuel: 1.0,
-            money: 10,
+            credits: 10,
+            total_credits: 10,
             tickets: 0,
             manouver_mode: false,
             manouver_dv: Vec2::ZERO,
@@ -52,6 +54,10 @@ impl Game {
             cargo_hold: [None; 3],
             time_of_last_contract_spawned: 0.0,
         }
+    }
+
+    pub fn day(&self) -> u32 {
+        (self.time / 2500.0).ceil() as u32
     }
 
     pub fn steps(&self) -> u32 {

@@ -5,9 +5,9 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
     let mx = m.x as i32;
     let my = m.y as i32;
 
-    // -- Money --
+    // -- Credits --
     if !game.manouver_mode {
-        Text::new(format!("${}k", game.money))
+        Text::new(format!("${}k", game.credits))
             .at(vec2(WIDTH as f32, 0.0))
             .align_right()
             .draw();
@@ -49,6 +49,15 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
                 .scale(1.0)
                 .draw();
         }
+    }
+
+    // -- Day number --
+    if !game.manouver_mode {
+        Text::new(format!("Day {}", game.day()))
+            .at(vec2(WIDTH as f32 - 1.0, 112.0))
+            .align_right()
+            .color(14)
+            .draw();
     }
 
     // -- Time controls --
@@ -143,7 +152,6 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
 
     if show_fuel {
         let fuel_height = 3.0 * 16.0 - 6.0;
-
         let fuel_h = (game.fuel * fuel_height) as i32;
         let fuel_y = HEIGHT - fuel_h - 2;
 
@@ -175,6 +183,7 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
 
     for (idx, cargo) in game.cargo_hold.iter().enumerate() {
         let hold_cell_offset = 16.0 * idx as f32;
+
         Img::sprite_idx_with_size(sprites::CARGO_HOLD as u32, uvec2(2, 2))
             .at(vec2(
                 left_offset,
