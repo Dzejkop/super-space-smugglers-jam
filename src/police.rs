@@ -95,51 +95,49 @@ pub fn tic(
     let mut game_over = false;
     let mut bribe = None;
 
-    for _ in 0..game.steps() {
-        for vehicle in &mut state.vehicles {
-            let vehicle_pos = camera.world_to_screen(vehicle.pos);
+    for vehicle in &mut state.vehicles {
+        let vehicle_pos = camera.world_to_screen(vehicle.pos);
 
-            let vehicle_dir = match vehicle.behavior {
-                PoliceVehicleBehavior::InPursuit => {
-                    (player.pos - vehicle.pos).normalize()
-                }
-                PoliceVehicleBehavior::Escaping { dir } => dir,
-            };
+        let vehicle_dir = match vehicle.behavior {
+            PoliceVehicleBehavior::InPursuit => {
+                (player.pos - vehicle.pos).normalize()
+            }
+            PoliceVehicleBehavior::Escaping { dir } => dir,
+        };
 
-            let vehicle_vel = vehicle_dir * 0.2;
+        let vehicle_vel = vehicle_dir * 0.2;
 
-            let vehicle_engine_at = ShipSprite::police()
-                .at(vehicle_pos)
-                .rot(PI - vehicle_dir.angle_between(Vec2::Y))
-                .scale(3.0 * camera.zoom)
-                .engine(true)
-                .draw(Some(game));
+        let vehicle_engine_at = ShipSprite::police()
+            .at(vehicle_pos)
+            .rot(PI - vehicle_dir.angle_between(Vec2::Y))
+            .scale(3.0 * camera.zoom)
+            .engine(true)
+            .draw(Some(game));
 
-            if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
-                if camera.zoom < 0.15 && game.time % 1000.0 < 500.0 {
-                    let color = if police_alternate_sprite() { 10 } else { 2 };
+        if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
+            if camera.zoom < 0.15 && game.time % 1000.0 < 500.0 {
+                let color = if police_alternate_sprite() { 10 } else { 2 };
 
-                    circb(vehicle_pos.x as i32, vehicle_pos.y as i32, 8, color);
-                }
-
-                OverflowIndicator::police(vehicle_pos).draw();
+                circb(vehicle_pos.x as i32, vehicle_pos.y as i32, 8, color);
             }
 
-            if !game.is_paused() {
-                vehicle.pos += vehicle_vel * DT;
+            OverflowIndicator::police(vehicle_pos).draw();
+        }
 
-                particles::spawn_exhaust(
-                    camera.screen_to_world(vehicle_engine_at),
-                    -vehicle_vel,
-                );
+        for _ in 0..game.steps() {
+            vehicle.pos += vehicle_vel * DT;
 
-                if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
-                    if bribe.is_none() && vehicle.collides_with(player) {
-                        if game.money == 0 {
-                            game_over = true;
-                        } else {
-                            bribe = Some(rng.gen_range(1..10).min(game.money));
-                        }
+            particles::spawn_exhaust(
+                camera.screen_to_world(vehicle_engine_at),
+                -vehicle_vel,
+            );
+
+            if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
+                if bribe.is_none() && vehicle.collides_with(player) {
+                    if game.money == 0 {
+                        game_over = true;
+                    } else {
+                        bribe = Some(rng.gen_range(1..10).min(game.money));
                     }
                 }
             }

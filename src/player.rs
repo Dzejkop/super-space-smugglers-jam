@@ -31,7 +31,9 @@ pub fn tic(camera: &Camera, game: &Game) {
         circb(at.x as i32, at.y as i32, 8, 5);
     }
 
-    particles::spawn_exhaust(camera.screen_to_world(engine_at), -ship.vel);
+    for _ in 0..game.steps() {
+        particles::spawn_exhaust(camera.screen_to_world(engine_at), -ship.vel);
+    }
 
     OverflowIndicator::player(at).draw();
 }
