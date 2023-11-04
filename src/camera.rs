@@ -11,7 +11,7 @@ pub struct Camera {
 
 static mut CAMERA: Camera = Camera {
     pos: vec2(0.0, 0.0),
-    zoom: 1.0,
+    zoom: 0.2,
 };
 
 pub fn camera() -> &'static Camera {

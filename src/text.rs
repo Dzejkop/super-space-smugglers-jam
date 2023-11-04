@@ -68,6 +68,6 @@ enum TextAlignment {
 
 impl Default for TextAlignment {
     fn default() -> Self {
-        TextAlignment::Center
+        TextAlignment::Left
     }
 }

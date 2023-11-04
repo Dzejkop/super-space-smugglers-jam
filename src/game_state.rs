@@ -64,6 +64,10 @@ impl Game {
         self.game_time
     }
 
+    pub fn day(&self) -> u32 {
+        (self.game_time / 250.0) as u32
+    }
+
     pub fn dt(&self) -> f32 {
         self.game_time - self.prev_game_time
     }

@@ -10,18 +10,20 @@ mod text;
 mod tic80;
 mod utils;
 
-use game_state::{Game, GameSpeed};
-use glam::*;
-use rand::rngs::SmallRng;
-use rand::SeedableRng;
+use std::f32::consts::PI;
 
 use self::camera::*;
+use self::game_state::*;
+use self::text::*;
 use self::tic80::sys::print;
 use self::tic80::*;
 use self::utils::*;
 use crate::game_state::game_mut;
 use crate::orbits::simulate_trajectory;
 use crate::ship::*;
+use glam::*;
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 
 #[derive(Clone)]
 pub struct Ship {
@@ -209,9 +211,42 @@ fn draw_space_and_stuff() {
         ShipSprite::player()
             .at(vec2(x as f32, y as f32))
             .rot(game.time() * 0.001)
-            .scale(3.0 * camera.zoom)
+            .scale((3.0 * camera.zoom).max(0.15))
             .engine(true)
             .draw();
+
+        if camera.zoom < 0.2 {
+            if time() % 1000.0 < 500.0 {
+                circb(x, y, 8, 5);
+            }
+        }
+
+        if (x < 4 || y < 4 || x > WIDTH + 4 || y > HEIGHT + 4) && time() % 1000.0 < 500.0 {
+            let pos_a = vec2(x as f32, y as f32);
+
+            let pos_b = pos_a.clamp(
+                vec2(2.0, 2.0),
+                vec2(WIDTH as f32 - 2.0, HEIGHT as f32 - 2.0),
+            );
+
+            let dir = (pos_a - pos_b).normalize();
+
+            let arrow = [
+                (vec2(0.0, 8.0), vec2(0.0, 1.0)),
+                (vec2(0.0, 2.0), vec2(-3.0, 4.0)),
+                (vec2(0.0, 2.0), vec2(3.0, 4.0)),
+            ];
+
+            let transform =
+                |v: Vec2| -> Vec2 { rotate(pos_b + v, pos_b, PI - dir.angle_between(Vec2::Y)) };
+
+            for (v0, v1) in arrow {
+                let v0 = transform(v0);
+                let v1 = transform(v1);
+
+                line(v0.x, v0.y, v1.x, v1.y, 5);
+            }
+        }
     }
 
     unsafe {
@@ -257,15 +292,6 @@ fn draw_space_and_stuff() {
                 prev_step = [step.x, step.y];
             }
         }
-    }
-
-    unsafe {
-        let t_delta = time() - TIME_PREV;
-        let time_as_text = t_delta.to_string();
-
-        print(time_as_text.as_bytes().as_ptr(), 0, 0, 7, true, 1, false);
-
-        TIME_PREV = time();
     }
 
     draw_ui(game);
@@ -348,6 +374,15 @@ fn draw_ui(game: &mut Game) {
             ..Default::default()
         },
     );
+
+    Text::new(format!("Day: {}", game.day()))
+        .at(vec2(0.0, 0.0))
+        .draw();
+
+    Text::new("Money: $123k").at(vec2(0.0, 8.0)).draw();
+    Text::new("Fuel: 100%").at(vec2(0.0, 16.0)).draw();
+
+    // ---
 
     if m.left && !unsafe { MOUSE_LEFT_PREV } {
         if mouse_over_stop_button {
