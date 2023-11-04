@@ -164,14 +164,6 @@ pub fn tic(
         vec2(16.0, cargo_hold_height),
     );
 
-    rect(
-        cargo_hold_bounds.0.x as i32,
-        cargo_hold_bounds.0.y as i32,
-        cargo_hold_bounds.1.x as i32,
-        cargo_hold_bounds.1.y as i32,
-        5,
-    );
-
     if mpos.x > cargo_hold_bounds.0.x
         && mpos.x < cargo_hold_bounds.0.x + cargo_hold_bounds.1.x
         && mpos.y > cargo_hold_bounds.0.y
@@ -182,16 +174,15 @@ pub fn tic(
                 let planet = &planets[contract.destination];
                 let planet_pos = camera.world_to_screen(planet.pos);
 
-                Arrow::new(
-                    vec2(
-                        cargo_hold_bounds.0.x + cargo_hold_bounds.1.x + 8.0,
-                        cargo_hold_bounds.0.y + 8.0 + 16.0 * idx as f32,
-                    ),
-                    planet_pos,
-                    planet.color,
-                )
-                .margin(5.0)
-                .draw();
+                let idx = 2 - idx;
+
+                let cargo_hold_middle = cargo_hold_bounds.0
+                    + vec2(cargo_hold_bounds.1.x / 2.0, 0.0)
+                    + vec2(0.0, 8.0 + 16.0 * idx as f32);
+
+                Arrow::new(cargo_hold_middle, planet_pos, planet.color)
+                    .margin(5.0)
+                    .draw();
             }
         }
     }
