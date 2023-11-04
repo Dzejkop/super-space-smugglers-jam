@@ -13,7 +13,6 @@ mod intro;
 mod manouvers;
 mod mouse_utils;
 mod msgs;
-mod orbits;
 mod overflow_indicator;
 mod particles;
 mod planet;
@@ -44,7 +43,7 @@ mod prelude {
     pub(crate) use crate::text::Text;
     pub(crate) use crate::tic80::*;
     pub(crate) use crate::utils::*;
-    pub(crate) use crate::{msgs, orbits, particles, police, sim};
+    pub(crate) use crate::{msgs, particles, police, sim};
 }
 
 use rand::rngs::SmallRng;

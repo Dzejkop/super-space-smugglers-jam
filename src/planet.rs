@@ -36,9 +36,8 @@ impl Planet {
         }
     }
 
-    pub const fn with_orbit(mut self, radius: f32, speed: f32) -> Self {
+    pub const fn with_orbit(mut self, radius: f32) -> Self {
         self.orbit_radius = radius;
-        self.orbit_speed = speed;
         self
     }
 
