@@ -81,8 +81,6 @@ pub fn tic() {
 
         State::Playing | State::GameOver => unsafe {
             if game::get().time == 0.0 {
-                // planets::init(planets::galaxies::alpha());
-                // planets::init(planets::galaxies::beta());
                 planets::init(planets::galaxies::gamma());
             }
 
