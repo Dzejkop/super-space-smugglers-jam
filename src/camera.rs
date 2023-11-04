@@ -1,11 +1,9 @@
 use crate::prelude::*;
 
-pub const MAX_ZOOM: f32 = 1.5;
-pub const MIN_ZOOM: f32 = 1e-2;
-
 static mut CAMERA: Camera = Camera {
     pos: vec2(0.0, 0.0),
     zoom: 0.2,
+    target_zoom: 0.2,
 };
 
 pub unsafe fn get() -> &'static Camera {
@@ -20,7 +18,6 @@ pub fn tic() {
     const SPEED: f32 = 2.0;
 
     let camera = unsafe { get_mut() };
-
     let m = mouse();
 
     if key(keys::A) {
@@ -40,18 +37,26 @@ pub fn tic() {
     }
 
     if m.scroll_y != 0 {
+        if m.scroll_y > 0 {
+            camera.target_zoom *= 1.2;
+        } else {
+            camera.target_zoom /= 1.2;
+        }
+
+        camera.target_zoom = camera.target_zoom.clamp(0.01, 1.5);
+    }
+
+    // ---
+
+    let zoom_diff = camera.target_zoom - camera.zoom;
+
+    if zoom_diff.abs() > 0.001 {
         let world_pos = camera.screen_to_world(m.x as i32, m.y as i32);
 
         let screen_pos_before =
             camera.world_to_screen(world_pos.0, world_pos.1);
 
-        if m.scroll_y > 0 {
-            camera.zoom *= 1.2;
-        } else {
-            camera.zoom /= 1.2;
-        }
-
-        camera.zoom = camera.zoom.clamp(MIN_ZOOM, MAX_ZOOM);
+        camera.zoom += zoom_diff * 0.25;
 
         let screen_pos_after = camera.world_to_screen(world_pos.0, world_pos.1);
 
@@ -66,6 +71,7 @@ pub fn tic() {
 pub struct Camera {
     pub pos: Vec2,
     pub zoom: f32,
+    pub target_zoom: f32,
 }
 
 impl Camera {

@@ -14,12 +14,10 @@ enum State {
 static mut STATE: Option<State> = None;
 
 pub fn tic(rng: &mut dyn RngCore, camera: &Camera, player: &Ship, game: &Game) {
-    let time = time();
-
     let state = unsafe {
         STATE.get_or_insert_with(|| State::Cooldown {
             // until: time + rng.gen_range(20.0..30.0), TODO
-            until: 0.0,
+            until: 0.1,
             just_initialized: true,
         })
     };
@@ -29,7 +27,7 @@ pub fn tic(rng: &mut dyn RngCore, camera: &Camera, player: &Ship, game: &Game) {
             until,
             just_initialized,
         } => {
-            if time < *until {
+            if game.time() < *until {
                 return;
             }
 
