@@ -189,75 +189,78 @@ pub mod galaxies {
 
     pub fn gamma() -> Vec<Planet> {
         vec![
-            Planet::new().with_radius(70.0).with_mass(5.0).with_color(4),
+            Planet::new()
+                .with_radius(70.0)
+                .with_mass(0.25)
+                .with_color(4),
             Planet::new()
                 .with_radius(20.0)
-                .with_mass(1.0)
+                .with_mass(0.05)
                 .with_orbit(1500.0, 0.0)
                 .with_color(3),
             Planet::new()
                 .with_radius(28.0)
-                .with_mass(1.0)
+                .with_mass(0.05)
                 .with_orbit(2500.0, 0.0)
                 .with_color(11),
             Planet::new()
                 .with_radius(35.0)
-                .with_mass(1.2)
+                .with_mass(0.06)
                 .with_orbit(2800.0, 2.0)
                 .with_color(10),
             Planet::new()
                 .with_radius(40.0)
-                .with_mass(1.5)
+                .with_mass(0.075)
                 .with_orbit(2800.0, 4.0)
                 .with_color(9),
             Planet::new()
                 .with_radius(35.0)
-                .with_mass(1.2)
+                .with_mass(0.06)
                 .with_orbit(3000.0, 6.0)
                 .with_color(8),
             Planet::new()
                 .with_radius(100.0)
-                .with_mass(2.5)
+                .with_mass(0.125)
                 .with_orbit(5000.0, 8.0)
                 .with_color(2),
             Planet::new()
                 .with_radius(100.0)
-                .with_mass(2.5)
+                .with_mass(0.125)
                 .with_orbit(10000.0, 10.0)
                 .with_color(5),
             Planet::moon_of(7)
                 .with_radius(10.0)
-                .with_mass(0.25)
+                .with_mass(0.0125)
                 .with_orbit(1000.0, 0.0)
                 .with_color(11),
             Planet::moon_of(7)
                 .with_radius(10.0)
-                .with_mass(0.25)
+                .with_mass(0.0125)
                 .with_orbit(1000.0, 1.0 / 3.0 * TAU)
                 .with_color(11),
             Planet::moon_of(7)
                 .with_radius(10.0)
-                .with_mass(0.25)
+                .with_mass(0.0125)
                 .with_orbit(1000.0, 2.0 / 3.0 * TAU)
                 .with_color(11),
             Planet::new()
                 .with_radius(100.0)
-                .with_mass(2.5)
+                .with_mass(0.125)
                 .with_orbit(10000.0, 10.0 + PI)
                 .with_color(5),
             Planet::moon_of(11)
                 .with_radius(10.0)
-                .with_mass(0.25)
+                .with_mass(0.0125)
                 .with_orbit(1000.0, 0.0)
                 .with_color(11),
             Planet::moon_of(11)
                 .with_radius(10.0)
-                .with_mass(0.25)
+                .with_mass(0.0125)
                 .with_orbit(1000.0, 1.0 / 3.0 * TAU)
                 .with_color(11),
             Planet::moon_of(11)
                 .with_radius(10.0)
-                .with_mass(0.25)
+                .with_mass(0.0125)
                 .with_orbit(1000.0, 2.0 / 3.0 * TAU)
                 .with_color(11),
         ]

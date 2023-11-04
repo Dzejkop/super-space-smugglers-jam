@@ -63,8 +63,7 @@ fn eval(time: f32, player: &mut Ship, planets: &mut [Planet]) {
 
         let planet = &mut planets[planet_id];
 
-        let orbit =
-            0.05 * PI * 2.0 * time / planet.orbit_speed + planet.orbit_phase;
+        let orbit = PI * 2.0 * time / planet.orbit_speed + planet.orbit_phase;
 
         let orbit = vec2(orbit.cos(), orbit.sin());
 
