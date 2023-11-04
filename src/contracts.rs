@@ -1,5 +1,3 @@
-use crate::mouse_utils::mouse_right_pressed;
-use crate::prelude::arrow::Arrow;
 use crate::prelude::sprites::buttons;
 use crate::prelude::*;
 

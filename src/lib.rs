@@ -8,6 +8,7 @@ mod tic80;
 mod alloc;
 mod camera;
 mod contracts;
+mod fuel;
 mod game;
 mod intro;
 mod manouvers;
@@ -32,10 +33,13 @@ mod prelude {
     pub(crate) use glam::*;
     pub(crate) use rand::prelude::*;
 
+    pub(crate) use crate::arrow::Arrow;
     pub(crate) use crate::camera::Camera;
     pub(crate) use crate::contracts::{Cargo, Contract};
     pub(crate) use crate::game::{Game, GameSpeed};
-    pub(crate) use crate::mouse_utils::mouse_left_pressed;
+    pub(crate) use crate::mouse_utils::{
+        mouse_left_pressed, mouse_right_pressed,
+    };
     pub(crate) use crate::overflow_indicator::OverflowIndicator;
     pub(crate) use crate::planet::Planet;
     pub(crate) use crate::selection_indicator::SelectionIndicator;
