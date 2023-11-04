@@ -113,7 +113,7 @@ pub fn tic(
         if flash_indicator {
             Img::sprite_idx_with_size(320, uvec2(2, 2))
                 .at(planet_pos + vec2(64.0, -64.0) * camera.zoom)
-                .scale(4.0 * camera.zoom)
+                .scale((4.0 * camera.zoom).max(0.3))
                 .draw();
         }
 
