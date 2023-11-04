@@ -6,7 +6,7 @@ const REFUELLING_PLANETS: &[usize] = &[7, 11];
 pub fn tic(
     camera: &Camera,
     game: &mut Game,
-    player: &Ship,
+    player: &Player,
     planets: &[Planet],
 ) {
     let mo = mouse();
@@ -45,7 +45,7 @@ pub fn tic(
     for planet in REFUELLING_PLANETS {
         let planet = &planets[*planet];
 
-        let distance_to_player = (player.pos - planet.pos).length();
+        let distance_to_player = (player.ship.pos - planet.pos).length();
 
         if distance_to_player < planet.radius + MIN_REFUEL_DISTANCE {
             game.fuel = game.fuel.max(1.0);

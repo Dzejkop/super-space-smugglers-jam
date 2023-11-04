@@ -5,7 +5,7 @@ const MAX_MANOUVER_LENGTH: f32 = 10.0;
 pub fn tic(
     camera: &Camera,
     game: &mut Game,
-    player: &mut Ship,
+    player: &mut Player,
     planets: &[Planet],
 ) {
     if !game.is_paused() {
@@ -15,7 +15,7 @@ pub fn tic(
     let mouse = mouse();
     let mouse_xy = vec2(mouse.x as f32, mouse.y as f32);
 
-    let vec = camera.world_to_screen(player.pos) - mouse_xy;
+    let vec = camera.world_to_screen(player.ship.pos) - mouse_xy;
     let dist = vec.length();
 
     game.manouver_dv = {
@@ -39,7 +39,7 @@ pub fn tic(
         (game.manouver_dv.length() / MAX_MANOUVER_LENGTH).max(0.04);
 
     if !game.manouver_mode && dist < 10.0 {
-        SelectionIndicator::new(camera.world_to_screen(player.pos))
+        SelectionIndicator::new(camera.world_to_screen(player.ship.pos))
             .size(vec2(16.0, 16.0))
             .draw();
 
@@ -57,8 +57,7 @@ pub fn tic(
             if game.fuel <= 0.00001 {
                 msgs::add("You don't have fuel.");
             } else {
-                player.vel.x += game.manouver_dv.x;
-                player.vel.y += game.manouver_dv.y;
+                player.ship.vel += game.manouver_dv;
                 game.fuel -= game.manouver_fuel;
 
                 if game.fuel < 0.01 {
@@ -71,12 +70,12 @@ pub fn tic(
     }
 
     if game.manouver_mode && game.manouver_dv.length() > 0.0 {
-        let mut player = *player;
+        let mut player = player.ship;
 
         player.vel += game.manouver_dv;
 
         let mut prev_step = player.pos;
-        let steps = sim::trajectory(game, &player, planets).take(750);
+        let steps = sim::trajectory(game, &player, planets).take(1200);
 
         for step in steps {
             let p1 = camera.world_to_screen(prev_step);

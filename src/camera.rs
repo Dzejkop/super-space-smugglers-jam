@@ -2,8 +2,8 @@ use crate::prelude::*;
 
 static mut CAMERA: Camera = Camera {
     pos: vec2(0.0, 0.0),
-    zoom: 0.2,
-    target_zoom: 0.2,
+    zoom: 0.033,
+    target_zoom: 0.033,
 };
 
 pub unsafe fn get() -> &'static Camera {

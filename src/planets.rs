@@ -9,6 +9,8 @@ pub fn init(mut planets: Vec<Planet>) {
         planet.orbit_speed = orbital_period(central_mass, planet.radius);
     }
 
+    sim::eval(0.0, &mut Ship::default(), &mut planets);
+
     unsafe {
         PLANETS = planets;
     }

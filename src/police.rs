@@ -28,7 +28,7 @@ pub unsafe fn get() -> &'static State {
 pub fn tic(
     rng: &mut dyn RngCore,
     camera: &Camera,
-    player: &Ship,
+    player: &Player,
     planets: &[Planet],
     game: &mut Game,
 ) -> bool {
@@ -111,7 +111,7 @@ pub fn tic(
 
         let vehicle_dir = match vehicle.behavior {
             PoliceVehicleBehavior::InPursuit => {
-                (player.pos - vehicle.pos).normalize()
+                (player.ship.pos - vehicle.pos).normalize()
             }
             PoliceVehicleBehavior::Escaping { dir } => dir,
         };
@@ -147,7 +147,7 @@ pub fn tic(
             );
 
             if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
-                if bribe.is_none() && vehicle.collides_with(player) {
+                if bribe.is_none() && vehicle.collides_with(&player.ship) {
                     if game.money == 0 {
                         game_over = true;
                     } else {

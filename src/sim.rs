@@ -1,8 +1,8 @@
 use crate::prelude::*;
 
-pub fn tic(game: &Game, player: &mut Ship, planets: &mut [Planet]) {
+pub fn tic(game: &Game, player: &mut Player, planets: &mut [Planet]) {
     for step in 0..game.steps() {
-        eval(game.time + (step as f32) * DT, player, planets);
+        eval(game.time + (step as f32) * DT, &mut player.ship, planets);
     }
 }
 
@@ -54,7 +54,7 @@ pub fn trajectory(
     })
 }
 
-fn eval(time: f32, player: &mut Ship, planets: &mut [Planet]) {
+pub fn eval(time: f32, player: &mut Ship, planets: &mut [Planet]) {
     for planet_id in 0..planets.len() {
         let parent_pos = planets[planet_id]
             .parent
@@ -62,9 +62,7 @@ fn eval(time: f32, player: &mut Ship, planets: &mut [Planet]) {
             .unwrap_or_default();
 
         let planet = &mut planets[planet_id];
-
         let orbit = PI * 2.0 * time / planet.orbit_speed + planet.orbit_phase;
-
         let orbit = vec2(orbit.cos(), orbit.sin());
 
         planet.pos = parent_pos + orbit * planet.orbit_radius;

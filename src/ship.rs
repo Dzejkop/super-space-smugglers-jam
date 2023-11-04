@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct Ship {
     pub pos: Vec2,
     pub vel: Vec2,

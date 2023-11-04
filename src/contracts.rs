@@ -46,7 +46,7 @@ pub fn insert_into_empty_cargo<const N: usize>(
 pub fn tic(
     camera: &Camera,
     game: &mut Game,
-    player: &Ship,
+    player: &Player,
     planets: &[Planet],
 ) {
     let mo = mouse();
@@ -67,8 +67,7 @@ pub fn tic(
 
         let mouse_pos = camera.screen_to_world(vec2(mo.x as f32, mo.y as f32));
         let cursor_to_planet_distance = (planet.pos - mouse_pos).length();
-
-        let ship_to_planet_distance = (player.pos - planet.pos).length();
+        let ship_to_planet_distance = (player.ship.pos - planet.pos).length();
 
         if camera.zoom < 0.15 && flash_indicator && !game.manouver_mode {
             circb(planet_pos.x as i32, planet_pos.y as i32, 8, 3);
@@ -188,11 +187,13 @@ pub fn tic(
 
     // Deliveries
     let mut deliveries_to_clear = vec![];
+
     for (idx, contract) in game.cargo_hold.iter().enumerate() {
         if let Some(contract) = contract {
             let planet = &planets[contract.destination];
 
-            let ship_to_planet_distance = (player.pos - planet.pos).length();
+            let ship_to_planet_distance =
+                (player.ship.pos - planet.pos).length();
 
             if ship_to_planet_distance < planet.radius + MIN_DELIVERY_DISTANCE {
                 game.money += contract.reward;
