@@ -85,7 +85,8 @@ impl ShipSprite {
         let engine_at = rotate(at + vec2(0.0, 16.0) * scale, at, rot);
 
         if engine {
-            Img::sprite(uvec2(16, 18), uvec2(2, 2))
+            let sprite_idx = if (time() / 100.0) as i32 % 2 == 0 { 288 } else { 290 };
+            Img::sprite_idx_with_size(sprite_idx, uvec2(2, 2))
                 .at(engine_at)
                 .rot(rot)
                 .scale(scale)
