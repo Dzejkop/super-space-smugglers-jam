@@ -38,6 +38,7 @@ mod prelude {
     pub(crate) use crate::{msgs, orbits, particles, police};
 }
 
+use game::{DV_FACTOR, MAX_DV_LENGTH};
 use rand::rngs::SmallRng;
 use rand::SeedableRng;
 
@@ -109,46 +110,70 @@ fn draw_space_and_stuff(
 ) {
     let mo = mouse();
 
-    let m = camera.screen_to_world(vec2(mo.x as f32, mo.y as f32));
-    let d = (player.pos - m).length_squared();
+    unsafe {
+        let mpos = camera.screen_to_world(vec2(mo.x as f32, mo.y as f32));
 
-    let s = camera.world_to_screen(player.pos);
-    let m = camera.world_to_screen(m);
+        let d = player.pos - mpos;
 
-    let dv = (s - m) * 0.01;
+        let d = d.length();
 
-    if mo.left
-        && game.is_paused()
-        && d < (30.0 / camera.zoom)
-        && !game.manouver_mode
-    {
-        game.manouver_mode = true;
-    }
+        let dv = (player.pos - mpos) * DV_FACTOR;
 
-    if game.manouver_mode && !mo.left {
-        game.manouver_mode = false;
+        game.manouver_dv = dv;
 
-        player.vel += dv;
-    }
+        if game.manouver_dv.length() > MAX_DV_LENGTH {
+            game.manouver_dv = game.manouver_dv.normalize() * MAX_DV_LENGTH;
+        }
 
-    if game.manouver_mode {
-        let mut t_ship = *player;
+        let s = camera.world_to_screen(player.pos);
+        let mpos = camera.world_to_screen(mpos);
 
-        t_ship.vel += dv;
+        if mo.left && game.is_paused() && d < (50.0) && !game.manouver_mode {
+            game.manouver_mode = true;
+        }
 
-        line(s.x, s.y, m.x, m.y, 12);
+        if game.manouver_mode && mo.right {
+            game.manouver_mode = false;
+        }
 
-        let mut prev_step = t_ship.pos;
+        if game.manouver_mode && !mo.left {
+            game.manouver_mode = false;
 
-        for step in orbits::trajectory(game.time(), &t_ship, planets).take(1000)
-        {
-            let step = vec2(step.x, step.y);
-            let p1 = camera.world_to_screen(prev_step);
-            let p2 = camera.world_to_screen(step);
+            player.vel.x += game.manouver_dv.x;
+            player.vel.y += game.manouver_dv.y;
 
-            line(p1.x, p1.y, p2.x, p2.y, 12);
+            game.fuel -= game.manouver_dv.length() / MAX_DV_LENGTH;
+        }
 
-            prev_step = step;
+        if game.manouver_mode {
+            let mut t_ship = *player;
+
+            t_ship.vel.x += game.manouver_dv.x;
+            t_ship.vel.y += game.manouver_dv.y;
+
+            let mut prev_step = t_ship.pos;
+
+            for step in
+                orbits::trajectory(game.time(), &t_ship, planets).take(1000)
+            {
+                let p1 = camera.world_to_screen(prev_step);
+
+                let p2 = camera.world_to_screen(vec2(step.x, step.y));
+
+                if step.n > 500 {
+                    if step.n % 8 == 0 {
+                        pix(p1.x as i32, p1.y as i32, 14);
+                    }
+                } else if step.n > 250 {
+                    if step.n % 4 == 0 {
+                        pix(p2.x as i32, p2.y as i32, 12);
+                    }
+                } else {
+                    line(p1.x, p1.y, p2.x, p2.y, 12);
+                }
+
+                prev_step = vec2(step.x, step.y);
+            }
         }
     }
 }

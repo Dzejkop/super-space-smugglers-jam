@@ -1,3 +1,4 @@
+use crate::game::MAX_DV_LENGTH;
 use crate::prelude::*;
 
 static mut MOUSE_LEFT_PREV: bool = false;
@@ -150,6 +151,36 @@ pub fn tic(game: &mut Game, police: &police::State) {
             game.speed = GameSpeed::Fast;
         }
     }
+
+    // -- Fuel UI --
+
+    let fuel_height = (game.fuel() * 16.0 * 3.0 - 4.0) as i32;
+    let offset_from_top = HEIGHT - fuel_height - 2;
+
+    rect(2, offset_from_top, 12, fuel_height, 6);
+
+    if game.manouver_mode {
+        let dv_mag = game.manouver_dv.length();
+
+        let dv_fuel = dv_mag / MAX_DV_LENGTH;
+
+        let fuel_height = (dv_fuel * 16.0 * 3.0 - 4.0) as i32;
+        let offset_from_top = HEIGHT - fuel_height - 2;
+
+        rect(2, offset_from_top, 12, fuel_height, 2);
+    }
+
+    spr(
+        14,
+        0,
+        HEIGHT - 16 * 3,
+        SpriteOptions {
+            w: 2,
+            h: 6,
+            transparent: &[0],
+            ..Default::default()
+        },
+    );
 
     // -- Keyboard controls --
 

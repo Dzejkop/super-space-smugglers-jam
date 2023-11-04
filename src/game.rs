@@ -1,5 +1,12 @@
 use crate::prelude::*;
 
+pub const MAX_DV_LENGTH: f32 = 1.0;
+
+// How does the DV world space vector translate to a DV manouver vector
+pub const DV_FACTOR: f32 = 0.001;
+
+// pub const
+
 static mut GAME: Option<Game> = None;
 
 pub unsafe fn get() -> &'static Game {
@@ -22,10 +29,13 @@ pub struct Game {
     prev_world_time: f32,
 
     pub speed: GameSpeed,
-    pub manouver_mode: bool,
     pub fuel: f32,
     pub money: u32,
     pub tickets: u32,
+
+    // Manouver mode stuff
+    pub manouver_mode: bool,
+    pub manouver_dv: Vec2,
 }
 
 impl Game {
@@ -36,10 +46,11 @@ impl Game {
             prev_real_time: 0.0,
             prev_world_time: 0.0,
             speed: GameSpeed::Stop,
-            manouver_mode: false,
             fuel: 1.0,
             money: 10,
             tickets: 0,
+            manouver_mode: false,
+            manouver_dv: Vec2::ZERO,
         }
     }
 
