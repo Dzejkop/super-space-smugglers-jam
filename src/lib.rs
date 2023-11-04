@@ -6,9 +6,11 @@ mod tic80;
 
 mod alloc;
 mod camera;
+mod contracts;
 mod game;
 mod intro;
 mod manouvers;
+mod mouse_utils;
 mod msgs;
 mod orbits;
 mod overflow_indicator;
@@ -30,7 +32,9 @@ mod prelude {
     pub(crate) use rand::prelude::*;
 
     pub(crate) use crate::camera::Camera;
+    pub(crate) use crate::contracts::{Cargo, Contract};
     pub(crate) use crate::game::{Game, GameSpeed};
+    pub(crate) use crate::mouse_utils::mouse_left_pressed;
     pub(crate) use crate::overflow_indicator::OverflowIndicator;
     pub(crate) use crate::planet::Planet;
     pub(crate) use crate::selection_indicator::SelectionIndicator;
@@ -97,10 +101,19 @@ pub fn tic() {
                 planets::get(),
             );
 
+            contracts::tic(
+                camera::get(),
+                game::get_mut(),
+                player::get_mut(),
+                planets::get(),
+            );
+
             particles::tic(rng, Some(camera::get()));
             msgs::tic(game::get());
             ui::tic(game::get_mut(), police::get());
             overflow_indicator::tic();
+
+            mouse_utils::tic();
         },
     }
 }

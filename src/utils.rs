@@ -2,6 +2,8 @@ use std::ops;
 
 use crate::prelude::*;
 
+pub mod arrow;
+
 pub mod btns {
     pub const UP: i32 = 0;
     pub const DOWN: i32 = 1;

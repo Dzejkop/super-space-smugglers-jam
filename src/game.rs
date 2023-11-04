@@ -1,3 +1,4 @@
+use crate::contracts::Contract;
 use crate::prelude::*;
 
 static mut GAME: Option<Game> = None;
@@ -30,6 +31,10 @@ pub struct Game {
     pub manouver_mode: bool,
     pub manouver_dv: Vec2,
     pub manouver_fuel: f32,
+
+    // Contracts stuff
+    pub contracts: Vec<Contract>,
+    pub selected_contract: Option<usize>,
 }
 
 impl Game {
@@ -46,6 +51,13 @@ impl Game {
             manouver_mode: false,
             manouver_dv: Vec2::ZERO,
             manouver_fuel: 0.0,
+            contracts: vec![Contract {
+                planet: 1,
+                destination: 2,
+                cargo: Cargo::Passengers,
+                reward: 20,
+            }],
+            selected_contract: None,
         }
     }
 

@@ -1,7 +1,5 @@
 use crate::prelude::*;
 
-static mut MOUSE_LEFT_PREV: bool = false;
-
 pub fn tic(game: &mut Game, police: &police::State) {
     let m = mouse();
     let mx = m.x as i32;
@@ -124,7 +122,7 @@ pub fn tic(game: &mut Game, police: &police::State) {
             },
         );
 
-        if m.left && !unsafe { MOUSE_LEFT_PREV } {
+        if mouse_left_pressed() {
             if mouse_over_stop_button {
                 game.speed = GameSpeed::Stop;
             } else if mouse_over_play_button {
@@ -208,8 +206,4 @@ pub fn tic(game: &mut Game, police: &police::State) {
     }
 
     // ---
-
-    unsafe {
-        MOUSE_LEFT_PREV = m.left;
-    }
 }
