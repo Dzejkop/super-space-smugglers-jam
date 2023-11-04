@@ -1,38 +1,35 @@
 use crate::prelude::*;
 
-static mut PLANETS: [Planet; 4] = [
+static mut PLANETS: &mut [Planet] = &mut [
     // 0: The Sun
-    Planet::base()
+    Planet::new()
         .with_radius(120.0)
         .with_mass(0.5)
         .with_color(4),
     // 1: Mercury-ish
-    Planet::base()
+    Planet::new()
         .with_orbit(1000.0, 0.0002)
         .with_radius(30.0)
         .with_mass(0.1)
         .with_color(3),
     // 2: Venus-ish
-    Planet::base()
+    Planet::new()
         .with_orbit(2000.0, 0.00001)
         .with_radius(30.0)
         .with_mass(0.1)
         .with_color(4),
     // 3: Jupiter-ish
-    Planet::base()
+    Planet::new()
         .with_orbit(4000.0, 0.0002)
         .with_radius(60.0)
         .with_mass(0.22)
         .with_color(6),
     // 4: Europa
-    // TODO: Implement moons in trajectory calculations
-    // Planet::planet(0.0, 0.0, 2000.0, 0.00001, 30.0, 0.1, 2),
-    // Planet::base()
-    //     .with_orbit(300.0, 0.002)
-    //     .with_radius(15.0)
-    //     .with_mass(0.01)
-    //     .with_color(9)
-    //     .moon_of(3),
+    Planet::moon_of(3)
+        .with_orbit(300.0, 0.002)
+        .with_radius(15.0)
+        .with_mass(0.01)
+        .with_color(9),
 ];
 
 static mut INIT: bool = false;
@@ -97,7 +94,7 @@ pub fn tic(camera: &Camera) {
 fn init() {
     let central_mass = unsafe { PLANETS[0].mass };
 
-    for planet in unsafe { &mut PLANETS } {
+    for planet in unsafe { PLANETS.iter_mut() } {
         planet.orbit_speed =
             orbits::orbital_period(central_mass, planet.radius);
     }

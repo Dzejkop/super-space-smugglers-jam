@@ -1,51 +1,33 @@
 use crate::prelude::*;
 
-pub fn tic(game: &Game, ship: &mut Ship, planets: &mut [Planet]) {
-    for _ in 0..game.steps() {
-        for planet_id in 0..planets.len() {
-            let planet;
-            let parent;
-
-            if let Some(parent_id) = planets[planet_id].parent {
-                let [a, b] =
-                    planets.get_many_mut([planet_id, parent_id]).unwrap();
-
-                planet = a;
-                parent = Some(b);
-            } else {
-                planet = &mut planets[planet_id];
-                parent = None;
-            }
-
-            if let Some(parent) = parent {
-                planet.pos.x = parent.pos.x
-                    + f32::cos(PI * 2.0 * game.time / planet.orbit_speed)
-                        * planet.orbit_radius;
-
-                planet.pos.y = parent.pos.y
-                    + f32::sin(PI * 2.0 * game.time / planet.orbit_speed)
-                        * planet.orbit_radius;
-            } else {
-                planet.pos.x =
-                    f32::cos(PI * 2.0 * game.time / planet.orbit_speed)
-                        * planet.orbit_radius;
-
-                planet.pos.y =
-                    f32::sin(PI * 2.0 * game.time / planet.orbit_speed)
-                        * planet.orbit_radius;
-            }
-        }
-
-        // ---
-
-        for planet in planets.iter() {
-            let d = planet.pos - ship.pos;
-            let d2 = d.length_squared();
-            let f = planet.mass / d2;
-
-            ship.vel += f * d * DT;
-        }
-
-        ship.pos += ship.vel * DT;
+pub fn tic(game: &Game, player: &mut Ship, planets: &mut [Planet]) {
+    for step in 0..game.steps() {
+        eval(game.time + (step as f32) * DT, player, planets);
     }
+}
+
+pub fn eval(time: f32, player: &mut Ship, planets: &mut [Planet]) {
+    for planet_id in 0..planets.len() {
+        let parent_pos = planets[planet_id]
+            .parent
+            .map(|parent_id| planets[parent_id].pos)
+            .unwrap_or_default();
+
+        let planet = &mut planets[planet_id];
+        let orbit = PI * 2.0 * time / planet.orbit_speed;
+        let orbit = vec2(orbit.cos(), orbit.sin());
+
+        planet.pos = parent_pos + orbit * planet.orbit_radius;
+    }
+
+    // ---
+
+    for planet in planets.iter() {
+        let d = planet.pos - player.pos;
+        let f = planet.mass / d.length_squared();
+
+        player.vel += f * d * DT;
+    }
+
+    player.pos += player.vel * DT;
 }

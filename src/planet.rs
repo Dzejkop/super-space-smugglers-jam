@@ -17,7 +17,7 @@ pub struct Planet {
 }
 
 impl Planet {
-    pub const fn base() -> Self {
+    pub const fn new() -> Self {
         Self {
             pos: vec2(0.0, 0.0),
             orbit_radius: 0.0,
@@ -29,29 +29,11 @@ impl Planet {
         }
     }
 
-    pub const fn planet(
-        x: f32,
-        y: f32,
-        orbit_radius: f32,
-        orbit_speed: f32,
-        radius: f32,
-        mass: f32,
-        color: u8,
-    ) -> Self {
+    pub const fn moon_of(parent: usize) -> Self {
         Self {
-            pos: vec2(x, y),
-            orbit_radius,
-            orbit_speed,
-            radius,
-            mass,
-            color,
-            parent: None,
+            parent: Some(parent),
+            ..Self::new()
         }
-    }
-
-    pub const fn moon_of(mut self, parent: usize) -> Self {
-        self.parent = Some(parent);
-        self
     }
 
     pub const fn with_pos(mut self, x: f32, y: f32) -> Self {
@@ -79,6 +61,10 @@ impl Planet {
     pub const fn with_color(mut self, color: u8) -> Self {
         self.color = color;
         self
+    }
+
+    pub fn update(&mut self) {
+        //
     }
 
     pub fn collides_with(&self, obj: Vec2) -> bool {

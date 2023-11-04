@@ -69,14 +69,12 @@ pub fn tic(
     }
 
     if game.manouver_mode && game.manouver_dv.length() > 0.0 {
-        let mut t_ship = *player;
+        let mut player = *player;
 
-        t_ship.vel.x += game.manouver_dv.x;
-        t_ship.vel.y += game.manouver_dv.y;
+        player.vel += game.manouver_dv;
 
-        let mut prev_step = t_ship.pos;
-
-        let steps = orbits::trajectory(game.time, &t_ship, planets).take(1000);
+        let mut prev_step = player.pos;
+        let steps = orbits::trajectory(game, &player, planets).take(1000);
 
         for step in steps {
             let p1 = camera.world_to_screen(prev_step);

@@ -22,42 +22,26 @@ pub struct TrajectoryStep {
 }
 
 pub fn trajectory(
-    t: f32,
-    ship: &Ship,
+    game: &Game,
+    player: &Ship,
     planets: &[Planet],
 ) -> impl Iterator<Item = TrajectoryStep> {
+    let mut step = 0;
+    let mut time = game.time;
+    let mut player = player.clone();
     let mut planets = planets.to_vec();
-    let mut ship = ship.clone();
-    let mut n = 0;
 
     std::iter::from_fn(move || {
-        n += 1;
+        step += 1;
+        time += DT;
 
-        let time = t + DT * n as f32;
-
-        for planet in &mut planets {
-            planet.pos.x = f32::cos(PI * 2.0 * time / planet.orbit_speed)
-                * planet.orbit_radius;
-
-            planet.pos.y = f32::sin(PI * 2.0 * time / planet.orbit_speed)
-                * planet.orbit_radius;
-        }
-
-        for planet in &planets {
-            let d = planet.pos - ship.pos;
-            let d2 = d.length_squared();
-            let f = planet.mass / d2;
-
-            ship.vel += f * d * DT;
-        }
-
-        ship.pos += ship.vel * DT;
+        sim::eval(time, &mut player, &mut planets);
 
         Some(TrajectoryStep {
-            n,
+            n: step,
             t: time,
-            x: ship.pos.x,
-            y: ship.pos.y,
+            x: player.pos.x,
+            y: player.pos.y,
         })
     })
 }

@@ -44,7 +44,7 @@ mod prelude {
     pub(crate) use crate::text::Text;
     pub(crate) use crate::tic80::*;
     pub(crate) use crate::utils::*;
-    pub(crate) use crate::{msgs, orbits, particles, police};
+    pub(crate) use crate::{msgs, orbits, particles, police, sim};
 }
 
 use rand::rngs::SmallRng;
