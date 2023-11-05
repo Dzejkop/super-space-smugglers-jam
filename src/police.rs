@@ -58,7 +58,7 @@ pub fn tic(
             let was_above_zero = state.wanted > 0.0;
 
             state.wanted = (state.wanted - 0.03).max(0.0);
-            state.deducation_at = game.time + rng.gen_range(1.0..4.0) * 1000.0;
+            state.deducation_at = game.time + rng.gen_range(1.0..5.0) * 1000.0;
 
             if state.wanted == 0.0 && was_above_zero {
                 msgs::add("Police seems to have lost interest in you.");
@@ -78,12 +78,12 @@ pub fn tic(
                 })
                 .count();
 
-            let max_vehicles_in_pursuit = (5.0 * state.wanted).ceil() as usize;
+            let max_vehicles_in_pursuit = (9.0 * state.wanted).ceil() as usize;
 
             if state.wanted > 0.0
                 && vehicles_in_pursuit < max_vehicles_in_pursuit
             {
-                let vehicles = if rng.gen_bool(0.5) { 1 } else { 2 };
+                let vehicles = if rng.gen_bool(0.5) { 1 } else { 3 };
 
                 for _ in 0..vehicles {
                     state.vehicles.push(PoliceVehicle::rand(rng));
@@ -197,7 +197,7 @@ pub fn tic(
                     if game.credits == 0 {
                         game_over = true;
                     } else {
-                        bribe = Some(rng.gen_range(1..10).min(game.credits));
+                        bribe = Some(rng.gen_range(1..20).min(game.credits));
                     }
                 }
             }
@@ -307,8 +307,8 @@ impl PoliceVehicle {
     fn rand(rng: &mut dyn RngCore) -> Self {
         Self {
             pos: vec2(
-                rng.gen_range(-5000.0..5000.0),
-                rng.gen_range(-5000.0..5000.0),
+                rng.gen_range(-10000.0..10000.0),
+                rng.gen_range(-10000.0..10000.0),
             ),
             behavior: PoliceVehicleBehavior::InPursuit,
         }
