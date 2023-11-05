@@ -9,6 +9,7 @@ pub struct Ship {
     pub in_orbit: Option<usize>,
 }
 
+#[derive(Clone, Copy)]
 pub struct ShipSprite {
     id: ShipSpriteId,
     at: Vec2,
@@ -108,6 +109,7 @@ pub fn police_alternate_sprite() -> bool {
     time() % 600.0 < 300.0
 }
 
+#[derive(Clone, Copy)]
 enum ShipSpriteId {
     Player,
     Police,

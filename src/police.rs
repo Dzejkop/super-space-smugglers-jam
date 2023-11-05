@@ -17,8 +17,8 @@ impl PoliceState {
         self.wanted
     }
 
-    pub fn increment_wanted_level(&mut self) {
-        self.wanted = (self.wanted + 0.2).min(1.0);
+    pub fn increment_wanted_level(&mut self, t: f32) {
+        self.wanted = (self.wanted + t).min(1.0);
     }
 }
 

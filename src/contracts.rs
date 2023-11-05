@@ -14,6 +14,7 @@ pub struct Contract {
     pub dst_planet: usize,
     pub cargo: Cargo,
     pub reward: u32,
+    pub wanted: f32,
 }
 
 #[derive(Clone, Copy)]
@@ -31,20 +32,6 @@ impl Cargo {
             Cargo::Crabs => 356,
         }
     }
-}
-
-pub fn insert_into_empty_cargo<const N: usize>(
-    contract: Contract,
-    hold: &mut [Option<Contract>; N],
-) -> bool {
-    for n in 0..N {
-        if hold[n].is_none() {
-            hold[n] = Some(contract);
-            return true;
-        }
-    }
-
-    false
 }
 
 pub fn tic(
@@ -83,18 +70,31 @@ pub fn tic(
                         continue;
                     }
 
-                    let cargo = match rng.gen_range(0..3) {
-                        0 => Cargo::Passengers,
-                        1 => Cargo::Crabs,
-                        2 => Cargo::Bananas,
-                        _ => unreachable!(),
-                    };
+                    let reward;
+                    let wanted;
+                    let cargo;
+
+                    if rng.gen_bool(0.15) {
+                        reward = rng.gen_range(8..=12);
+                        wanted = 0.7;
+                        cargo = Cargo::Crabs;
+                    } else {
+                        reward = rng.gen_range(1..=5);
+                        wanted = ((reward as f32) / 5.0 * 0.3).clamp(0.1, 0.33);
+
+                        cargo = if rng.gen_bool(0.5) {
+                            Cargo::Passengers
+                        } else {
+                            Cargo::Bananas
+                        };
+                    }
 
                     game.contracts.push(Contract {
                         src_planet,
                         dst_planet,
                         cargo,
-                        reward: rng.gen_range(5..=25),
+                        reward,
+                        wanted,
                     });
 
                     spawned = true;
@@ -135,6 +135,7 @@ pub fn tic(
         if ship_to_planet_distance < src_planet.radius + MIN_ACCEPT_DISTANCE
             && !camera.is_animating()
             && !game.is_paused()
+            && game.cargo_hold.iter().any(|c| c.is_none())
         {
             game.selected_contract = Some(idx);
             game.manouver_mode = false;
@@ -233,13 +234,16 @@ pub fn tic(
 
                 camera.animate_back();
 
-                if !insert_into_empty_cargo(*contract, &mut game.cargo_hold) {
-                    msgs::add("Complete your current contracts first!");
-                } else {
-                    audio::play(sounds::COIN);
-                    game.contracts.remove(selected_contract);
-                    police.increment_wanted_level();
+                for hold in &mut game.cargo_hold {
+                    if hold.is_none() {
+                        *hold = Some(*contract);
+                        break;
+                    }
                 }
+
+                audio::play(sounds::COIN);
+                police.increment_wanted_level(contract.wanted);
+                game.contracts.remove(selected_contract);
             } else if btn_reject_hover {
                 game.selected_contract = None;
                 game.speed = GameSpeed::Normal;
