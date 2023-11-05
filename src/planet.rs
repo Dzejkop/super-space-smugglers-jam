@@ -23,7 +23,7 @@ impl Planet {
             pos: vec2(0.0, 0.0),
             orbit_radius: 0.0,
             orbit_phase: 0.0,
-            orbit_speed: 0.0,
+            orbit_speed: 1.0,
             radius: 0.0,
             mass: 0.0,
             color: 0,
