@@ -216,7 +216,7 @@ pub fn tic() {
 
                 Text::new(format!(
                     "You've collected ${}k credits.",
-                    game::get().day()
+                    game::get().total_credits
                 ))
                 .at(vec2(WIDTH as f32, y + 58.0))
                 .align_center()
