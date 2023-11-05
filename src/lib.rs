@@ -179,10 +179,17 @@ pub fn tic() {
             if let State::GameOver { reason } = state {
                 let y = 22.0;
 
-                let text = match reason {
-                    GameOverReason::Caught => "Ouch, you've been caught!",
+                let text;
+                let ship;
+
+                match reason {
+                    GameOverReason::Caught => {
+                        text = "Ouch, you've been caught!";
+                        ship = ShipSprite::police();
+                    }
                     GameOverReason::FellIntoTheSun => {
-                        "Ouch, you fell into the sun!"
+                        text = "Ouch, you fell into the sun!";
+                        ship = ShipSprite::player();
                     }
                 };
 
@@ -214,13 +221,11 @@ pub fn tic() {
                 .color(4)
                 .draw();
 
-                ShipSprite::police()
-                    .at(vec2(18.0, y + 22.0))
+                ship.at(vec2(18.0, y + 22.0))
                     .rot((time() / 333.0).sin())
                     .draw(None);
 
-                ShipSprite::police()
-                    .at(vec2(WIDTH as f32 - 18.0, y + 22.0))
+                ship.at(vec2(WIDTH as f32 - 18.0, y + 22.0))
                     .rot((time() / 333.0).cos())
                     .draw(None);
 
