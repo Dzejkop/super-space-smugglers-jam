@@ -15,6 +15,7 @@ pub struct Contract {
     pub cargo: Cargo,
     pub reward: u32,
     pub wanted: f32,
+    pub expires_at: f32,
 }
 
 #[derive(Clone, Copy)]
@@ -95,6 +96,8 @@ pub fn tic(
                         cargo,
                         reward,
                         wanted,
+                        expires_at: game.time
+                            + rng.gen_range(20.0..45.0) * 1000.0,
                     });
 
                     spawned = true;
@@ -110,6 +113,11 @@ pub fn tic(
             }
         }
     }
+
+    // Remove contracts that went stale
+    game.contracts
+        .extract_if(|contract| game.time >= contract.expires_at)
+        .for_each(drop);
 
     // Draw available unselected contracts
     for (idx, contract) in game.contracts.iter().enumerate() {
