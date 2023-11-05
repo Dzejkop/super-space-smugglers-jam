@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 const MIN_REFUEL_DISTANCE: f32 = 250.0;
-const REFUELLING_PLANETS: &[usize] = &[7, 11];
+const REFUELLING_PLANETS: &[usize] = &[7, 9];
 
 pub fn tic(
     camera: &Camera,

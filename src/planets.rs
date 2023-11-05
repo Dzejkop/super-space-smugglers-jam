@@ -91,7 +91,7 @@ fn draw_orbit(x: f32, y: f32, r: f32, p: f32) {
 fn orbital_period(central_mass: f32, radius: f32) -> f32 {
     const G: f32 = 6.6743e-11;
 
-    0.0001 * 2.0 * PI * (radius * radius * radius / (G * central_mass)).sqrt()
+    0.000001 * 2.0 * PI * (radius * radius * radius / (G * central_mass)).sqrt()
 }
 
 pub mod galaxies {
