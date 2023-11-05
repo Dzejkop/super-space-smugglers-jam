@@ -41,7 +41,7 @@ impl Game {
     pub fn init() -> Self {
         Self {
             time: 0.0,
-            speed: GameSpeed::Stop,
+            speed: GameSpeed::Paused,
             fuel: 1.0,
             credits: 10,
             total_credits: 10,
@@ -62,20 +62,20 @@ impl Game {
 
     pub fn steps(&self) -> u32 {
         match self.speed {
-            GameSpeed::Stop => 0,
+            GameSpeed::Paused => 0,
             GameSpeed::Normal => 1,
             GameSpeed::Fast => 2,
         }
     }
 
     pub fn is_paused(&self) -> bool {
-        self.speed == GameSpeed::Stop
+        self.speed == GameSpeed::Paused
     }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum GameSpeed {
-    Stop,
+    Paused,
     Normal,
     Fast,
 }
@@ -83,7 +83,7 @@ pub enum GameSpeed {
 impl GameSpeed {
     fn to_speed(&self) -> f32 {
         match self {
-            GameSpeed::Stop => 0.0,
+            GameSpeed::Paused => 0.0,
             GameSpeed::Normal => 1.0,
             GameSpeed::Fast => 2.0,
         }

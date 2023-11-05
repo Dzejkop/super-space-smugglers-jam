@@ -128,7 +128,7 @@ pub fn tic(
         {
             game.selected_contract = Some(idx);
             game.manouver_mode = false;
-            game.speed = GameSpeed::Stop;
+            game.speed = GameSpeed::Paused;
 
             let target_pos = (src_planet.pos + dst_planet.pos) * 0.5;
 

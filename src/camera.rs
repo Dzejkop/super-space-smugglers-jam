@@ -5,7 +5,8 @@ static mut CAMERA: Camera = Camera {
     scale: 0.033,
     target_scale: 0.033,
     anim_target: None,
-    anim_source: None,
+    anim_origin: None,
+    anim_t: 0.0,
 };
 
 pub unsafe fn get() -> &'static Camera {
@@ -22,20 +23,31 @@ pub fn tic() {
     let camera = unsafe { get_mut() };
     let m = mouse();
 
-    if let Some(target) = camera.anim_target {
-        let pos_delta = target.xy() - camera.pos;
-        let scale_delta = target.z - camera.scale;
+    if let (Some(origin), Some(target)) =
+        (camera.anim_origin, camera.anim_target)
+    {
+        fn ease(t: f32) -> f32 {
+            if t < 0.5 {
+                4.0 * t * t * t
+            } else {
+                1.0 - (-2.0 * t + 2.0).powf(3.0) / 2.0
+            }
+        }
 
-        camera.pos += pos_delta * 0.075;
-        camera.scale = (camera.scale + target.z) * 0.5;
+        camera.anim_t += 1.0 / 60.0;
 
-        if pos_delta.length() < 0.1 && scale_delta.abs() < 0.01 {
+        let t = ease(camera.anim_t);
+
+        camera.pos = lerp(origin.xy(), target.xy(), t);
+        camera.scale = lerp(origin.z, target.z, t);
+
+        if camera.anim_t >= 1.0 {
             camera.pos = target.xy();
             camera.scale = target.z;
             camera.anim_target = None;
         }
     } else {
-        if camera.anim_source.is_some() {
+        if camera.anim_origin.is_some() {
             return;
         }
 
@@ -89,7 +101,8 @@ pub struct Camera {
     pub scale: f32,
     pub target_scale: f32,
     pub anim_target: Option<Vec3>,
-    pub anim_source: Option<Vec3>,
+    pub anim_origin: Option<Vec3>,
+    pub anim_t: f32,
 }
 
 impl Camera {
@@ -112,15 +125,16 @@ impl Camera {
     pub fn animate_to(&mut self, target: Vec3) {
         let target_pos = -Self::center() - target.xy();
 
-        self.anim_source = Some(self.pos.extend(self.scale));
+        self.anim_origin = Some(self.pos.extend(self.scale));
         self.anim_target = Some(target_pos.extend(target.z));
+        self.anim_t = 0.0;
     }
 
     pub fn animate_back(&mut self) {
-        let source = self.anim_source.take().unwrap();
+        let origin = self.anim_origin.take().unwrap();
 
-        self.pos = source.xy();
-        self.scale = source.z;
+        self.pos = origin.xy();
+        self.scale = origin.z;
         self.anim_target = None;
     }
 

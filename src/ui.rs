@@ -79,7 +79,7 @@ pub fn tic(game: &mut Game, camera: &Camera, police: &police::PoliceState) {
             && my < HEIGHT - 16 - 4 + 16 * 2;
 
         spr(
-            if matches!(game.speed, GameSpeed::Stop) {
+            if matches!(game.speed, GameSpeed::Paused) {
                 sprites::buttons::active::STOP
             } else if mouse_over_stop_button {
                 sprites::buttons::highlighted::STOP
@@ -134,7 +134,7 @@ pub fn tic(game: &mut Game, camera: &Camera, police: &police::PoliceState) {
 
         if mouse_left_pressed() {
             if mouse_over_stop_button {
-                game.speed = GameSpeed::Stop;
+                game.speed = GameSpeed::Paused;
             } else if mouse_over_play_button {
                 game.speed = GameSpeed::Normal;
             } else if mouse_over_fast_button {
@@ -205,15 +205,15 @@ pub fn tic(game: &mut Game, camera: &Camera, police: &police::PoliceState) {
     // -- Keyboard controls --
     if visible && !game.manouver_mode {
         if key(keys::DIGIT_1) {
-            game.speed = GameSpeed::Stop;
+            game.speed = GameSpeed::Paused;
         } else if key(keys::DIGIT_2) {
             game.speed = GameSpeed::Normal;
         } else if key(keys::DIGIT_3) {
             game.speed = GameSpeed::Fast;
         } else if keyp(keys::SPACE, 16, 16) {
             game.speed = match game.speed {
-                GameSpeed::Stop => GameSpeed::Normal,
-                _ => GameSpeed::Stop,
+                GameSpeed::Paused => GameSpeed::Normal,
+                _ => GameSpeed::Paused,
             };
         }
     }
