@@ -1,10 +1,12 @@
-# Space: Out of Control
+# Super Space Smugglers
 
-Game for [TK Game Jam 2023](https://itch.io/jam/tk-game-jam-2023).
+[Play it online!](https://dzejkop.itch.io/super-space-smullgers)
+
+Game made for [TK Game Jam 2023](https://itch.io/jam/tk-game-jam-2023).
 
 ## Running
 
-Assuming you've got `tic80` installed (and in `PATH`), just:
+Requirements: Cargo, Just, TIC-80.
 
 ``` bash
 $ just
