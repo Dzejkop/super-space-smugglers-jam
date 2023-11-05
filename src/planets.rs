@@ -5,8 +5,16 @@ static mut PLANETS: Vec<Planet> = Vec::new();
 pub fn init(mut planets: Vec<Planet>) {
     let central_mass = planets[0].mass;
 
-    for planet in &mut planets {
-        planet.orbit_speed = orbital_period(central_mass, planet.radius);
+    for planet in 0..planets.len() {
+        if let Some(parent) = planets[planet].parent {
+            let mass_of_parent = planets[parent].mass;
+
+            planets[planet].orbit_speed =
+                orbital_period(mass_of_parent, planets[planet].radius);
+        } else {
+            planets[planet].orbit_speed =
+                orbital_period(central_mass, planets[planet].radius);
+        }
     }
 
     sim::eval(0.0, &mut Ship::default(), &mut planets);
