@@ -7,6 +7,7 @@ mod alloc;
 mod audio;
 mod camera;
 mod contracts;
+mod death;
 mod fuel;
 mod game;
 mod intro;
@@ -61,7 +62,12 @@ enum State {
     Intro,
     Spawning,
     Playing,
-    GameOver,
+    GameOver { reason: GameOverReason },
+}
+
+enum GameOverReason {
+    Caught,
+    FellIntoTheSun,
 }
 
 static mut STATE: State = State::Intro;
@@ -102,7 +108,7 @@ pub fn tic() {
             particles::tic(rng, None, None);
         }
 
-        State::Spawning | State::Playing | State::GameOver => unsafe {
+        State::Spawning | State::Playing | State::GameOver { .. } => unsafe {
             audio::tic();
 
             if game::get().time == 0.0 {
@@ -121,6 +127,12 @@ pub fn tic() {
                 *state = State::Playing;
             }
 
+            if death::tic(player::get(), planets::get()) {
+                *state = State::GameOver {
+                    reason: GameOverReason::FellIntoTheSun,
+                };
+            }
+
             if police::tic(
                 rng,
                 camera::get(),
@@ -128,7 +140,9 @@ pub fn tic() {
                 planets::get(),
                 game::get_mut(),
             ) {
-                *state = State::GameOver;
+                *state = State::GameOver {
+                    reason: GameOverReason::Caught,
+                };
                 player::get_mut().is_caught = true;
             }
 
@@ -162,10 +176,17 @@ pub fn tic() {
                 sim::tic(game::get(), player::get_mut(), planets::get_mut());
             }
 
-            if let State::GameOver = state {
+            if let State::GameOver { reason } = state {
                 let y = 22.0;
 
-                Text::new("Ouch, you've been caught!")
+                let text = match reason {
+                    GameOverReason::Caught => "Ouch, you've been caught!",
+                    GameOverReason::FellIntoTheSun => {
+                        "Ouch, you fell into the sun!"
+                    }
+                };
+
+                Text::new(text)
                     .at(vec2(WIDTH as f32, y + 16.0))
                     .align_center()
                     .draw();
