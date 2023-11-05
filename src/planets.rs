@@ -101,7 +101,7 @@ pub mod galaxies {
         vec![
             // 0
             Planet::new()
-                .with_radius(70.0)
+                .with_radius(500.0)
                 .with_orbit(0.0, 0.0)
                 .with_mass(10.0)
                 .with_color(4),
@@ -138,13 +138,13 @@ pub mod galaxies {
             // 6
             Planet::new()
                 .with_radius(100.0)
-                .with_mass(0.18)
+                .with_mass(1.0)
                 .with_orbit(5000.0, 8.0)
                 .with_color(2),
             // 7
             Planet::new()
                 .with_radius(100.0)
-                .with_mass(0.2)
+                .with_mass(4.0)
                 .with_orbit(10000.0, 10.0)
                 .with_color(5),
             // 8
@@ -156,7 +156,7 @@ pub mod galaxies {
             // 9
             Planet::new()
                 .with_radius(120.0)
-                .with_mass(0.22)
+                .with_mass(4.4)
                 .with_orbit(10000.0, 10.0 + PI)
                 .with_color(5),
             // 10
