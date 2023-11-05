@@ -96,6 +96,7 @@ pub fn tic() {
     }
 }
 
+#[derive(Default)]
 pub struct Camera {
     pub pos: Vec2,
     pub scale: f32,
@@ -112,6 +113,13 @@ impl Camera {
 
     pub fn center() -> Vec2 {
         Self::size() / 2.0
+    }
+
+    pub fn contains(&self, pos: Vec2) -> bool {
+        pos.x >= 2.0
+            && pos.y >= 2.0
+            && pos.x <= (WIDTH as f32 - 2.0)
+            && pos.y <= (HEIGHT as f32 - 2.0)
     }
 
     pub fn world_to_screen(&self, pos: Vec2) -> Vec2 {

@@ -22,7 +22,7 @@ pub fn tic(
     game.manouver_dv = {
         let manouver_dir = vec.normalize();
         let manouver_len = vec.length();
-        let manouver_sensitivity = lerp(0.008, 0.03, manouver_len / 100.0);
+        let manouver_sensitivity = lerp(0.02, 0.08, manouver_len / 64.0);
 
         let manouver = manouver_dir * manouver_len * manouver_sensitivity;
         let max_manouver_len = game.fuel * MAX_MANOUVER_LENGTH;

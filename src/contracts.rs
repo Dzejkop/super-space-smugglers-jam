@@ -63,33 +63,50 @@ pub fn tic(
             > MIN_DELAY_BETWEEN_NEW_CONTRACTS
         {
             if rng.gen::<f32>() > 0.5 {
-                // Spawn new contract
+                let mut tries = 0;
+                let mut spawned = false;
 
-                audio::play(sounds::NEW_CONTRACT);
-                msgs::add("New contract available!");
+                while tries < 64 {
+                    tries += 1;
 
-                game.time_of_last_contract_spawned = game.time;
+                    // ---
 
-                let src_planet = rng.gen_range(1..planets.len());
-                let mut dst_planet = rng.gen_range(1..planets.len());
+                    let src_planet = rng.gen_range(1..planets.len());
+                    let dst_planet = rng.gen_range(1..planets.len());
 
-                while dst_planet == src_planet {
-                    dst_planet = rng.gen_range(1..planets.len());
+                    if dst_planet == src_planet {
+                        continue;
+                    }
+
+                    if game.contracts.iter().any(|c| c.src_planet == src_planet)
+                    {
+                        continue;
+                    }
+
+                    let cargo = match rng.gen_range(0..3) {
+                        0 => Cargo::Passengers,
+                        1 => Cargo::Crabs,
+                        2 => Cargo::Bananas,
+                        _ => unreachable!(),
+                    };
+
+                    game.contracts.push(Contract {
+                        src_planet,
+                        dst_planet,
+                        cargo,
+                        reward: rng.gen_range(5..=25),
+                    });
+
+                    spawned = true;
+                    break;
                 }
 
-                let cargo = match rng.gen_range(0..3) {
-                    0 => Cargo::Passengers,
-                    1 => Cargo::Crabs,
-                    2 => Cargo::Bananas,
-                    _ => unreachable!(),
-                };
+                if spawned {
+                    audio::play(sounds::NEW_CONTRACT);
+                    msgs::add("New contract available!");
+                }
 
-                game.contracts.push(Contract {
-                    src_planet,
-                    dst_planet,
-                    cargo,
-                    reward: rng.gen_range(5..=25),
-                });
+                game.time_of_last_contract_spawned = game.time;
             }
         }
     }
@@ -125,8 +142,29 @@ pub fn tic(
 
             let target_pos = (src_planet.pos + dst_planet.pos) * 0.5;
 
-            let target_scale = Camera::size().min_element()
-                / (src_planet.pos.distance(dst_planet.pos) * 1.2);
+            let target_scale = {
+                let mut scale = 1.0;
+
+                // ugh, this can surely be calculated analytically, but I don't
+                // have much time now
+                while scale > 0.001 {
+                    let camera = Camera {
+                        scale,
+                        ..Default::default()
+                    };
+
+                    let src = camera.world_to_screen(src_planet.pos);
+                    let dst = camera.world_to_screen(dst_planet.pos);
+
+                    if camera.contains(src) && camera.contains(dst) {
+                        break;
+                    }
+
+                    scale -= 0.0001;
+                }
+
+                scale
+            };
 
             camera.animate_to(target_pos.extend(target_scale));
         }
@@ -155,11 +193,12 @@ pub fn tic(
             .draw();
 
         let mpos = vec2(mo.x as f32, mo.y as f32);
+        let tooltip_pos = (src_pos + dst_pos) * 0.5 + vec2(0.0, -14.0);
 
-        let tooltip_pos = dst_pos + vec2(8.0, -14.0);
-
-        let txt_width =
-            Text::new("Accept?").at(tooltip_pos).draw() as f32 + 1.0;
+        let txt_width = Text::new(format!("+${}k - Accept?", contract.reward))
+            .at(tooltip_pos)
+            .draw() as f32
+            + 1.0;
 
         let btn_accept_pos = tooltip_pos + vec2(txt_width - 3.0 * 8.0, 14.0);
         let btn_reject_pos = tooltip_pos + vec2(txt_width - 1.0 * 8.0, 14.0);

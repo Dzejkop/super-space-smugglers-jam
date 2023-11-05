@@ -64,8 +64,7 @@ enum State {
     GameOver,
 }
 
-// TODO change before release
-static mut STATE: State = State::Spawning;
+static mut STATE: State = State::Intro;
 static mut MUSIC_STARTED: bool = false;
 
 #[export_name = "TIC"]
@@ -96,7 +95,7 @@ pub fn tic() {
         State::Intro => {
             if intro::tic() {
                 *rng = SmallRng::seed_from_u64(time().to_bits() as u64);
-                *state = State::Playing;
+                *state = State::Spawning;
             }
 
             audio::tic();
