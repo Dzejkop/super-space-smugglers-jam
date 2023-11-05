@@ -123,7 +123,18 @@ pub fn tic(
 
         let vehicle_dir = match vehicle.behavior {
             PoliceVehicleBehavior::InPursuit => {
-                (player.ship.pos - vehicle.pos).normalize()
+                let to_player = player.ship.pos - vehicle.pos;
+                let player_vel = player.ship.vel;
+
+                let distance = to_player.length();
+                let time_to_impact = distance / player_vel.length();
+
+                let player_pos_at_impact =
+                    player.ship.pos + player_vel * time_to_impact;
+
+                let to_player_at_impact = player_pos_at_impact - vehicle.pos;
+
+                to_player_at_impact.normalize()
             }
             PoliceVehicleBehavior::Escaping { dir } => dir,
         };
