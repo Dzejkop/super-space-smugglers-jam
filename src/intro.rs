@@ -23,7 +23,7 @@ pub fn tic() -> bool {
         State::AnimatingOut { elapsed, .. } => *elapsed,
     };
 
-    Text::new("Space: Out of Control")
+    Text::new("Super Space Smugglers")
         .at(vec2(WIDTH as f32, 45.0 - text_offset))
         .align_center()
         .draw();
