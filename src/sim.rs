@@ -25,11 +25,23 @@ pub fn trajectory(
     let mut player = player.clone();
     let mut planets = planets.to_vec();
 
-    std::iter::from_fn(move || {
-        step += 1;
-        time += DT;
+    let mut prev_pos = vec2(f32::MAX, f32::MAX);
 
-        sim::eval(time, &mut player, &mut planets);
+    std::iter::from_fn(move || {
+        loop {
+            step += 1;
+            time += DT;
+
+            if step > 1000 {
+                return None;
+            }
+
+            sim::eval(time, &mut player, &mut planets);
+
+            if player.pos.distance(prev_pos) >= 100.0 {
+                break;
+            }
+        }
 
         let mut closest_color = 12;
         let mut closest_dist = f32::MAX;
@@ -38,13 +50,18 @@ pub fn trajectory(
         for planet in &planets {
             let dist = planet.pos.distance(player.pos);
 
-            touches |= dist <= planet.radius + MIN_ACCEPT_DISTANCE;
-
             if dist < closest_dist {
                 closest_color = planet.color;
                 closest_dist = dist;
             }
+
+            if dist <= planet.radius + MIN_ACCEPT_DISTANCE {
+                touches = true;
+                break;
+            }
         }
+
+        prev_pos = player.pos;
 
         Some(TrajectoryStep {
             step,
