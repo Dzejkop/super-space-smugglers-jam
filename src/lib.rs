@@ -127,10 +127,12 @@ pub fn tic() {
                 *state = State::Playing;
             }
 
-            if death::tic(player::get(), planets::get()) {
-                *state = State::GameOver {
-                    reason: GameOverReason::FellIntoTheSun,
-                };
+            if let State::Playing = state {
+                if death::tic(player::get(), planets::get()) {
+                    *state = State::GameOver {
+                        reason: GameOverReason::FellIntoTheSun,
+                    };
+                }
             }
 
             if police::tic(
