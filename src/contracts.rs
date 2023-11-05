@@ -218,6 +218,7 @@ pub fn tic(
             } else if btn_reject_hover {
                 game.selected_contract = None;
                 game.speed = GameSpeed::Normal;
+                game.contracts.remove(selected_contract);
 
                 camera.animate_back();
             }
