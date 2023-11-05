@@ -4,6 +4,7 @@
 mod tic80;
 
 mod alloc;
+mod audio;
 mod camera;
 mod contracts;
 mod fuel;
@@ -46,7 +47,7 @@ mod prelude {
     pub(crate) use crate::text::Text;
     pub(crate) use crate::tic80::*;
     pub(crate) use crate::utils::*;
-    pub(crate) use crate::{msgs, particles, police, sim};
+    pub(crate) use crate::{audio, msgs, particles, police, sim};
 }
 
 use rand::rngs::SmallRng;
@@ -65,13 +66,31 @@ enum State {
 
 // TODO change before release
 static mut STATE: State = State::Spawning;
+static mut MUSIC_STARTED: bool = false;
 
 #[export_name = "TIC"]
 pub fn tic() {
     let rng = unsafe { RNG.get_or_insert_with(|| SmallRng::seed_from_u64(64)) };
     let state = unsafe { &mut STATE };
+    let music_started = unsafe { &mut MUSIC_STARTED };
 
     cls(0);
+
+    if !*music_started {
+        music(
+            7,
+            MusicOptions {
+                frame: 0,
+                row: 0,
+                repeat: true,
+                sustain: false,
+                tempo: 140,
+                speed: 6,
+            },
+        );
+
+        *music_started = true;
+    }
 
     match state {
         State::Intro => {
@@ -80,10 +99,13 @@ pub fn tic() {
                 *state = State::Playing;
             }
 
+            audio::tic();
             particles::tic(rng, None, None);
         }
 
         State::Spawning | State::Playing | State::GameOver => unsafe {
+            audio::tic();
+
             if game::get().time == 0.0 {
                 planets::init(planets::galaxies::gamma());
             }

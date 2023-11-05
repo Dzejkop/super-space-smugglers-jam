@@ -57,10 +57,80 @@ pub mod keys {
     pub const SPACE: i32 = 48;
 }
 
-pub mod tracks {
-    pub const COIN_SOUND: i32 = 0;
-    pub const REFUEL_SOUND: i32 = 1;
-    pub const NEW_CONTRACT_SOUND: i32 = 2;
+pub mod sounds {
+    use crate::audio::*;
+
+    pub static COIN: &[Note] = &[
+        Note::Play {
+            sfx: 0,
+            note: 11,
+            octave: 3,
+            duration: 8,
+        },
+        Note::Wait { duration: 6 },
+        Note::Play {
+            sfx: 0,
+            note: 4,
+            octave: 4,
+            duration: 16,
+        },
+        Note::Wait { duration: 16 },
+    ];
+
+    pub static REFUEL: &[Note] = &[
+        Note::Play {
+            sfx: 3,
+            note: 0,
+            octave: 3,
+            duration: 8,
+        },
+        Note::Wait { duration: 12 },
+        Note::Play {
+            sfx: 3,
+            note: 0,
+            octave: 3,
+            duration: 8,
+        },
+        Note::Wait { duration: 12 },
+        Note::Play {
+            sfx: 3,
+            note: 0,
+            octave: 3,
+            duration: 8,
+        },
+        Note::Wait { duration: 12 },
+    ];
+
+    pub static NEW_CONTRACT: &[Note] = &[
+        Note::Play {
+            sfx: 0,
+            note: 5,
+            octave: 3,
+            duration: 3 * 8,
+        },
+        Note::Wait { duration: 8 },
+        Note::Play {
+            sfx: 0,
+            note: 7,
+            octave: 3,
+            duration: 2 * 8,
+        },
+        Note::Wait { duration: 8 },
+        Note::Play {
+            sfx: 0,
+            note: 10,
+            octave: 3,
+            duration: 8,
+        },
+        Note::Wait { duration: 16 },
+        Note::Play {
+            sfx: 0,
+            note: 10,
+            octave: 3,
+            duration: 8,
+        },
+        Note::Wait { duration: 8 },
+    ];
 }
 
 pub mod sprites {
@@ -72,7 +142,7 @@ pub mod sprites {
         }
 
         pub mod highlighted {
-            pub const STOP: i32 = 32;
+            pub const STOP: i32 = 16;
             pub const NORMAL: i32 = 34;
             pub const FAST: i32 = 36;
 

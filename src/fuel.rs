@@ -47,14 +47,7 @@ pub fn tic(
         if distance_to_player < planet.radius + MIN_REFUEL_DISTANCE {
             game.fuel = game.fuel.max(1.0);
 
-            music(
-                tracks::REFUEL_SOUND,
-                MusicOptions {
-                    repeat: false,
-                    ..Default::default()
-                },
-            );
-
+            audio::play(sounds::REFUEL);
             msgs::add("Refuelled!");
 
             break;

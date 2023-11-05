@@ -65,14 +65,7 @@ pub fn tic(
             if rng.gen::<f32>() > 0.5 {
                 // Spawn new contract
 
-                music(
-                    tracks::NEW_CONTRACT_SOUND,
-                    MusicOptions {
-                        repeat: false,
-                        ..Default::default()
-                    },
-                );
-
+                audio::play(sounds::NEW_CONTRACT);
                 msgs::add("New contract available!");
 
                 game.time_of_last_contract_spawned = game.time;
@@ -204,14 +197,7 @@ pub fn tic(
                 if !insert_into_empty_cargo(*contract, &mut game.cargo_hold) {
                     msgs::add("Complete your current contracts first!");
                 } else {
-                    music(
-                        tracks::COIN_SOUND,
-                        MusicOptions {
-                            repeat: false,
-                            ..Default::default()
-                        },
-                    );
-
+                    audio::play(sounds::COIN);
                     game.contracts.remove(selected_contract);
                     police.increment_wanted_level();
                 }
@@ -268,14 +254,7 @@ pub fn tic(
                 game.credits += contract.reward;
                 game.total_credits += contract.reward;
 
-                music(
-                    tracks::COIN_SOUND,
-                    MusicOptions {
-                        repeat: false,
-                        ..Default::default()
-                    },
-                );
-
+                audio::play(sounds::COIN);
                 msgs::add("Delivery complete!");
 
                 deliveries_to_clear.push(idx);
