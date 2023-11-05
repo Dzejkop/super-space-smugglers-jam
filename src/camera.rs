@@ -74,7 +74,7 @@ pub fn tic() {
                 camera.target_scale /= 1.2;
             }
 
-            camera.target_scale = camera.target_scale.clamp(0.005, 1.0);
+            camera.target_scale = camera.target_scale.clamp(0.002, 1.0);
         }
 
         // ---
