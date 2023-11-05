@@ -1,6 +1,10 @@
 use crate::prelude::*;
 use crate::ship::police_alternate_sprite;
 
+const STARTING_POLICE_SPEED: f32 = 0.2;
+const MAX_POLICE_SPEED: f32 = 0.75;
+const MAX_SPEED_TIME: f32 = 60_000.0;
+
 pub struct PoliceState {
     wanted: f32,
     dispatch_at: f32,
@@ -43,6 +47,11 @@ pub fn tic(
     let state = unsafe { &mut STATE };
 
     // ---
+
+    if keyp(keys::P, 0, 0) {
+        msgs::add("Police MAX");
+        state.wanted = 1.0;
+    }
 
     if !player.is_caught {
         if game.time >= state.deducation_at {
@@ -139,7 +148,17 @@ pub fn tic(
             PoliceVehicleBehavior::Escaping { dir } => dir,
         };
 
-        let vehicle_vel = vehicle_dir * 0.2;
+        let speed = if game.time > MAX_SPEED_TIME {
+            MAX_POLICE_SPEED
+        } else {
+            remap(
+                game.time,
+                (0.0, MAX_SPEED_TIME),
+                (STARTING_POLICE_SPEED, MAX_POLICE_SPEED),
+            )
+        };
+
+        let vehicle_vel = vehicle_dir * speed;
 
         let vehicle_engine_at = ShipSprite::police()
             .at(vehicle_pos)

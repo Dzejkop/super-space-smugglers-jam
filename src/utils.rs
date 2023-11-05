@@ -206,3 +206,10 @@ where
 {
     a + (b - a) * t.clamp(0.0, 1.0)
 }
+
+pub fn remap(value: f32, from: (f32, f32), to: (f32, f32)) -> f32 {
+    let (from_min, from_max) = from;
+    let (to_min, to_max) = to;
+
+    (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min
+}
