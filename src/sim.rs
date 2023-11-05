@@ -32,7 +32,7 @@ pub fn trajectory(
             step += 1;
             time += DT;
 
-            if step > 1000 {
+            if step > 650 {
                 return None;
             }
 

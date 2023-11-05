@@ -90,17 +90,14 @@ pub fn tic(
         player.vel += game.manouver_dv;
 
         let mut prev_step = player.pos;
-        let steps = sim::trajectory(game, &player, planets).take(750);
+        let steps = sim::trajectory(game, &player, planets);
+        let display = time() % 500.0 < 250.0;
 
         for step in steps {
             let p1 = camera.world_to_screen(prev_step);
             let p2 = camera.world_to_screen(step.pos);
 
-            let display = if step.touches {
-                time() % 500.0 < 250.0
-            } else {
-                true
-            };
+            let display = if step.touches { display } else { true };
 
             if display {
                 line(p1.x, p1.y, p2.x, p2.y, step.color);
