@@ -1,3 +1,4 @@
+use crate::contracts::MIN_ACCEPT_DISTANCE;
 use crate::prelude::*;
 
 pub fn tic(game: &Game, player: &mut Player, planets: &mut [Planet]) {
@@ -37,7 +38,7 @@ pub fn trajectory(
         for planet in &planets {
             let dist = planet.pos.distance(player.pos);
 
-            touches |= dist <= planet.radius * 3.0 + 128.0;
+            touches |= dist <= planet.radius + MIN_ACCEPT_DISTANCE;
 
             if dist < closest_dist {
                 closest_color = planet.color;

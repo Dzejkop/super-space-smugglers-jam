@@ -76,7 +76,8 @@ pub mod sprites {
             pub const NORMAL: i32 = 34;
             pub const FAST: i32 = 36;
 
-            pub const OK: i32 = 38;
+            pub const YES: i32 = 38;
+            pub const NO: i32 = 40;
         }
 
         pub mod inactive {
@@ -84,7 +85,8 @@ pub mod sprites {
             pub const NORMAL: i32 = 2;
             pub const FAST: i32 = 4;
 
-            pub const OK: i32 = 6;
+            pub const YES: i32 = 6;
+            pub const NO: i32 = 8;
         }
     }
 

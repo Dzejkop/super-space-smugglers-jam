@@ -34,7 +34,6 @@ mod prelude {
 
     pub(crate) use crate::arrow::Arrow;
     pub(crate) use crate::camera::Camera;
-    pub(crate) use crate::contracts::Cargo;
     pub(crate) use crate::game::{Game, GameSpeed};
     pub(crate) use crate::mouse_utils::{
         mouse_left_pressed, mouse_right_pressed,
@@ -122,7 +121,7 @@ pub fn tic() {
 
                 contracts::tic(
                     rng,
-                    camera::get(),
+                    camera::get_mut(),
                     game::get_mut(),
                     player::get_mut(),
                     planets::get(),
@@ -138,7 +137,7 @@ pub fn tic() {
 
                 msgs::tic(game::get());
                 overflow_indicator::tic();
-                ui::tic(game::get_mut(), police::get());
+                ui::tic(game::get_mut(), camera::get(), police::get());
                 sim::tic(game::get(), player::get_mut(), planets::get_mut());
             }
 
@@ -189,7 +188,7 @@ pub fn tic() {
                     .align_center()
                     .draw();
 
-                camera::get_mut().zoom /= 1.0025;
+                camera::get_mut().scale /= 1.0025;
             }
 
             screen_shake::tic(rng);

@@ -37,7 +37,7 @@ pub fn tic(camera: &Camera) {
         draw_orbit(
             orbit.x,
             orbit.y,
-            planet.orbit_radius * camera.zoom,
+            planet.orbit_radius * camera.scale,
             planet.orbit_phase,
         );
 
@@ -49,7 +49,7 @@ pub fn tic(camera: &Camera) {
         circ(
             center.x,
             center.y,
-            (camera.zoom * planet.radius).max(min_radius) as i32,
+            (camera.scale * planet.radius).max(min_radius) as i32,
             planet.color,
         );
     }

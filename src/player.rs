@@ -59,13 +59,13 @@ pub fn tic(camera: &Camera, game: &Game) -> bool {
     let engine_at = ShipSprite::player()
         .at(at)
         .rot(rot)
-        .scale(camera.zoom.max(min_scale))
+        .scale(camera.scale.max(min_scale))
         .engine(player.is_spawned)
         .draw(Some(game));
 
     if player.is_spawned {
         if !player.is_caught
-            && camera.zoom < 0.15
+            && camera.scale < 0.15
             && time() % 1000.0 < 500.0
             && !game.manouver_mode
         {

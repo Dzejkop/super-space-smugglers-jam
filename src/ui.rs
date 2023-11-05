@@ -1,12 +1,13 @@
 use crate::prelude::*;
 
-pub fn tic(game: &mut Game, police: &police::PoliceState) {
+pub fn tic(game: &mut Game, camera: &Camera, police: &police::PoliceState) {
     let m = mouse();
     let mx = m.x as i32;
     let my = m.y as i32;
+    let visible = game.selected_contract.is_none() && !camera.is_animating();
 
     // -- Credits --
-    if !game.manouver_mode {
+    if visible && !game.manouver_mode {
         Text::new(format!("${}k", game.credits))
             .at(vec2(WIDTH as f32, 0.0))
             .align_right()
@@ -14,7 +15,7 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
     }
 
     // -- Police stars --
-    if !game.manouver_mode {
+    if visible && !game.manouver_mode {
         for idx in 0..3 {
             let active = match idx {
                 0 => police.wanted() > 0.0,
@@ -52,7 +53,7 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
     }
 
     // -- Day number --
-    if !game.manouver_mode {
+    if visible && !game.manouver_mode {
         Text::new(format!("Day {}", game.day()))
             .at(vec2(WIDTH as f32 - 1.0, 112.0))
             .align_right()
@@ -61,7 +62,7 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
     }
 
     // -- Time controls --
-    if !game.manouver_mode {
+    if visible && !game.manouver_mode {
         let mouse_over_stop_button = mx >= WIDTH - (16 * 3) - 4
             && mx < WIDTH - (16 * 4) - 4 + 16 * 2
             && my >= HEIGHT - 16 - 4
@@ -150,7 +151,7 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
             true
         };
 
-    if show_fuel {
+    if visible && show_fuel {
         let fuel_height = 3.0 * 16.0 - 6.0;
         let fuel_h = (game.fuel * fuel_height) as i32;
         let fuel_y = HEIGHT - fuel_h - 2;
@@ -202,7 +203,7 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
     }
 
     // -- Keyboard controls --
-    if !game.manouver_mode {
+    if visible && !game.manouver_mode {
         if key(keys::DIGIT_1) {
             game.speed = GameSpeed::Stop;
         } else if key(keys::DIGIT_2) {
@@ -219,7 +220,7 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
 
     // ---
 
-    if game.manouver_mode {
+    if visible && game.manouver_mode {
         if game.fuel == 0.0 {
             Text::new("You don't have fuel.")
                 .at(vec2(0.0, 0.0))
@@ -237,6 +238,4 @@ pub fn tic(game: &mut Game, police: &police::PoliceState) {
                 .draw();
         }
     }
-
-    // ---
 }

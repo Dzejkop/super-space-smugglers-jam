@@ -37,7 +37,7 @@ impl Text {
         self
     }
 
-    pub fn draw(self) {
+    pub fn draw(self) -> i32 {
         let Self {
             text,
             at,
@@ -45,16 +45,12 @@ impl Text {
             alignment,
         } = self;
 
-        let at = {
-            let width = print_alloc(&text, 1024, 1024, Default::default());
+        let width = print_alloc(&text, 1024, 1024, Default::default());
 
-            match alignment {
-                TextAlignment::Left => at,
-                TextAlignment::Center => {
-                    vec2((at.x - width as f32) / 2.0, at.y)
-                }
-                TextAlignment::Right => vec2(at.x - width as f32, at.y),
-            }
+        let at = match alignment {
+            TextAlignment::Left => at,
+            TextAlignment::Center => vec2((at.x - width as f32) / 2.0, at.y),
+            TextAlignment::Right => vec2(at.x - width as f32, at.y),
         };
 
         let opts = PrintOptions {
@@ -63,6 +59,8 @@ impl Text {
         };
 
         print!(text, at.x as i32, at.y as i32, opts);
+
+        width
     }
 }
 

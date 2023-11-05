@@ -1,18 +1,17 @@
 use crate::police::PoliceState;
-use crate::prelude::keys::P;
 use crate::prelude::sprites::buttons;
 use crate::prelude::*;
 
-pub const MIN_ACCEPT_DISTANCE: f32 = 250.0;
-pub const MIN_DELIVERY_DISTANCE: f32 = 250.0;
+pub const MIN_ACCEPT_DISTANCE: f32 = 256.0;
+pub const MIN_DELIVERY_DISTANCE: f32 = 256.0;
 
 pub const MIN_DELAY_BETWEEN_NEW_CONTRACTS: f32 = 5000.0;
 pub const MAX_CONTRACTS: usize = 3;
 
 #[derive(Clone, Copy)]
 pub struct Contract {
-    pub planet: usize,
-    pub destination: usize,
+    pub src_planet: usize,
+    pub dst_planet: usize,
     pub cargo: Cargo,
     pub reward: u32,
 }
@@ -50,7 +49,7 @@ pub fn insert_into_empty_cargo<const N: usize>(
 
 pub fn tic(
     rng: &mut dyn RngCore,
-    camera: &Camera,
+    camera: &mut Camera,
     game: &mut Game,
     player: &Player,
     planets: &[Planet],
@@ -59,7 +58,6 @@ pub fn tic(
     let mo = mouse();
 
     // Spawn new contracts
-
     if game.contracts.len() < MAX_CONTRACTS {
         if game.time - game.time_of_last_contract_spawned
             > MIN_DELAY_BETWEEN_NEW_CONTRACTS
@@ -79,11 +77,11 @@ pub fn tic(
 
                 game.time_of_last_contract_spawned = game.time;
 
-                let planet = rng.gen_range(1..planets.len());
-                let mut dest = rng.gen_range(1..planets.len());
+                let src_planet = rng.gen_range(1..planets.len());
+                let mut dst_planet = rng.gen_range(1..planets.len());
 
-                while dest == planet {
-                    dest = rng.gen_range(1..planets.len());
+                while dst_planet == src_planet {
+                    dst_planet = rng.gen_range(1..planets.len());
                 }
 
                 let cargo = match rng.gen_range(0..3) {
@@ -94,10 +92,10 @@ pub fn tic(
                 };
 
                 game.contracts.push(Contract {
-                    planet,
-                    destination: dest,
+                    src_planet,
+                    dst_planet,
                     cargo,
-                    reward: 20,
+                    reward: rng.gen_range(5..=25),
                 });
             }
         }
@@ -105,40 +103,39 @@ pub fn tic(
 
     // Draw available unselected contracts
     for (idx, contract) in game.contracts.iter().enumerate() {
-        let planet = &planets[contract.planet];
-        let planet_pos = camera.world_to_screen(planet.pos);
-
+        let src_planet = &planets[contract.src_planet];
+        let dst_planet = &planets[contract.dst_planet];
+        let src_pos = camera.world_to_screen(src_planet.pos);
         let flash_indicator = (time() / 1000.0) as i32 % 2 == 0;
 
         if flash_indicator {
             Img::sprite_idx_with_size(320, uvec2(2, 2))
-                .at(planet_pos + vec2(64.0, -64.0) * camera.zoom)
-                .scale((4.0 * camera.zoom).max(0.3))
+                .at(src_pos + vec2(64.0, -64.0) * camera.scale)
+                .scale((4.0 * camera.scale).max(0.3))
                 .draw();
         }
 
-        let mouse_pos = camera.screen_to_world(vec2(mo.x as f32, mo.y as f32));
-        let cursor_to_planet_distance = (planet.pos - mouse_pos).length();
-        let ship_to_planet_distance = (player.ship.pos - planet.pos).length();
+        let ship_to_planet_distance =
+            (player.ship.pos - src_planet.pos).length();
 
-        if camera.zoom < 0.15 && flash_indicator && !game.manouver_mode {
-            circb(planet_pos.x as i32, planet_pos.y as i32, 8, 3);
+        if camera.scale < 0.15 && flash_indicator && !game.manouver_mode {
+            circb(src_pos.x as i32, src_pos.y as i32, 8, 3);
         }
 
-        if cursor_to_planet_distance < planet.radius
-            && ship_to_planet_distance < planet.radius + MIN_ACCEPT_DISTANCE
+        if ship_to_planet_distance < src_planet.radius + MIN_ACCEPT_DISTANCE
+            && !camera.is_animating()
+            && !game.is_paused()
         {
-            SelectionIndicator::new(planet_pos)
-                .size(Vec2::ONE * planet.radius * 1.2)
-                .draw();
+            game.selected_contract = Some(idx);
+            game.manouver_mode = false;
+            game.speed = GameSpeed::Stop;
 
-            if mouse_left_pressed() {
-                game.selected_contract = Some(idx);
+            let target_pos = (src_planet.pos + dst_planet.pos) * 0.5;
 
-                // Enforce pause game, and disable manouver mode
-                game.manouver_mode = false;
-                game.speed = GameSpeed::Stop;
-            }
+            let target_scale = Camera::size().min_element()
+                / (src_planet.pos.distance(dst_planet.pos) * 1.2);
+
+            camera.animate_to(target_pos.extend(target_scale));
         }
     }
 
@@ -154,55 +151,77 @@ pub fn tic(
     if let Some(selected_contract) = game.selected_contract {
         let contract = &game.contracts[selected_contract];
 
-        let planet = &planets[contract.planet];
-        let destination = &planets[contract.destination];
+        let src_planet = &planets[contract.src_planet];
+        let dst_planet = &planets[contract.dst_planet];
 
-        let planet_pos = camera.world_to_screen(planet.pos);
-        let destination_pos = camera.world_to_screen(destination.pos);
+        let src_pos = camera.world_to_screen(src_planet.pos);
+        let dst_pos = camera.world_to_screen(dst_planet.pos);
 
-        Arrow::new(planet_pos, destination_pos, destination.color)
+        Arrow::new(src_pos, dst_pos, dst_planet.color)
             .margin(5.0)
-            .draw();
-
-        let middle_point = (planet_pos + destination_pos) / 2.0;
-
-        Text::new("Accept?")
-            .at(middle_point + vec2(0.0, 8.0))
             .draw();
 
         let mpos = vec2(mo.x as f32, mo.y as f32);
 
-        let button_pos = middle_point + vec2(0.0, 32.0);
+        let tooltip_pos = dst_pos + vec2(8.0, -14.0);
 
-        let mouse_over_accept_button = (mpos - button_pos).length() < 8.0;
+        let txt_width =
+            Text::new("Accept?").at(tooltip_pos).draw() as f32 + 1.0;
 
-        let sprite_idx = if mouse_over_accept_button {
-            buttons::highlighted::OK
+        let btn_accept_pos = tooltip_pos + vec2(txt_width - 3.0 * 8.0, 14.0);
+        let btn_reject_pos = tooltip_pos + vec2(txt_width - 1.0 * 8.0, 14.0);
+
+        let btn_accept_hover = (mpos - btn_accept_pos).length() < 8.0;
+        let btn_reject_hover = (mpos - btn_reject_pos).length() < 8.0;
+
+        let btn_accept_sprite = if btn_accept_hover {
+            buttons::highlighted::YES
         } else {
-            buttons::inactive::OK
+            buttons::inactive::YES
         };
 
-        if mouse_over_accept_button && mouse_left_pressed() {
-            game.selected_contract = None;
+        let btn_reject_sprite = if btn_reject_hover {
+            buttons::highlighted::NO
+        } else {
+            buttons::inactive::NO
+        };
 
-            if !insert_into_empty_cargo(*contract, &mut game.cargo_hold) {
-                msgs::add("Cargo hold is full!");
-            } else {
-                music(
-                    tracks::COIN_SOUND,
-                    MusicOptions {
-                        repeat: false,
-                        ..Default::default()
-                    },
-                );
-                game.contracts.remove(selected_contract);
-                police.increment_wanted_level();
+        Img::sprite_idx_with_size(btn_accept_sprite as u32, uvec2(2, 2))
+            .at(btn_accept_pos)
+            .draw();
+
+        Img::sprite_idx_with_size(btn_reject_sprite as u32, uvec2(2, 2))
+            .at(btn_reject_pos)
+            .draw();
+
+        if mouse_left_pressed() {
+            if btn_accept_hover {
+                game.selected_contract = None;
+                game.speed = GameSpeed::Normal;
+
+                camera.animate_back();
+
+                if !insert_into_empty_cargo(*contract, &mut game.cargo_hold) {
+                    msgs::add("Complete your current contracts first!");
+                } else {
+                    music(
+                        tracks::COIN_SOUND,
+                        MusicOptions {
+                            repeat: false,
+                            ..Default::default()
+                        },
+                    );
+
+                    game.contracts.remove(selected_contract);
+                    police.increment_wanted_level();
+                }
+            } else if btn_reject_hover {
+                game.selected_contract = None;
+                game.speed = GameSpeed::Normal;
+
+                camera.animate_back();
             }
         }
-
-        Img::sprite_idx_with_size(sprite_idx as u32, uvec2(2, 2))
-            .at(button_pos)
-            .draw();
     }
 
     // If mouse is over cargo hold, show arrows to destinations
@@ -220,13 +239,12 @@ pub fn tic(
         && mpos.y > cargo_hold_bounds.0.y
         && mpos.y < cargo_hold_bounds.0.y + cargo_hold_bounds.1.y
     {
-        for (idx, cargo) in game.cargo_hold.iter().enumerate() {
+        for cargo in &game.cargo_hold {
             if let Some(contract) = cargo {
-                let planet = &planets[contract.destination];
-                let planet_pos = camera.world_to_screen(planet.pos);
-                let idx = 2 - idx;
+                let dst_planet = &planets[contract.dst_planet];
+                let dst_pos = camera.world_to_screen(dst_planet.pos);
 
-                Arrow::new(mpos, planet_pos, planet.color)
+                Arrow::new(mpos, dst_pos, dst_planet.color)
                     .margin(5.0)
                     .draw();
             }
@@ -238,12 +256,14 @@ pub fn tic(
 
     for (idx, contract) in game.cargo_hold.iter().enumerate() {
         if let Some(contract) = contract {
-            let planet = &planets[contract.destination];
+            let dst_planet = &planets[contract.dst_planet];
 
             let ship_to_planet_distance =
-                (player.ship.pos - planet.pos).length();
+                (player.ship.pos - dst_planet.pos).length();
 
-            if ship_to_planet_distance < planet.radius + MIN_DELIVERY_DISTANCE {
+            if ship_to_planet_distance
+                < dst_planet.radius + MIN_DELIVERY_DISTANCE
+            {
                 game.credits += contract.reward;
                 game.total_credits += contract.reward;
 

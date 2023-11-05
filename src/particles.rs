@@ -26,7 +26,7 @@ pub fn tic(
             .unwrap_or(particle.pos);
 
         let scale = camera
-            .map(|camera| (3.0 * camera.zoom).max(0.2))
+            .map(|camera| (3.0 * camera.scale).max(0.2))
             .unwrap_or(1.0);
 
         Img::sprite_idx(sprite).at(at).scale(scale).draw();

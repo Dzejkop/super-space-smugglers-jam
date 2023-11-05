@@ -14,7 +14,7 @@ impl PoliceState {
     }
 
     pub fn increment_wanted_level(&mut self) {
-        self.wanted = (self.wanted + 0.2).max(1.0);
+        self.wanted = (self.wanted + 0.2).min(1.0);
     }
 }
 
@@ -133,7 +133,7 @@ pub fn tic(
         let vehicle_engine_at = ShipSprite::police()
             .at(vehicle_pos)
             .rot(PI - vehicle_dir.angle_between(Vec2::Y))
-            .scale(3.0 * camera.zoom)
+            .scale(3.0 * camera.scale)
             .engine(true)
             .draw(Some(game));
 
@@ -142,7 +142,7 @@ pub fn tic(
         }
 
         if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
-            if camera.zoom < 0.15
+            if camera.scale < 0.15
                 && time() % 1000.0 < 500.0
                 && !game.manouver_mode
             {
@@ -208,10 +208,10 @@ pub fn tic(
         .vehicles
         .extract_if(|vehicle| {
             if let PoliceVehicleBehavior::Escaping { .. } = &vehicle.behavior {
-                vehicle.pos.x < -10000.0
-                    || vehicle.pos.y < -10000.0
-                    || vehicle.pos.x > 10000.0
-                    || vehicle.pos.y > 10000.0
+                vehicle.pos.x < -50000.0
+                    || vehicle.pos.y < -50000.0
+                    || vehicle.pos.x > 50000.0
+                    || vehicle.pos.y > 50000.0
             } else {
                 false
             }
@@ -275,17 +275,11 @@ struct PoliceVehicle {
 
 impl PoliceVehicle {
     fn rand(rng: &mut dyn RngCore) -> Self {
-        let w = 5.0 * WIDTH as f32;
-        let h = 5.0 * HEIGHT as f32;
-
-        let dx = rng.gen_range(200.0..1500.0);
-        let dy = rng.gen_range(200.0..1500.0);
-
-        let x = if rng.gen_bool(0.5) { -w - dx } else { w + dx };
-        let y = if rng.gen_bool(0.5) { -h - dy } else { h + dy };
-
         Self {
-            pos: vec2(x, y),
+            pos: vec2(
+                rng.gen_range(-5000.0..5000.0),
+                rng.gen_range(-5000.0..5000.0),
+            ),
             behavior: PoliceVehicleBehavior::InPursuit,
         }
     }
