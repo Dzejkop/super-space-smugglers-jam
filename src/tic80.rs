@@ -1,5 +1,7 @@
-// Because this isn't in a separate crate, we have to allow unused code to silence the warnings.
-#![allow(dead_code, unused_macros)]
+#![allow(dead_code)]
+#![allow(unused_macros)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::crate_in_macro_def)]
 
 use std::ffi::CString;
 

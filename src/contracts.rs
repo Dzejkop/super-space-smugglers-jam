@@ -46,6 +46,7 @@ pub fn tic(
     let mo = mouse();
 
     // Spawn new contracts
+    #[allow(clippy::collapsible_if)]
     if game.contracts.len() < MAX_CONTRACTS {
         if game.time - game.time_of_last_contract_spawned
             > MIN_DELAY_BETWEEN_NEW_CONTRACTS
@@ -277,15 +278,13 @@ pub fn tic(
         && mpos.y > cargo_hold_bounds.0.y
         && mpos.y < cargo_hold_bounds.0.y + cargo_hold_bounds.1.y
     {
-        for cargo in &game.cargo_hold {
-            if let Some(contract) = cargo {
-                let dst_planet = &planets[contract.dst_planet];
-                let dst_pos = camera.world_to_screen(dst_planet.pos);
+        for contract in game.cargo_hold.iter().flatten() {
+            let dst_planet = &planets[contract.dst_planet];
+            let dst_pos = camera.world_to_screen(dst_planet.pos);
 
-                Arrow::new(mpos, dst_pos, dst_planet.color)
-                    .margin(5.0)
-                    .draw();
-            }
+            Arrow::new(mpos, dst_pos, dst_planet.color)
+                .margin(5.0)
+                .draw();
         }
     }
 

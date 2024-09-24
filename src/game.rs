@@ -14,7 +14,7 @@ pub unsafe fn get_mut() -> &'static mut Game {
 pub fn tic() {
     let game = unsafe { get_mut() };
 
-    game.time += DT * game.speed.to_speed();
+    game.time += DT * game.speed.delta();
 }
 
 pub struct Game {
@@ -23,7 +23,6 @@ pub struct Game {
     pub fuel: f32,
     pub credits: u32,
     pub total_credits: u32,
-    pub tickets: u32,
 
     // Manouver mode stuff
     pub manouver_mode: bool,
@@ -45,7 +44,6 @@ impl Game {
             fuel: 1.0,
             credits: 10,
             total_credits: 10,
-            tickets: 0,
             manouver_mode: false,
             manouver_dv: Vec2::ZERO,
             manouver_fuel: 0.0,
@@ -81,7 +79,7 @@ pub enum GameSpeed {
 }
 
 impl GameSpeed {
-    fn to_speed(&self) -> f32 {
+    fn delta(&self) -> f32 {
         match self {
             GameSpeed::Paused => 0.0,
             GameSpeed::Normal => 1.0,

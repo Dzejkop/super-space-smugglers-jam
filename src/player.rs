@@ -10,7 +10,6 @@ static mut PLAYER: Player = Player {
     ship: Ship {
         pos: vec2(1800.0, 0.0),
         vel: vec2(-1.0, 1.0),
-        in_orbit: None,
     },
     is_spawned: false,
     is_caught: false,

@@ -64,14 +64,10 @@ impl Text {
     }
 }
 
+#[derive(Default)]
 enum TextAlignment {
+    #[default]
     Left,
     Center,
     Right,
-}
-
-impl Default for TextAlignment {
-    fn default() -> Self {
-        TextAlignment::Left
-    }
 }

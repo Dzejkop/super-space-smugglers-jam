@@ -62,6 +62,7 @@ pub fn tic(game: &mut Game, camera: &Camera, police: &police::PoliceState) {
     }
 
     // -- Time controls --
+    #[allow(clippy::manual_range_contains)]
     if visible && !game.manouver_mode {
         let mouse_over_stop_button = mx >= WIDTH - (16 * 3) - 4
             && mx < WIDTH - (16 * 4) - 4 + 16 * 2
@@ -73,7 +74,7 @@ pub fn tic(game: &mut Game, camera: &Camera, police: &police::PoliceState) {
             && my >= HEIGHT - 16 - 4
             && my < HEIGHT - 16 - 4 + 16 * 2;
 
-        let mouse_over_fast_button = mx >= WIDTH - (16 * 1) - 4
+        let mouse_over_fast_button = mx >= WIDTH - 16 - 4
             && mx < WIDTH - (16 * 2) - 4 + 16 * 2
             && my >= HEIGHT - 16 - 4
             && my < HEIGHT - 16 - 4 + 16 * 2;

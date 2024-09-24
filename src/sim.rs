@@ -9,7 +9,6 @@ pub fn tic(game: &Game, player: &mut Player, planets: &mut [Planet]) {
 
 #[derive(Clone, Copy)]
 pub struct TrajectoryStep {
-    pub step: usize,
     pub pos: Vec2,
     pub color: u8,
     pub touches: bool,
@@ -22,7 +21,7 @@ pub fn trajectory(
 ) -> impl Iterator<Item = TrajectoryStep> {
     let mut step = 0;
     let mut time = game.time;
-    let mut player = player.clone();
+    let mut player = *player;
     let mut planets = planets.to_vec();
 
     let mut prev_pos = vec2(f32::MAX, f32::MAX);
@@ -64,7 +63,6 @@ pub fn trajectory(
         prev_pos = player.pos;
 
         Some(TrajectoryStep {
-            step,
             pos: player.pos,
             color: closest_color,
             touches,

@@ -1,4 +1,5 @@
 #![feature(extract_if)]
+#![allow(static_mut_refs)]
 
 #[macro_use]
 mod tic80;
