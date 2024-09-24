@@ -149,4 +149,8 @@ impl Camera {
     pub fn is_animating(&self) -> bool {
         self.anim_target.is_some()
     }
+
+    pub fn zoom(&mut self, delta: f32) {
+        self.scale = (self.scale * delta).max(0.001);
+    }
 }

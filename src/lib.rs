@@ -238,7 +238,7 @@ pub fn tic() {
                     .align_center()
                     .draw();
 
-                camera::get_mut().scale /= 1.0025;
+                camera::get_mut().zoom(1.0 / 1.0025);
             }
 
             screen_shake::tic(rng);
