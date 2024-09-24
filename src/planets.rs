@@ -48,9 +48,9 @@ pub fn tic(camera: &Camera) {
             planet.orbit_radius * camera.scale,
             planet.orbit_phase,
         );
+    }
 
-        // ---
-
+    for planet in planets {
         let center = camera.world_to_screen(planet.pos).as_ivec2();
         let min_radius = if planet.parent.is_some() { 1.0 } else { 2.0 };
 
