@@ -197,5 +197,9 @@ fn any_key() -> bool {
         }
     }
 
+    if mouse().left || mouse().right {
+        return true;
+    }
+
     false
 }
