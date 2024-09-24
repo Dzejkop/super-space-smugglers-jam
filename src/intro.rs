@@ -150,12 +150,12 @@ pub fn tic() -> bool {
     false
 }
 
-fn centerish() -> Vec2 {
-    vec2(WIDTH as f32 / 2.0, HEIGHT as f32 / 2.0 - 10.0)
+fn center() -> Vec2 {
+    vec2(WIDTH as f32 / 2.0, HEIGHT as f32 / 2.0)
 }
 
 fn get_player_pos(time: f32) -> Vec2 {
-    centerish() + vec2(time.cos() * 100.0, time.sin() * 60.0)
+    center() + vec2(time.cos() * 100.0, time.sin() * 60.0)
 }
 
 fn get_police_pos(idx: usize, time: f32) -> Vec2 {
@@ -173,7 +173,7 @@ fn get_police_pos(idx: usize, time: f32) -> Vec2 {
         _ => unreachable!(),
     };
 
-    centerish() + vec2(time.cos() * 100.0 * f, time.sin() * 50.0 * f)
+    center() + vec2(time.cos() * 100.0 * f, time.sin() * 50.0 * f)
 }
 
 fn get_velocity(p1: Vec2, p2: Vec2) -> Vec2 {
