@@ -230,12 +230,10 @@ pub fn tic(game: &mut Game, camera: &Camera, police: &police::PoliceState) {
         } else {
             Text::new("Release left mouse button to confirm.")
                 .at(vec2(0.0, 0.0))
-                .color(14)
                 .draw();
 
             Text::new("Press right mouse button or X to cancel.")
                 .at(vec2(0.0, 8.0))
-                .color(14)
                 .draw();
         }
     }
