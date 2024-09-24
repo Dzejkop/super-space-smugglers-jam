@@ -20,6 +20,13 @@ impl OverflowIndicator {
         }
     }
 
+    pub fn contract(at: Vec2) -> Self {
+        Self {
+            at,
+            id: OverflowIndicatorTy::Contract,
+        }
+    }
+
     pub fn draw(self) {
         unsafe {
             INDICATORS.push(self);
@@ -43,6 +50,14 @@ impl OverflowIndicator {
                     2
                 } else {
                     10
+                }
+            }
+
+            OverflowIndicatorTy::Contract => {
+                if blink() {
+                    3
+                } else {
+                    4
                 }
             }
         };
@@ -76,6 +91,7 @@ impl OverflowIndicator {
 enum OverflowIndicatorTy {
     Player,
     Police,
+    Contract,
 }
 
 static mut INDICATORS: Vec<OverflowIndicator> = Vec::new();
