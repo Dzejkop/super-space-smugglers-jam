@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use crate::ship::police_alternate_sprite;
 
 const STARTING_POLICE_SPEED: f32 = 0.2;
 const MAX_POLICE_SPEED: f32 = 0.75;
@@ -160,27 +159,19 @@ pub fn tic(
 
         let vehicle_vel = vehicle_dir * speed;
 
-        let vehicle_engine_at = ShipSprite::police()
-            .at(vehicle_pos)
-            .rot(PI - vehicle_dir.angle_between(Vec2::Y))
-            .scale(3.0 * camera.scale)
-            .engine(true)
-            .draw(Some(game));
+        let vehicle_engine_at =
+            ShipSprite::police(vehicle.behavior.is_in_pursuit())
+                .at(vehicle_pos)
+                .rot(PI - vehicle_dir.angle_between(Vec2::Y))
+                .scale(camera.scale.max(0.3))
+                .engine(true)
+                .draw(Some(game));
 
         if player.is_caught {
             continue;
         }
 
         if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
-            if camera.scale < 0.15
-                && time() % 1000.0 < 500.0
-                && !game.manouver_mode
-            {
-                let color = if police_alternate_sprite() { 10 } else { 2 };
-
-                circb(vehicle_pos.x as i32, vehicle_pos.y as i32, 8, color);
-            }
-
             OverflowIndicator::police(vehicle_pos).draw();
         }
 
@@ -336,5 +327,9 @@ impl PoliceVehicleBehavior {
         };
 
         PoliceVehicleBehavior::Escaping { dir }
+    }
+
+    fn is_in_pursuit(&self) -> bool {
+        matches!(self, PoliceVehicleBehavior::InPursuit)
     }
 }

@@ -86,7 +86,7 @@ pub fn tic() -> bool {
 
                 let police_rot = get_rotation(police_vel);
 
-                let police_engine_at = ShipSprite::police()
+                let police_engine_at = ShipSprite::police(true)
                     .at(police_at)
                     .rot(police_rot)
                     .engine(true)
@@ -129,7 +129,7 @@ pub fn tic() -> bool {
                 let ship = if ship_idx == 0 {
                     ShipSprite::player()
                 } else {
-                    ShipSprite::police()
+                    ShipSprite::police(true)
                 };
 
                 let ship_engine_at = ship

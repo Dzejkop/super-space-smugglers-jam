@@ -64,14 +64,6 @@ pub fn tic(camera: &Camera, game: &Game) -> bool {
         .draw(Some(game));
 
     if player.is_spawned {
-        if !player.is_caught
-            && camera.scale < 0.15
-            && time() % 1000.0 < 500.0
-            && !game.manouver_mode
-        {
-            circb(at.x as i32, at.y as i32, 8, 5);
-        }
-
         for _ in 0..game.steps() {
             particles::spawn_exhaust(
                 camera.screen_to_world(engine_at),

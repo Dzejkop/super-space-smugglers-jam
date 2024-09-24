@@ -1,3 +1,5 @@
+use std::iter;
+
 use crate::contracts::MIN_ACCEPT_DISTANCE;
 use crate::prelude::*;
 
@@ -26,7 +28,7 @@ pub fn trajectory(
 
     let mut prev_pos = vec2(f32::MAX, f32::MAX);
 
-    std::iter::from_fn(move || {
+    iter::from_fn(move || {
         loop {
             step += 1;
             time += DT;

@@ -11,6 +11,7 @@ pub fn tic(
 ) {
     let mo = mouse();
     let mpos = vec2(mo.x as f32, mo.y as f32);
+    let ui_visible = game.selected_contract.is_none() && !camera.is_animating();
 
     let fuel_gauge_height = 48.0;
 
@@ -19,7 +20,8 @@ pub fn tic(
         vec2(16.0, HEIGHT as f32),
     );
 
-    if mpos.x > fuel_gauge_bounds.0.x
+    if ui_visible
+        && mpos.x > fuel_gauge_bounds.0.x
         && mpos.x < fuel_gauge_bounds.0.x + fuel_gauge_bounds.1.x
         && mpos.y > fuel_gauge_bounds.0.y
         && mpos.y < fuel_gauge_bounds.0.y + fuel_gauge_bounds.1.y
@@ -41,7 +43,6 @@ pub fn tic(
 
     for planet in REFUELLING_PLANETS {
         let planet = &planets[*planet];
-
         let distance_to_player = (player.ship.pos - planet.pos).length();
 
         if distance_to_player < planet.radius + MIN_REFUEL_DISTANCE {

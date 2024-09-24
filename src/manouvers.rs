@@ -37,7 +37,7 @@ pub fn tic(
         (game.manouver_dv.length() / MAX_MANOUVER_LENGTH).max(0.04);
 
     if !game.manouver_mode && dist < 10.0 {
-        SelectionIndicator::new(camera.world_to_screen(player.ship.pos))
+        Selector::new(camera.world_to_screen(player.ship.pos))
             .size(vec2(16.0, 16.0))
             .draw();
 

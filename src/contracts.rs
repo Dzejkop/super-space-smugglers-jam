@@ -125,9 +125,9 @@ pub fn tic(
         let src_planet = &planets[contract.src_planet];
         let dst_planet = &planets[contract.dst_planet];
         let src_pos = camera.world_to_screen(src_planet.pos);
-        let flash_indicator = (time() / 1000.0) as i32 % 2 == 0;
+        let blink = blink();
 
-        if flash_indicator {
+        if blink {
             Img::sprite_idx_with_size(320, uvec2(2, 2))
                 .at(src_pos + vec2(64.0, -64.0) * camera.scale)
                 .scale((4.0 * camera.scale).max(0.3))
@@ -137,7 +137,7 @@ pub fn tic(
         let ship_to_planet_distance =
             (player.ship.pos - src_planet.pos).length();
 
-        if camera.scale < 0.15 && flash_indicator && !game.manouver_mode {
+        if camera.scale < 0.15 && blink && !game.manouver_mode {
             circb(src_pos.x as i32, src_pos.y as i32, 8, 3);
         }
 

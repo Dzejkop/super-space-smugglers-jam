@@ -1,11 +1,11 @@
 use crate::prelude::*;
 
-pub struct SelectionIndicator {
+pub struct Selector {
     at: Vec2,
     size: Vec2,
 }
 
-impl SelectionIndicator {
+impl Selector {
     pub fn new(at: Vec2) -> Self {
         Self {
             at,

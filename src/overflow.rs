@@ -1,22 +1,22 @@
 use crate::prelude::*;
 
 pub struct OverflowIndicator {
-    id: OverflowIndicatorId,
     at: Vec2,
+    id: OverflowIndicatorTy,
 }
 
 impl OverflowIndicator {
     pub fn player(at: Vec2) -> Self {
         Self {
-            id: OverflowIndicatorId::Player,
             at,
+            id: OverflowIndicatorTy::Player,
         }
     }
 
     pub fn police(at: Vec2) -> Self {
         Self {
-            id: OverflowIndicatorId::Police,
             at,
+            id: OverflowIndicatorTy::Police,
         }
     }
 
@@ -29,24 +29,20 @@ impl OverflowIndicator {
     fn draw_ex(self) {
         let Self { id, at } = self;
 
-        let color = {
-            let is_time_even = time() % 1000.0 < 500.0;
-
-            match id {
-                OverflowIndicatorId::Player => {
-                    if is_time_even {
-                        return;
-                    } else {
-                        5
-                    }
+        let color = match id {
+            OverflowIndicatorTy::Player => {
+                if blink() {
+                    return;
+                } else {
+                    5
                 }
+            }
 
-                OverflowIndicatorId::Police => {
-                    if is_time_even {
-                        2
-                    } else {
-                        10
-                    }
+            OverflowIndicatorTy::Police => {
+                if blink() {
+                    2
+                } else {
+                    10
                 }
             }
         };
@@ -77,7 +73,7 @@ impl OverflowIndicator {
     }
 }
 
-enum OverflowIndicatorId {
+enum OverflowIndicatorTy {
     Player,
     Police,
 }

@@ -22,7 +22,7 @@ mod planets;
 mod player;
 mod police;
 mod screen_shake;
-mod selection;
+mod selector;
 mod ship;
 mod sim;
 mod text;
@@ -44,7 +44,7 @@ mod prelude {
     pub(crate) use crate::overflow::OverflowIndicator;
     pub(crate) use crate::planet::Planet;
     pub(crate) use crate::player::Player;
-    pub(crate) use crate::selection::SelectionIndicator;
+    pub(crate) use crate::selector::Selector;
     pub(crate) use crate::ship::{Ship, ShipSprite};
     pub(crate) use crate::text::Text;
     pub(crate) use crate::tic80::*;
@@ -175,8 +175,8 @@ pub fn tic() {
                 );
 
                 msgs::tic(game::get());
-                overflow::tic();
                 ui::tic(game::get_mut(), camera::get(), police::get());
+                overflow::tic();
                 sim::tic(game::get(), player::get_mut(), planets::get_mut());
             }
 
@@ -189,7 +189,7 @@ pub fn tic() {
                 match reason {
                     GameOverReason::Caught => {
                         text = "Ouch, you've been caught!";
-                        ship = ShipSprite::police();
+                        ship = ShipSprite::police(true);
                     }
                     GameOverReason::FellIntoTheSun => {
                         text = "Ouch, you fell into the sun!";

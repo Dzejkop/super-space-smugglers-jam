@@ -283,3 +283,7 @@ pub fn remap(value: f32, from: (f32, f32), to: (f32, f32)) -> f32 {
 
     (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min
 }
+
+pub fn blink() -> bool {
+    time() % 1000.0 < 500.0
+}

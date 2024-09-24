@@ -147,7 +147,7 @@ pub fn tic(game: &mut Game, camera: &Camera, police: &police::PoliceState) {
     // -- Fuel UI --
     let show_fuel =
         if game.manouver_mode && (game.fuel - game.manouver_fuel) < 0.01 {
-            time() % 1000.0 < 500.0
+            blink()
         } else {
             true
         };

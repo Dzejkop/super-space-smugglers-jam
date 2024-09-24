@@ -8,7 +8,7 @@ pub struct Ship {
 
 #[derive(Clone, Copy)]
 pub struct ShipSprite {
-    id: ShipSpriteId,
+    ty: ShipSpriteTy,
     at: Vec2,
     rot: f32,
     scale: f32,
@@ -16,9 +16,9 @@ pub struct ShipSprite {
 }
 
 impl ShipSprite {
-    fn new(id: ShipSpriteId) -> Self {
+    fn new(id: ShipSpriteTy) -> Self {
         Self {
-            id,
+            ty: id,
             at: Default::default(),
             rot: Default::default(),
             scale: 1.0,
@@ -27,11 +27,11 @@ impl ShipSprite {
     }
 
     pub fn player() -> Self {
-        Self::new(ShipSpriteId::Player)
+        Self::new(ShipSpriteTy::Player)
     }
 
-    pub fn police() -> Self {
-        Self::new(ShipSpriteId::Police)
+    pub fn police(in_pursuit: bool) -> Self {
+        Self::new(ShipSpriteTy::Police { in_pursuit })
     }
 
     pub fn at(mut self, at: Vec2) -> Self {
@@ -56,7 +56,7 @@ impl ShipSprite {
 
     pub fn draw(self, game: Option<&Game>) -> Vec2 {
         let Self {
-            id,
+            ty: id,
             at,
             rot,
             scale,
@@ -64,12 +64,17 @@ impl ShipSprite {
         } = self;
 
         let sprite = match id {
-            ShipSpriteId::Player => uvec2(16, 16),
-            ShipSpriteId::Police => {
-                if police_alternate_sprite() {
-                    uvec2(18, 16)
+            ShipSpriteTy::Player => uvec2(16, 16),
+
+            ShipSpriteTy::Police { in_pursuit } => {
+                if in_pursuit {
+                    if police_alternate_sprite() {
+                        uvec2(18, 16)
+                    } else {
+                        uvec2(20, 16)
+                    }
                 } else {
-                    uvec2(20, 16)
+                    uvec2(16, 24)
                 }
             }
         };
@@ -107,7 +112,7 @@ pub fn police_alternate_sprite() -> bool {
 }
 
 #[derive(Clone, Copy)]
-enum ShipSpriteId {
+enum ShipSpriteTy {
     Player,
-    Police,
+    Police { in_pursuit: bool },
 }
