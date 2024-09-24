@@ -197,6 +197,14 @@ pub fn tic() {
                     }
                 };
 
+                for x in 0..WIDTH {
+                    for y in 0..HEIGHT {
+                        if get_pix(x, y) > 0 {
+                            pix(x, y, 14);
+                        }
+                    }
+                }
+
                 Text::new(text)
                     .at(vec2(WIDTH as f32, y + 16.0))
                     .align_center()
