@@ -90,7 +90,7 @@ pub fn tic() {
                 row: 0,
                 repeat: true,
                 sustain: false,
-                tempo: 140,
+                tempo: 160,
                 speed: 6,
             },
         );
