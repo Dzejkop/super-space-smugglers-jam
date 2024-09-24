@@ -3,6 +3,7 @@ use crate::prelude::*;
 pub struct Player {
     pub ship: Ship,
     pub is_spawned: bool,
+    pub is_just_spawned: bool,
     pub is_caught: bool,
 }
 
@@ -12,6 +13,7 @@ static mut PLAYER: Player = Player {
         vel: vec2(-1.0, 1.0),
     },
     is_spawned: false,
+    is_just_spawned: false,
     is_caught: false,
 };
 
@@ -34,13 +36,12 @@ pub fn tic(camera: &Camera, game: &Game) -> bool {
             .draw();
 
         Text::new("Use WASD & scroll to move camera; click to")
-            .at(vec2(0.0, 8.0))
+            .at(vec2(0.0, 16.0))
             .draw();
 
-        Text::new("spawn.").at(vec2(0.0, 16.0)).draw();
+        Text::new("spawn.").at(vec2(0.0, 24.0)).draw();
 
-        player.ship.pos =
-            camera.screen_to_world(vec2(mouse().x as f32, mouse().y as f32));
+        player.ship.pos = camera.screen_to_world(mouse_pos());
     }
 
     // ---
@@ -85,10 +86,15 @@ pub fn tic(camera: &Camera, game: &Game) -> bool {
         OverflowIndicator::player(at).draw();
     }
 
+    if player.is_just_spawned {
+        player.is_just_spawned = false;
+    }
+
     if !player.is_spawned && mouse().left {
         let rot = rot - PI / 2.0;
 
         player.is_spawned = true;
+        player.is_just_spawned = true;
         player.ship.vel = vec2(rot.cos(), rot.sin());
 
         msgs::add("Good luck!");

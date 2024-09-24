@@ -13,10 +13,7 @@ pub fn tic(
         return;
     }
 
-    let mouse = mouse();
-    let mouse_xy = vec2(mouse.x as f32, mouse.y as f32);
-
-    let vec = camera.world_to_screen(player.ship.pos) - mouse_xy;
+    let vec = camera.world_to_screen(player.ship.pos) - mouse_pos();
     let dist = vec.length();
 
     game.manouver_dv = {
@@ -44,14 +41,14 @@ pub fn tic(
             .size(vec2(16.0, 16.0))
             .draw();
 
-        game.manouver_mode |= mouse.left;
+        game.manouver_mode |= mouse_left_pressed() && !player.is_just_spawned;
     }
 
-    if game.manouver_mode && (mouse.right || key(keys::X)) {
+    if game.manouver_mode && (mouse_right_pressed() || key(keys::X)) {
         game.manouver_mode = false;
     }
 
-    if game.manouver_mode && !mouse.left {
+    if game.manouver_mode && !mouse_left_hold() {
         game.manouver_mode = false;
 
         if game.manouver_dv.length() > 0.0 {

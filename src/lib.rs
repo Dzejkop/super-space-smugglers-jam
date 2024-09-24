@@ -13,16 +13,16 @@ mod fuel;
 mod game;
 mod intro;
 mod manouvers;
-mod mouse_utils;
+mod mouse_mgr;
 mod msgs;
-mod overflow_indicator;
+mod overflow;
 mod particles;
 mod planet;
 mod planets;
 mod player;
 mod police;
 mod screen_shake;
-mod selection_indicator;
+mod selection;
 mod ship;
 mod sim;
 mod text;
@@ -38,13 +38,13 @@ mod prelude {
     pub(crate) use crate::arrow::Arrow;
     pub(crate) use crate::camera::Camera;
     pub(crate) use crate::game::{Game, GameSpeed};
-    pub(crate) use crate::mouse_utils::{
-        mouse_left_pressed, mouse_right_pressed,
+    pub(crate) use crate::mouse_mgr::{
+        mouse_left_hold, mouse_left_pressed, mouse_pos, mouse_right_pressed,
     };
-    pub(crate) use crate::overflow_indicator::OverflowIndicator;
+    pub(crate) use crate::overflow::OverflowIndicator;
     pub(crate) use crate::planet::Planet;
     pub(crate) use crate::player::Player;
-    pub(crate) use crate::selection_indicator::SelectionIndicator;
+    pub(crate) use crate::selection::SelectionIndicator;
     pub(crate) use crate::ship::{Ship, ShipSprite};
     pub(crate) use crate::text::Text;
     pub(crate) use crate::tic80::*;
@@ -146,6 +146,7 @@ pub fn tic() {
                 *state = State::GameOver {
                     reason: GameOverReason::Caught,
                 };
+
                 player::get_mut().is_caught = true;
             }
 
@@ -174,7 +175,7 @@ pub fn tic() {
                 );
 
                 msgs::tic(game::get());
-                overflow_indicator::tic();
+                overflow::tic();
                 ui::tic(game::get_mut(), camera::get(), police::get());
                 sim::tic(game::get(), player::get_mut(), planets::get_mut());
             }
@@ -242,7 +243,7 @@ pub fn tic() {
             }
 
             screen_shake::tic(rng);
-            mouse_utils::tic();
+            mouse_mgr::tic();
         },
     }
 }
