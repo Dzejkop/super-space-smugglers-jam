@@ -1,8 +1,2 @@
 /target
-/Cargo.lock
-
-# Windows executable
-tic80.exe
-
-# Local TIC-80 files
 .local
