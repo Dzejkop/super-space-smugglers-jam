@@ -75,7 +75,7 @@ pub fn tic(camera: &Camera, game: &Game) -> bool {
     // ---
 
     if !player.is_caught {
-        OverflowIndicator::player(at).draw();
+        Localizator::player(at).draw();
     }
 
     if player.is_just_spawned {

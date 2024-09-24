@@ -16,9 +16,9 @@ pub struct ShipSprite {
 }
 
 impl ShipSprite {
-    fn new(id: ShipSpriteTy) -> Self {
+    fn new(ty: ShipSpriteTy) -> Self {
         Self {
-            ty: id,
+            ty,
             at: Default::default(),
             rot: Default::default(),
             scale: 1.0,

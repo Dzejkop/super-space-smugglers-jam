@@ -1,29 +1,29 @@
 use crate::prelude::*;
 
-pub struct OverflowIndicator {
+pub struct Localizator {
     at: Vec2,
-    id: OverflowIndicatorTy,
+    ty: LocalizatorTy,
 }
 
-impl OverflowIndicator {
+impl Localizator {
     pub fn player(at: Vec2) -> Self {
         Self {
             at,
-            id: OverflowIndicatorTy::Player,
+            ty: LocalizatorTy::Player,
         }
     }
 
     pub fn police(at: Vec2) -> Self {
         Self {
             at,
-            id: OverflowIndicatorTy::Police,
+            ty: LocalizatorTy::Police,
         }
     }
 
     pub fn contract(at: Vec2) -> Self {
         Self {
             at,
-            id: OverflowIndicatorTy::Contract,
+            ty: LocalizatorTy::Contract,
         }
     }
 
@@ -34,10 +34,10 @@ impl OverflowIndicator {
     }
 
     fn draw_ex(self) {
-        let Self { id, at } = self;
+        let Self { ty: id, at } = self;
 
         let color = match id {
-            OverflowIndicatorTy::Player => {
+            LocalizatorTy::Player => {
                 if blink() {
                     return;
                 } else {
@@ -45,7 +45,7 @@ impl OverflowIndicator {
                 }
             }
 
-            OverflowIndicatorTy::Police => {
+            LocalizatorTy::Police => {
                 if blink() {
                     2
                 } else {
@@ -53,7 +53,7 @@ impl OverflowIndicator {
                 }
             }
 
-            OverflowIndicatorTy::Contract => {
+            LocalizatorTy::Contract => {
                 if blink() {
                     3
                 } else {
@@ -88,13 +88,13 @@ impl OverflowIndicator {
     }
 }
 
-enum OverflowIndicatorTy {
+enum LocalizatorTy {
     Player,
     Police,
     Contract,
 }
 
-static mut INDICATORS: Vec<OverflowIndicator> = Vec::new();
+static mut INDICATORS: Vec<Localizator> = Vec::new();
 
 pub fn tic() {
     let indicators = unsafe { INDICATORS.drain(..) };

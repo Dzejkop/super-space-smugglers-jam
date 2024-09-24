@@ -134,7 +134,7 @@ pub fn tic(
                 .draw();
         }
 
-        OverflowIndicator::contract(src_pos).draw();
+        Localizator::contract(src_pos).draw();
 
         let ship_to_planet_distance =
             (player.ship.pos - src_planet.pos).length();

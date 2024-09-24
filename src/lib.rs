@@ -12,10 +12,10 @@ mod death;
 mod fuel;
 mod game;
 mod intro;
+mod localizator;
 mod manouvers;
 mod mouse_mgr;
 mod msgs;
-mod overflow;
 mod particles;
 mod planet;
 mod planets;
@@ -38,10 +38,10 @@ mod prelude {
     pub(crate) use crate::arrow::Arrow;
     pub(crate) use crate::camera::Camera;
     pub(crate) use crate::game::{Game, GameSpeed};
+    pub(crate) use crate::localizator::Localizator;
     pub(crate) use crate::mouse_mgr::{
         mouse_left_hold, mouse_left_pressed, mouse_pos, mouse_right_pressed,
     };
-    pub(crate) use crate::overflow::OverflowIndicator;
     pub(crate) use crate::planet::Planet;
     pub(crate) use crate::player::Player;
     pub(crate) use crate::selector::Selector;
@@ -176,7 +176,7 @@ pub fn tic() {
 
                 msgs::tic(game::get());
                 ui::tic(game::get_mut(), camera::get(), police::get());
-                overflow::tic();
+                localizator::tic();
                 sim::tic(game::get(), player::get_mut(), planets::get_mut());
             }
 

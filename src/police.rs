@@ -172,7 +172,7 @@ pub fn tic(
         }
 
         if let PoliceVehicleBehavior::InPursuit = &vehicle.behavior {
-            OverflowIndicator::police(vehicle_pos).draw();
+            Localizator::police(vehicle_pos).draw();
         }
 
         for _ in 0..game.steps() {
